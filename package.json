@@ -1,0 +1,19 @@
+{
+  "name": "sakar-paisen",
+  "version": "1.0.0",
+  "description": "Japonca öğrenme oyunu — Hiragana/Katakana. Saf statik site, derleme yok.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sunucu": "node sunucu.mjs",
+    "test": "playwright test",
+    "test:izle": "playwright test --headed --workers=1",
+    "test:rapor": "playwright test --reporter=html && playwright show-report",
+    "test:liste": "playwright test --list",
+    "test:hizli": "playwright test --max-failures=3 --workers=1",
+    "test:dosya": "playwright test --workers=1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}

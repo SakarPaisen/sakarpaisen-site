@@ -1,0 +1,30 @@
+# Netlify'ın kök klasörü körü körüne sunmasını engeller.
+# Yayınlanan siteye sadece site dosyaları girer; geliştirme notları ve
+# ses üretme betikleri dışarıda kalır (siteyi şişirmesin, kafa karıştırmasın).
+# NOT: Bunlar siteye gerekli DEĞİL, ama kalsalar da çalışmaya engel olmazlar.
+
+# Ses üretme betikleri (siteye hiç gerekmiyor)
+ses-uret/
+
+# Geliştirme notları
+NOTLAR.md
+README.md
+
+# Yerel sunucu betikleri + test altyapısı
+sunucu.ps1
+sunucu-tek.ps1
+sunucu.mjs
+playwright.config.mjs
+tests/
+test-results/
+package.json
+package-lock.json
+node_modules/
+TESTLER.md
+# Yeni geliştirme dosyaları (siteye gerekmiyor)
+_veri-kontrol.mjs
+YAYIN.md
+
+# Elle yazılan ders dosyaları yayınlanır (dersler/ klasörü gerekli),
+# ama taslak duran eski dersler yayınlanmasın:
+dersler/taslak/

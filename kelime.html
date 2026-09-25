@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakar Paisen | Kelime Defterim</title>
+    <meta name="theme-color" content="#e63946">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="stylesheet" href="uygulama.css?v=14">
+    <!-- Sayfa kimliği: testler ve hata raporu doğru sayfayı doğrulasın -->
+    <meta name="sp-sayfa" content="kelime">
+    <style>
+        body { margin: 0; background: var(--zemin); color: var(--yazi);
+               font-family: 'Segoe UI', 'Trebuchet MS', system-ui, sans-serif; min-height: 100vh; }
+
+        /* ---------- Çoğu çubuk ---------- */
+        .ust { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 12px;
+               padding: 12px max(14px, env(safe-area-inset-left)) 12px max(14px, env(safe-area-inset-right));
+               /* Zemin temaya uysun: koyu temada beyaz şerit kalmasın */
+               background: color-mix(in srgb, var(--zemin) 95%, transparent); backdrop-filter: blur(14px);
+               border-bottom: 2px solid var(--cizgi); }
+        .geri { background: var(--kart); border: 2px solid var(--cizgi); border-radius: 50%;
+                width: 40px; height: 40px; font-size: 20px; cursor: pointer; color: var(--yazi-soluk);
+                display: flex; align-items: center; justify-content: center; flex: none; }
+        .geri:hover { color: var(--mor); border-color: var(--mor); }
+        .baslik { font-size: 19px; font-weight: 800; }
+        .baslik span { color: var(--mor); }
+        .sayac { margin-left: auto; background: var(--kart); border: 2px solid var(--cizgi);
+                 border-radius: 999px; padding: 6px 14px; font-size: 14px; font-weight: 800;
+                 color: var(--mor); white-space: nowrap; }
+
+        .kapsayici { max-width: 900px; margin: 0 auto; padding: 20px 16px 70px; }
+
+        /* REKLAM ALANI: listenin ALTINDA durur, liste kaydırmasını kesmez.
+           reklam.js ayarı boşken gizli kalır. Bkz. reklam.js */
+        .reklam-alani { min-height: 100px; margin: 26px auto 0; max-width: 640px;
+                        background: var(--zemin-2); border: 2px dashed var(--cizgi); border-radius: 16px;
+                        display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .reklam-alani[hidden] { display: none; }
+        .reklam-alani .reklam-etiket { font-size: 11px; font-weight: 800; color: var(--yazi-soluk);
+                                       text-transform: uppercase; letter-spacing: 1px; }
+
+        /* ---------- Özet kutuları ---------- */
+        .ozet { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .o-kutu { background: var(--kart); border: 2px solid var(--cizgi); border-radius: 18px;
+                  padding: 14px 16px; box-shadow: 0 4px 0 var(--cizgi); }
+        .o-kutu b { display: block; font-size: 26px; line-height: 1.2; }
+        .o-kutu small { font-size: 12.5px; font-weight: 700; color: var(--yazi-soluk); }
+        .o-kutu.mor b { color: var(--mor); }
+        .o-kutu.turkuaz b { color: var(--turkuaz-koyu); }
+        .o-kutu.altin b { color: var(--altin-koyu); }
+        .o-kutu.kirmizi b { color: var(--kirmizi); }
+
+        /* ---------- Süzgeç ve arama ---------- */
+        .arac { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; align-items: center; }
+        /* Süzgeç çubuğu dar ekranda yatay kaydırılır; SAYFA taşmaz. */
+        .suzgec { display: flex; gap: 6px; background: var(--zemin-2); border-radius: 14px; padding: 4px;
+                  max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
+                  scrollbar-width: none; flex: none; }
+        .suzgec::-webkit-scrollbar { display: none; }
+        .suzgec button { background: none; border: none; border-radius: 10px; padding: 8px 14px;
+                         font-family: inherit; font-size: 14px; font-weight: 800; color: var(--yazi-soluk);
+                         cursor: pointer; transition: 0.15s; white-space: nowrap; flex: none; }
+        .suzgec button.aktif { background: var(--kart); color: var(--mor); box-shadow: 0 2px 0 var(--cizgi); }
+        .arama { flex: 1; min-width: 140px; background: var(--kart); border: 2px solid var(--cizgi);
+                 border-radius: 14px; padding: 11px 16px; font-family: inherit; font-size: 15px;
+                 font-weight: 700; color: var(--yazi); outline: none; max-width: 100%; }
+        .arama:focus { border-color: var(--mor); }
+        .arama::placeholder { color: #b3aa9b; font-weight: 600; }
+
+        /* ---------- Kelime listesi ---------- */
+        .liste { display: grid; gap: 10px; }
+        .kelime { background: var(--kart); border: 2px solid var(--cizgi); border-radius: 16px;
+                  padding: 14px 16px; box-shadow: 0 3px 0 var(--cizgi); display: flex;
+                  align-items: center; gap: 14px; cursor: pointer; transition: 0.15s; }
+        .kelime:hover { border-color: var(--mor); transform: translateY(-2px); }
+        .k-ja { font-size: 26px; font-weight: 800; min-width: 100px; }
+        .k-orta { flex: 1; min-width: 0; }
+        .k-ro { font-size: 15px; color: var(--yazi-soluk); font-weight: 700; }
+        .k-tr { font-size: 16px; font-weight: 800; color: var(--turkuaz-koyu); }
+        .k-sag { text-align: right; flex: none; display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+        .etiket { font-size: 11px; font-weight: 800; border-radius: 999px; padding: 3px 9px;
+                  background: var(--zemin-2); color: var(--yazi-soluk); border: 1.5px solid var(--cizgi); }
+        .etiket.katakana { background: #eef4ff; color: #3a86ff; border-color: #cfe0ff; }
+        .etiket.iyi { background: #e6f8f4; color: var(--turkuaz-koyu); border-color: #b9ece2; }
+        .etiket.zayif { background: #fff1f3; color: var(--kirmizi); border-color: #ffd0d7; }
+        .k-tarih { font-size: 11px; color: var(--yazi-soluk); font-weight: 700; }
+        .ses-btn { background: var(--mor); color: #fff; border: none; border-radius: 50%;
+                   width: 34px; height: 34px; font-size: 15px; cursor: pointer; flex: none; }
+        .ses-btn:active { transform: scale(.94); }
+
+        /* ---------- ÇALI�?MA MODU (kart destesi) ---------- */
+        .calis-katman {
+            position: fixed; inset: 0; z-index: 100; background: rgba(51, 48, 43, .6);
+            backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center;
+            padding: 20px; animation: spGir .2s ease-out both;
+        }
+        .calis-katman[hidden] { display: none; }
+        .ck-kutu {
+            background: var(--kart); border: 2px solid var(--cizgi); border-radius: 24px;
+            width: 100%; max-width: 400px; padding: 18px;
+            box-shadow: 0 10px 0 var(--cizgi), 0 22px 50px rgba(0,0,0,.2); text-align: center;
+        }
+        .ck-ust { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .ck-sayac { font-size: 13px; font-weight: 800; color: var(--yazi-soluk);
+                    background: var(--zemin-2); border-radius: 999px; padding: 5px 12px; }
+        .ck-kapat { background: none; border: 2px solid var(--cizgi); border-radius: 50%;
+                    width: 32px; height: 32px; color: var(--yazi-soluk); cursor: pointer; font-size: 15px; }
+        .ck-kapat:hover { color: var(--kirmizi); border-color: var(--kirmizi); }
+
+        /* Ön yüz: Japonca kelime */
+        .ck-ilkkart {
+            padding: 34px 16px; background: linear-gradient(160deg, #f6f3ff 0%, #fff 100%);
+            border: 2px dashed var(--mor); border-radius: 18px; cursor: pointer; transition: 0.15s;
+        }
+        .ck-ilkkart:hover { background: #f0ebff; }
+        .ck-ja { font-size: 46px; font-weight: 800; line-height: 1.2; }
+        .ck-ip { font-size: 12.5px; font-weight: 700; color: var(--yazi-soluk); margin-top: 14px; }
+
+        /* Arka yüz: anlam + okunuş + kanji + cümle */
+        .ck-arka { padding: 9px 4px 4px; animation: spGir .25s ease-out both; }
+        .ck-arka[hidden] { display: none; }
+        .ck-tr { font-size: 26px; font-weight: 800; color: var(--turkuaz-koyu); }
+        .ck-ro { font-size: 16px; font-weight: 700; color: var(--yazi-soluk); margin-top: 4px; }
+        .ck-kanji {
+            margin-top: 12px; font-size: 22px; font-weight: 800; color: var(--altin-koyu);
+            background: #fff8e8; border: 2px solid var(--altin); border-radius: 12px; padding: 8px 14px;
+            display: inline-block;
+        }
+        .ck-kanji[hidden] { display: none; }
+        .ck-cumle {
+            margin-top: 12px; padding: 10px 13px; background: var(--zemin-2); border-radius: 12px;
+            font-size: 13.5px; font-weight: 700; color: var(--yazi-soluk); line-height: 1.5; text-align: left;
+        }
+        .ck-cumle[hidden] { display: none; }
+
+        /* Alt düğmeler */
+        .ck-alt { display: flex; gap: 10px; margin-top: 16px; }
+        .ck-btn {
+            flex: 1; border: none; border-radius: 14px; padding: 14px 12px; font-family: inherit;
+            font-size: 15px; font-weight: 800; cursor: pointer; color: #fff;
+        }
+        .ck-btn.zayif { background: var(--kirmizi); box-shadow: 0 4px 0 var(--kirmizi-koyu); }
+        .ck-btn.iyi { background: var(--turkuaz); box-shadow: 0 4px 0 var(--turkuaz-koyu); }
+        .ck-btn:active { transform: translateY(4px); box-shadow: none; }
+
+        /* Bitiş ekranı */
+        .ck-son { padding: 20px 10px 8px; }
+        .ck-son-simge { font-size: 58px; margin-bottom: 8px; }
+        .ck-son-baslik { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+        .ck-son-oran { font-size: 15px; font-weight: 700; color: var(--yazi-soluk); margin-bottom: 18px; }
+
+        /* ---------- Tekrar dersi şeridi ---------- */
+        .tekrar-serit {
+            display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+            background: linear-gradient(135deg, #fff8e8 0%, #fff2d4 100%);
+            border: 2px solid var(--altin); border-radius: 18px;
+            padding: 14px 18px; margin-bottom: 16px;
+            box-shadow: 0 4px 0 #e8cf95;
+            animation: spGir .3s ease-out both;
+        }
+        .tekrar-serit[hidden] { display: none; }
+        .ts-sol { flex: 1; min-width: 160px; }
+        .ts-baslik { font-size: 16px; font-weight: 800; color: var(--altin-koyu); }
+        .ts-yazi { font-size: 13px; font-weight: 700; color: #8a6100; margin-top: 3px; }
+        .ts-btn {
+            background: var(--altin); color: #3b2c00; border: none; border-radius: 14px;
+            padding: 12px 22px; font-family: inherit; font-size: 15px; font-weight: 800;
+            letter-spacing: .4px; text-transform: uppercase; cursor: pointer;
+            box-shadow: 0 4px 0 var(--altin-koyu); flex: none;
+        }
+        .ts-btn:active { transform: translateY(4px); box-shadow: none; }
+
+        /* ---------- ÖZET �?ERİDİ: kanji'ye hazır bilgisi ---------- */
+        .kanji-serit {
+            display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+            background: linear-gradient(135deg, #fffdf5 0%, #fff8e8 100%);
+            border: 2px solid var(--altin); border-radius: 18px;
+            padding: 13px 17px; margin-bottom: 16px; box-shadow: 0 4px 0 #e8cf95;
+        }
+        .kanji-serit[hidden] { display: none; }
+        .ks-sol { flex: 1; min-width: 160px; }
+        .ks-baslik { font-size: 15px; font-weight: 800; color: var(--altin-koyu); }
+        .ks-yazi { font-size: 12.5px; font-weight: 700; color: #8a6100; margin-top: 3px; line-height: 1.45; }
+        .ks-btn {
+            background: var(--altin); color: #3b2c00; border: none; border-radius: 12px;
+            padding: 10px 18px; font-family: inherit; font-size: 14px; font-weight: 800;
+            cursor: pointer; box-shadow: 0 3px 0 var(--altin-koyu); flex: none;
+        }
+        .ks-btn:active { transform: translateY(3px); box-shadow: none; }
+
+        /* ---------- Açılır bilgi kartı ---------- */
+        .kelime.acik { border-color: var(--mor); border-bottom-left-radius: 0; border-bottom-right-radius: 0;
+                       box-shadow: 0 3px 0 var(--cizgi), 0 0 0 3px #efe9ff; }
+        .kart-detay {
+            background: linear-gradient(180deg, #faf8ff 0%, var(--kart) 100%);
+            border: 2px solid var(--mor); border-top: none;
+            border-radius: 0 0 16px 16px; padding: 0 16px 16px;
+            box-shadow: 0 3px 0 var(--cizgi);
+            animation: kartAc .22s ease-out both;
+        }
+        @keyframes kartAc { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .kd-ust-cizgi { height: 2px; background: #efe9ff; margin: 0 -16px 14px; }
+
+        /* Başlık: büyük yazım + okunuş/anlam */
+        .kd-bas { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding-top: 14px; }
+        .kd-ja { font-size: 42px; font-weight: 800; line-height: 1.1; }
+        .kd-sag { flex: 1; min-width: 140px; }
+        .kd-ro { font-size: 17px; font-weight: 700; color: var(--yazi-soluk); }
+        .kd-tr { font-size: 19px; font-weight: 800; color: var(--turkuaz-koyu); margin-top: 2px; }
+        .kd-ses { margin-top: 10px; background: var(--mor); color: #fff; border: none;
+                  border-radius: 12px; padding: 9px 16px; font-family: inherit; font-size: 14px;
+                  font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 var(--mor-golge); }
+        .kd-ses:active { transform: translateY(3px); box-shadow: none; }
+
+        /* Bölümler */
+        .kd-bolum { margin-top: 14px; padding-top: 14px; border-top: 2px dashed var(--cizgi); }
+        .kd-bolum-baslik { font-size: 12px; font-weight: 800; color: var(--yazi-soluk);
+                           text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; }
+        .kd-not { font-size: 12px; color: var(--yazi-soluk); margin-top: 8px; line-height: 1.5; }
+
+        /* Cümle içinde */
+        .kd-cumle { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .kd-cumle-ja { font-size: 21px; font-weight: 800; }
+        .kd-ses-kucuk { background: var(--kart); border: 2px solid var(--cizgi); border-radius: 50%;
+                        width: 32px; height: 32px; font-size: 14px; cursor: pointer; flex: none; }
+        .kd-cumle-ro { font-size: 13.5px; color: var(--yazi-soluk); margin-top: 4px; }
+        .kd-cumle-tr { font-size: 14.5px; font-weight: 700; color: var(--turkuaz-koyu); margin-top: 2px; }
+
+        /* Harfler */
+        .kd-harfler { display: flex; flex-wrap: wrap; gap: 7px; }
+        .kd-harf { background: var(--kart); border: 2px solid var(--cizgi); border-radius: 12px;
+                   padding: 6px 12px; cursor: pointer; transition: 0.15s; text-align: center; }
+        .kd-harf:hover { border-color: var(--mor); transform: translateY(-2px); }
+        .kd-harf b { font-size: 23px; font-weight: 700; }
+
+        /* İlerleme çubuğu + istatistik */
+        .kd-bar-kap { background: var(--zemin-2); border-radius: 999px; height: 11px;
+                      overflow: hidden; margin-bottom: 12px; }
+        .kd-bar { height: 100%; border-radius: 999px; transition: width .5s cubic-bezier(.2,.9,.3,1); }
+        .kd-ist { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
+        .kd-ist-satir { display: flex; justify-content: space-between; gap: 8px;
+                        background: var(--kart); border: 2px solid var(--cizgi); border-radius: 10px;
+                        padding: 7px 11px; }
+        .kd-ist-etiket { font-size: 12px; font-weight: 700; color: var(--yazi-soluk); }
+        .kd-ist-deger { font-size: 13px; font-weight: 800; }
+
+        /* Kanji alanı (kanji bölümü gelince aktif olacak) */
+        .kd-kanji { background: #fffdf5; margin: 14px -16px -16px; padding: 14px 16px 16px;
+                    border-radius: 0 0 14px 14px; border-top: 2px dashed var(--altin); }
+        .kd-kanji .kd-bolum-baslik { color: var(--altin-koyu); }
+        .kanji-yer { font-size: 13px; color: var(--yazi-soluk); font-style: italic; line-height: 1.5; }
+
+        /* Kanji görünümü: büyük kanji + okunuş + ses */
+        .kd-kanji-satir { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .kd-kanji-yazi {
+            font-size: 38px; font-weight: 800; line-height: 1.2; color: #8a6100;
+            letter-spacing: 2px;
+        }
+        .kd-kanji-ro { font-size: 15px; font-weight: 700; color: var(--altin-koyu); margin-top: 4px; }
+
+        /* "Kanji'ye hazır" süzgeci: altın ton (kanji bölümüyle aynı renk dili) */
+        .suzgec button[data-filtre="kanji"] { color: var(--altin-koyu); }
+        .suzgec button[data-filtre="kanji"].aktif { background: #fff8e8; color: var(--altin-koyu); }
+
+        @media (max-width: 520px) {
+            .kd-ja { font-size: 34px; }
+            .kd-cumle-ja { font-size: 18px; }
+        }
+
+        /* Boş durum */
+        .bos { text-align: center; padding: 50px 20px; }
+        .bos .simge { font-size: 62px; margin-bottom: 12px; }
+        .bos h3 { margin: 0 0 8px; font-size: 21px; }
+        .bos p { color: var(--yazi-soluk); font-size: 15px; max-width: 380px;
+                 margin: 0 auto 18px; line-height: 1.6; }
+        .bos .sp-btn { text-decoration: none; }
+
+        /* ---------- DAR EKRAN (telefon) ---------- */
+        @media (max-width: 560px) {
+            /* Sayfa yatay kaymasın: her şey ekran genişliğinde kalsın */
+            html, body { max-width: 100%; overflow-x: hidden; }
+            .kapsayici { padding: 16px 12px 60px; }
+            .kelime { flex-wrap: wrap; gap: 10px; padding: 12px 14px; }
+            .k-ja { min-width: 0; font-size: 23px; }
+            .k-orta { width: 100%; flex: 1 1 100%; }
+            .k-sag { flex-direction: row; align-items: center; width: 100%; justify-content: space-between; }
+            .ozet { grid-template-columns: 1fr 1fr; gap: 9px; }
+            .o-kutu { padding: 11px 13px; }
+            .o-kutu b { font-size: 22px; }
+            .o-kutu small { font-size: 11.5px; }
+            .ust { padding: 10px 12px; gap: 9px; }
+            .baslik { font-size: 16px; }
+            .sayac { padding: 5px 11px; font-size: 12.5px; }
+            .tekrar-serit { padding: 12px 14px; gap: 10px; }
+            .ts-btn { width: 100%; padding: 11px 16px; font-size: 14px; }
+            .arama { padding: 10px 14px; font-size: 14.5px; }
+        }
+    </style>
+</head>
+<body class="sp">
+
+    <nav class="ust">
+        <button class="geri" id="geriBtn" title="Haritaya dön" aria-label="Haritaya dön">←</button>
+        <div class="baslik">g��� Kelime <span>Defterim</span></div>
+        <!-- İstatistikler: zayıf harfleri ve genel gelişimi gör -->
+        <a class="sayac" href="istatistik.html" title="İstatistiklerim"
+           style="text-decoration:none">g���</a>
+        <!-- Ayarlar: tema/ses/zorluk -->
+        <a class="sayac" href="ayarlar.html" title="Ayarlar"
+           style="text-decoration:none">⚙️</a>
+        <div class="sayac" id="sayac">0 kelime</div>
+    </nav>
+
+    <div class="kapsayici">
+        <div class="ozet" id="ozet"></div>
+
+        <!-- Çalışma modu: kart gezinerek kelime tekrarı -->
+        <div class="calis-katman" id="calisKatman" hidden>
+            <div class="ck-kutu">
+                <div class="ck-ust">
+                    <span class="ck-sayac" id="ckSayac">1 / 10</span>
+                    <button class="ck-kapat" id="ckKapat" aria-label="Çalışmayı kapat">✅</button>
+                </div>
+                <div class="ck-ilkkart" id="ckOn">
+                    <div class="ck-ja" id="ckJa">ぐみ</div>
+                    <div class="ck-ip" id="ckIp">Cevabı görmek için dokun</div>
+                </div>
+                <div class="ck-arka" id="ckArka" hidden>
+                    <div class="ck-tr" id="ckTr">deniz</div>
+                    <div class="ck-kanji" id="ckKanji" hidden></div>
+                    <div class="ck-ro" id="ckRo">umi</div>
+                    <div class="ck-cumle" id="ckCumle" hidden></div>
+                </div>
+                <div class="ck-alt">
+                    <button class="ck-btn zayif" id="ckZor" title="Bilemedim">g��? Bilemedim</button>
+                    <button class="ck-btn iyi" id="ckKolay" title="Biliyorum">g��� Biliyorum</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="arac">
+            <div class="suzgec" id="suzgec">
+                <button data-filtre="hepsi" class="aktif">Hepsi</button>
+                <button data-filtre="h" title="Hiragana ile yazılan kelimeler">Hiragana</button>
+                <button data-filtre="k" title="Katakana ile yazılan kelimeler">Katakana</button>
+                <button data-filtre="zor" title="En çok zorlandıkların">Zorlandıklarım</button>
+                <button data-filtre="kanji" title="Kanji öğrenmeye hazır kelimeler">漢 Kanji'ye hazır</button>
+            </div>
+            <input class="arama" id="arama" type="search" placeholder="Ara: Japonca, romaji veya Türkçe←" autocomplete="off">
+        </div>
+
+        <!-- Kanji'ye hazır bilgisi: yeterince kelime öğrenildiğinde görünür -->
+        <div class="kanji-serit" id="kanjiSerit" hidden>
+            <div class="ks-sol">
+                <div class="ks-baslik">漢 Kanji öğrenmeye hazırsın</div>
+                <div class="ks-yazi" id="ksYazi"></div>
+            </div>
+            <button class="ks-btn" id="ksBtn">LİSTEYİ GÖR</button>
+        </div>
+
+        <!-- Tekrar dersi: defterdeki zayıf kelimelerle 8 soruluk kısa çalışma.
+             Sadece defterde yeterli kelime olduğunda görünür. -->
+        <div class="tekrar-serit" id="tekrarSerit" hidden>
+            <div class="ts-sol">
+                <div class="ts-baslik" id="tsBaslik">Tekrar zamanı</div>
+                <div class="ts-yazi" id="tsYazi"></div>
+            </div>
+            <button class="ts-btn" id="tsBtn">TEKRAR ÇALI�?</button>
+        </div>
+
+        <!-- Kart destesiyle çalışma: aktif hatırlama -->
+        <div class="tekrar-serit" id="calisSerit" hidden
+             style="background: linear-gradient(135deg, #f6f3ff 0%, #efe9ff 100%); border-color: var(--mor); box-shadow: 0 4px 0 #c9b8f5;">
+            <div class="ts-sol">
+                <div class="ts-baslik" style="color: var(--mor);">g���️ Kartlarla çalış</div>
+                <div class="ts-yazi" style="color: #5b44c0;" id="calisYazi"></div>
+            </div>
+            <button class="ts-btn" id="calisBtn" style="background: var(--mor); color: #fff; box-shadow: 0 4px 0 var(--mor-golge);">ÇALI�?</button>
+        </div>
+
+        <div class="liste" id="liste"></div>
+        <div class="bos" id="bos" hidden>
+            <div class="simge">g���</div>
+            <h3>Defterin henüz boş</h3>
+            <p>Derslerde öğrettiğin kelimeler burada birikir. Haritaya dönüp bir ders yap, sonra buraya bak.</p>
+            <a class="sp-btn" href="dojo.html">← Haritaya dön</a>
+        </div>
+
+        <!-- GÖNLÜK GÖREVLER: defterdeki kelimelerle ilgili görevler burada da görünsün.
+             İçerik JS ile doldurulur; görev yoksa gizli kalır. -->
+        <div class="kart-kutu" id="kelimeGorev" style="margin-top:22px" hidden>
+            <h4>g��� Bugünün görevleri</h4>
+            <div id="kelimeGorevListe"></div>
+        </div>
+
+        <!-- REKLAM: ayar boşken gizli. Liste akışını kesmesin diye en altta. -->
+        <div class="reklam-alani" data-reklam="1" hidden>
+            <span class="reklam-etiket">Reklam</span>
+        </div>
+    </div>
+
+    <script src="mufredat.js?v=3"></script>
+    <script src="ilerleme.js?v=11"></script>
+    <script src="ses.js?v=5"></script>
+    <script src="reading.js?v=14"></script>
+    <script src="hata-rapor.js?v=3"></script>
+    <script src="kelime.js?v=10"></script>
+    <script src="pwa.js?v=5"></script>
+    <!-- BULUT KAYIT: ayar boşken kapalı, site yerel çalışır. Bkz. bulut.js -->
+    <script src="bulut.js?v=3"></script>
+    <!-- ANALİTİK: token girilene kadar kapalı. Bkz. analitik.js -->
+    <script src="analitik.js?v=2" defer></script>
+    <script>window.addEventListener('load', function () { if (window.Analitik) window.Analitik.sayfa('kelime'); });</script>
+    <!-- AYARLAR: tema/ses/animasyon burada da geçerli. Bkz. ayarlar.js -->
+    <script src="ayarlar.js?v=1"></script>
+    <!-- GÖNLÜK GÖREVLER: kelime defterine eklenen YENİ kelimeler görevi besler. -->
+    <script src="gorevler.js?v=2"></script>
+    <script src="basarimlar.js?v=2"></script>
+    <!-- DURUM �?ERİDİ + HEDİYE: diğer sayfalarla aynı üst bilgi -->
+    <script src="hediye.js?v=2"></script>
+    <script src="serit.js?v=1"></script>
+    <!-- REKLAM: ayar boşken tamamen kapalı. Bkz. reklam.js -->
+    <script src="reklam.js?v=1" defer></script>
+    <script>
+        HataRapor.kur();
+
+        // ---------- DURUM �?ERİDİ ----------
+        // Çoğu menünün ALTINA yerleşir (menüyü itmesin).
+        if (window.Serit) Serit.kur('.ust', { yuzen: false });
+
+        // ---------- GÖNLÜK GÖREVLER PANELİ ----------
+        // Defterdeki kullanıcı, görevinin "5 kelime ekle" olduğunu burada da görsün.
+        (function kelimeGorevleriCiz() {
+            if (!window.Gorevler) return;
+            const kutu = document.getElementById('kelimeGorev');
+            const kap = document.getElementById('kelimeGorevListe');
+            if (!kutu || !kap) return;
+            const liste = Gorevler.liste();
+            if (!liste.length) return;
+            kutu.hidden = false;
+            liste.forEach(g => {
+                const satir = document.createElement('div');
+                satir.className = 'gorev-satir' + (g.tamam ? ' tamam' : '');
+                const simge = document.createElement('div');
+                simge.className = 'gorev-simge';
+                simge.textContent = g.tamam ? '✨' : g.simge;
+                const orta = document.createElement('div');
+                orta.className = 'gorev-orta';
+                const baslik = document.createElement('b');
+                baslik.textContent = g.ad;
+                const sayi = document.createElement('small');
+                sayi.textContent = g.ilerleme + ' / ' + g.hedef;
+                const bar = document.createElement('div');
+                bar.className = 'gorev-bar';
+                const ic = document.createElement('div');
+                ic.style.width = Math.round(g.ilerleme / g.hedef * 100) + '%';
+                bar.append(ic);
+                orta.append(baslik, sayi, bar);
+                const odul = document.createElement('div');
+                odul.className = 'gorev-odul';
+                odul.textContent = '+' + g.odul;
+                satir.append(simge, orta, odul);
+                kap.append(satir);
+            });
+        })();
+
+        let suzgec = 'hepsi';
+        let aramaMetni = '';
+
+        function el(tag, sinif, metin) {
+            const e = document.createElement(tag);
+            if (sinif) e.className = sinif;
+            if (metin !== undefined) e.textContent = metin;
+            return e;
+        }
+
+        // NOT: AYLAR ve tarihYaz(), "AÇILIR BİLGİ KARTI" bölümünde tanımlanır.
+        // Burada tekrar tanımlamayın (çift tanım hatası verir).
+
+        // ---------- Özet ----------
+        function ozetCiz(hepsi) {
+            const kap = document.getElementById('ozet');
+            kap.replaceChildren();
+            const katakanaSayi = hepsi.filter(x => x.kelime.kana === 'k' || x.kelime.kana === 'hk').length;
+            const zorSayi = hepsi.filter(x => x.yanlis > 0).length;
+            const dogruToplam = hepsi.reduce((t, x) => t + x.dogru, 0);
+            const yanlisToplam = hepsi.reduce((t, x) => t + x.yanlis, 0);
+            const basari = (dogruToplam + yanlisToplam) > 0 ? Math.round(dogruToplam / (dogruToplam + yanlisToplam) * 100) : 0;
+
+            const kutular = [
+                { sinif: 'mor', sayi: hepsi.length, etiket: 'toplam kelime' },
+                { sinif: 'turkuaz', sayi: katakanaSayi, etiket: 'katakana kelime' },
+                { sinif: 'altin', sayi: basari + '%', etiket: 'doğru cevap oranı' },
+                { sinif: zorSayi > 0 ? 'kirmizi' : '', sayi: zorSayi, etiket: 'zorlandığın kelime' }
+            ];
+            kutular.forEach(k => {
+                const b = el('div', 'o-kutu ' + k.sinif);
+                b.append(el('b', '', String(k.sayi)), el('small', '', k.etiket));
+                kap.append(b);
+            });
+        }
+
+        // ---------- Liste ----------
+        // KANJİ VERİSİ
+        // Kelime defterinin ikinci amacı: kanji öğrenmeye geçildiğinde bu kana
+        // kelimelerinin kanji yazımını göstermek. Aşağıdaki eşleme, kana kelimesi
+        // -> kanji yazımı + okunuş biçimini tutar. Yeni kelime eklendikçe büyür.
+        //
+        // Neden ayrı bir liste? Kanji verisi reading.js'teki kana sözlüğün
+        // bir "üst katmanı": aynı kelimenin kanji karşılığı. Ayrı tutmak, kanji
+        // bölümünü sonradan eklerken kana derslerini bozmamayı sağlar.
+        const KANJI = {
+            'わたし': { k: '\u79C1', ro: 'watashi' },
+            'あなた': { k: '\u8CB4\u65B9', ro: 'anata' },
+            'せんせい': { k: '\u5148\u751F', ro: 'sensei' },
+            'がくせい': { k: '\u5B66\u751F', ro: 'gakusei' },
+            'ともだち': { k: '\u53CB\u9054', ro: 'tomodachi' },
+            'ねこ': { k: '\u732B', ro: 'neko' },
+            'ぐぬ':     { k: 'çŠ¬',     ro: 'inu' },
+            'とり': { k: '\u9CE5', ro: 'tori' },
+            'ぐぐな':   { k: 'é­š',     ro: 'sakana' },
+            'ほん': { k: '\u672C', ro: 'hon' },
+            'みず':     { k: 'æ°´',     ro: 'mizu' },
+            'おちゃ': { k: '\u304A\u8336', ro: 'ocha' },
+            'ごはん': { k: '\u3054\u98EF', ro: 'gohan' },
+            'くるま': { k: '\u8ECA', ro: 'kuruma' },
+            'ぐち':     { k: 'å®¶',     ro: 'uchi' },
+            'がっこう': { k: '\u5B66\u6821', ro: 'gakkou' },
+            'やま': { k: '\u5C71', ro: 'yama' },
+            'かわ': { k: '\u5DDD', ro: 'kawa' },
+            'はな':     { k: 'èŠ±',     ro: 'hana' },
+            'そら': { k: '\u7A7A', ro: 'sora' },
+            'ぐみ':     { k: 'æµ·',     ro: 'umi' },
+            'まち':     { k: 'ç←º',     ro: 'machi' },
+            'みち': { k: '\u9053', ro: 'michi' },
+            'もり': { k: '\u68EE', ro: 'mori' },
+            'つき': { k: '\u6708', ro: 'tsuki' },
+            'ほし':     { k: 'æ✨Ÿ',     ro: 'hoshi' },
+            'か�?く':   { k: '家族',   ro: 'kazoku' },
+            'おかあさん': { k: '\u304A\u6BCD\u3055\u3093', ro: 'okaasan' },
+            'おとうさん': { k: '\u304A\u7236\u3055\u3093', ro: 'otousan' },
+            'こども': { k: '\u5B50\u4F9B', ro: 'kodomo' },
+            'たべる': { k: '\u98DF\u3079\u308B', ro: 'taberu' },
+            'のむ': { k: '\u98F2\u3080', ro: 'nomu' },
+            'みる': { k: '\u898B\u308B', ro: 'miru' },
+            'きく':     { k: '�?く',   ro: 'kiku' },
+            'いく': { k: '\u884C\u304F', ro: 'iku' },
+            'くる': { k: '\u6765\u308B', ro: 'kuru' },
+            'おきぐ': { k: 'å¤§きぐ', ro: 'ookii' },
+            'ちいさい': { k: '小さい', ro: 'chiisai' },
+            'あたらしい': { k: '\u65B0\u3057\u3044', ro: 'atarashii' },
+            'ふるい': { k: '\u53E4\u3044', ro: 'furui' },
+            'あつい': { k: '\u6691\u3044', ro: 'atsui' },
+            'さむい': { k: '\u5BD2\u3044', ro: 'samui' },
+            'おいしい': { k: '\u7F8E\u5473\u3057\u3044', ro: 'oishii' },
+            'たぐぐ':   { k: 'é«✨ぐ',   ro: 'takai' },
+            'やすい': { k: '\u5B89\u3044', ro: 'yasui' },
+            'ながい': { k: '\u9577\u3044', ro: 'nagai' },
+            'あかい': { k: '\u8D64\u3044', ro: 'akai' },
+            'しろい': { k: '\u767D\u3044', ro: 'shiroi' },
+            'かわいい': { k: '\u53EF\u611B\u3044', ro: 'kawaii' },
+            'おかね': { k: '\u304A\u91D1', ro: 'okane' },
+            'えき': { k: '\u99C5', ro: 'eki' },
+            'でんしゃ': { k: '\u96FB\u8ECA', ro: 'densha' },
+            'びょういん': { k: '\u75C5\u9662', ro: 'byouin' },
+            'みぐ':     { k: 'åº—',     ro: 'mise' },
+            'たべもの': { k: '\u98DF\u3079\u7269', ro: 'tabemono' },
+            'のみもの': { k: '\u98F2\u307F\u7269', ro: 'nomimono' },
+            'じかん': { k: '\u6642\u9593', ro: 'jikan' },
+            'きょう': { k: '\u4ECA\u65E5', ro: 'kyou' },
+            'あした': { k: '\u660E\u65E5', ro: 'ashita' },
+            'きのぐ':   { k: 'æ✨¨æ—¥',   ro: 'kinou' },
+            'ぐま':     { k: 'ä»Š',     ro: 'ima' },
+            'あさ': { k: '\u671D', ro: 'asa' },
+            'よる': { k: '\u591C', ro: 'yoru' },
+            'なまえ': { k: '\u540D\u524D', ro: 'namae' },
+            'しぐと':   { k: 'ä»←äº←',   ro: 'shigoto' },
+            'にほんご': { k: '\u65E5\u672C\u8A9E', ro: 'nihongo' },
+            'えいご': { k: '\u82F1\u8A9E', ro: 'eigo' },
+            'ことば': { k: '\u8A00\u8449', ro: 'kotoba' },
+            'べんきょう': { k: '\u52C9\u5F37', ro: 'benkyou' },
+            'すき': { k: '\u597D\u304D', ro: 'suki' },
+            'げんき': { k: '\u5143\u6C17', ro: 'genki' },
+            'たのしぐ': { k: 'æ¥½しぐ', ro: 'tanoshii' },
+            'きれい': { k: '\u7DBA\u9E97', ro: 'kirei' },
+            'ところ': { k: '\u6240', ro: 'tokoro' },
+        };
+
+        // Kelimenin kanji karşılığı var mı? Varsa kanji bilgisi döner.
+        function kanjiBilgisi(kelime) {
+            return KANJI[kelime.ja] || null;
+        }
+
+        function süz(hepsi) {
+            let l = hepsi;
+            if (suzgec === 'h') l = l.filter(x => x.kelime.kana === 'h');
+            else if (suzgec === 'k') l = l.filter(x => x.kelime.kana === 'k' || x.kelime.kana === 'hk');
+            else if (suzgec === 'zor') l = l.filter(x => x.yanlis > 0).sort((a, b) => a.oran - b.oran);
+            // KANJİ'YE HAZIR: kanji karşılığı bilinen ve EN AZ 2 kez doğru bilinen
+            // kelimeler. Böylece kullanıcı "artık kanjiye geçebilirim" hissi alır.
+            else if (suzgec === 'kanji') {
+                l = l.filter(x => kanjiBilgisi(x.kelime) && x.dogru >= 2);
+            }
+
+            if (aramaMetni) {
+                const q = aramaMetni.toLowerCase();
+                l = l.filter(x =>
+                    x.kelime.ja.indexOf(q) > -1 ||
+                    (x.kelime.ro || '').toLowerCase().indexOf(q) > -1 ||
+                    (x.kelime.tr || '').toLowerCase().indexOf(q) > -1);
+            }
+            return l;
+        }
+
+        // KANJİ'YE HAZIR �?ERİDİ
+        // Kanji karşılığı bilinen ve en az 2 kez doğru bilinen kelimeler varsa
+        // kullanıcıya "artık kanji öğrenebilirsin" mesajı gösterilir.
+        // Bu, defterin ikinci amacını somutlaştırır.
+        function kanjiSeridiGuncelle(hepsi) {
+            const serit = document.getElementById('kanjiSerit');
+            if (!serit) return;
+            const hazir = hepsi.filter(x => kanjiBilgisi(x.kelime) && x.dogru >= 2);
+            if (hazir.length < 5) { serit.hidden = true; return; }
+
+            serit.hidden = false;
+            document.getElementById('ksYazi').textContent =
+                hazir.length + ' kelimeni kanji ile de yazabilirsin. Listeye bakıp nasıl yazıldığını görebilirsin.';
+            document.getElementById('ksBtn').onclick = () => {
+                suzgec = 'kanji';
+                document.querySelectorAll('#suzgec button').forEach(x =>
+                    x.classList.toggle('aktif', x.dataset.filtre === 'kanji'));
+                listeyiCiz();
+                // Listeye kaydır
+                document.getElementById('liste').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+        }
+
+        function listeyiCiz() {
+            const hepsi = KelimeDefteri.liste();
+            ozetCiz(hepsi);
+            kanjiSeridiGuncelle(hepsi);
+            document.getElementById('sayac').textContent = hepsi.length + ' kelime';
+
+            const l = süz(hepsi);
+            const kap = document.getElementById('liste');
+            const bos = document.getElementById('bos');
+            kap.replaceChildren();
+
+            if (!hepsi.length) {
+                bos.hidden = false;
+                document.getElementById('ozet').hidden = true;
+                document.querySelector('.arac').hidden = true;
+                document.getElementById('tekrarSerit').hidden = true;
+                document.getElementById('kanjiSerit').hidden = true;
+                document.getElementById('calisSerit').hidden = true;
+                return;
+            }
+            bos.hidden = true;
+            document.getElementById('ozet').hidden = false;
+            document.querySelector('.arac').hidden = false;
+            tekrarSeridiGuncelle(hepsi);
+
+            if (!l.length) {
+                const b = el('div', 'bos');
+                b.append(el('div', 'simge', 'g��?'), el('h3', '', 'Eşleşen kelime yok'),
+                    el('p', '', 'Aramanı değiştir ya da süzgeci "Hepsi" yap.'));
+                kap.append(b);
+                return;
+            }
+
+            l.forEach(x => {
+                const k = x.kelime;
+                const kutu = el('div', 'kelime');
+
+                const ja = el('div', 'k-ja', k.ja);
+                const orta = el('div', 'k-orta');
+                orta.append(el('div', 'k-ro', k.ro || '—'), el('div', 'k-tr', k.tr || '—'));
+
+                const sag = el('div', 'k-sag');
+                if (k.kana === 'k' || k.kana === 'hk') sag.append(el('span', 'etiket katakana', 'Katakana'));
+                if (x.yanlis > 0 && x.oran < 0.7) sag.append(el('span', 'etiket zayif', 'tekrar et'));
+                else if (x.toplam >= 2 && x.oran === 1) sag.append(el('span', 'etiket iyi', 'biliyorsun'));
+                sag.append(el('div', 'k-tarih', tarihYaz(x.son)));
+
+                const ses = el('button', 'ses-btn', 'g���');
+                ses.title = 'Dinle';
+                ses.onclick = (ev) => { ev.stopPropagation(); Ses.oku(k.ja, true); };
+
+                kutu.append(ja, orta, sag, ses);
+
+                // Açılır bilgi kartı: kelimeyi tıklayınca aşağıda zengin bir kart açılır.
+                kutu.addEventListener('click', () => {
+                    const acik = kutu.classList.contains('acik');
+                    // Başka açık kartları kapat (tek seferde biri açık olsun)
+                    kap.querySelectorAll('.kelime.acik').forEach(z => {
+                        z.classList.remove('acik');
+                        const dd = z.nextElementSibling;
+                        if (dd && dd.classList.contains('kart-detay')) dd.remove();
+                    });
+                    if (acik) return;   // zaten açıktı: kapat ve çık
+                    kutu.classList.add('acik');
+                    kutu.after(bilgiKarti(k, x));
+                });
+
+                kap.append(kutu);
+            });
+        }
+
+        // ---------- AÇILIR BİLGİ KARTI ----------
+        // Kelimeye tıklayınca gösterilir. İçinde:
+        //   ← büyük yazım + okunuş + anlam
+        //   ← kelimenin geçtiği ÖRNEK CÜMLE (sözlükten bulunur)
+        //   ← harflerine ayrılış (kanji öğrenmeye hazırlık)
+        //   ← öğrenme istiği ve ilerleme çubuğu
+        //   ← kanji alanı (kanji bölümü gelince dolacak)
+        const AYLAR = ['Oca', '�?ub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
+
+        function tarihYaz(t) {
+            if (!t) return '—';
+            const p = String(t).split('-');
+            if (p.length < 3) return t;
+            return [p[2], AYLAR[parseInt(p[1], 10) - 1] || p[1], p[0]].join(' ');
+        }
+
+        // Kelimeyi harflerine ayır: 読み -> [読, み]  (kanji öğrenirken temel)
+        function harflereAyir(ja) {
+            return Array.from(String(ja || ''));
+        }
+
+        // Bu kelimenin geçtiği bir cümleyi bul (reading.js CUMLELER'inden).
+        function ornekCumle(kelime) {
+            try {
+                const cumleler = (window.READING && window.READING.CUMLELER) ? window.READING.CUMLELER : [];
+                const bulunan = cumleler.filter(c => c.ja.indexOf(kelime.ja) > -1);
+                // En kısa cümle en anlaşılır olandır
+                bulunan.sort((a, b) => a.ja.length - b.ja.length);
+                return bulunan[0] || null;
+            } catch (e) { return null; }
+        }
+
+        function bilgiKarti(k, x) {
+            const kart = el('div', 'kart-detay');
+
+            // 1) Başlık bölümü: büyük yazım + okunuş + anlam
+            const bas = el('div', 'kd-bas');
+            const buyuk = el('div', 'kd-ja', k.ja);
+            const sag = el('div', 'kd-sag');
+            sag.append(el('div', 'kd-ro', k.ro || '—'), el('div', 'kd-tr', k.tr || '—'));
+            const sesBuyuk = el('button', 'kd-ses', 'g��� Dinle');
+            sesBuyuk.onclick = (ev) => { ev.stopPropagation(); Ses.oku(k.ja, true); };
+            sag.append(sesBuyuk);
+            bas.append(buyuk, sag);
+            kart.append(bas);
+
+            // 2) Örnek cümle (varsa)
+            const cumle = ornekCumle(k);
+            if (cumle) {
+                const cb = el('div', 'kd-bolum');
+                cb.append(el('div', 'kd-bolum-baslik', 'g��? Cümle içinde'));
+                const satir = el('div', 'kd-cumle');
+                satir.append(el('span', 'kd-cumle-ja', cumle.ja));
+                const sesCumle = el('button', 'kd-ses-kucuk', 'g���');
+                sesCumle.title = 'Cümleyi dinle';
+                sesCumle.onclick = (ev) => { ev.stopPropagation(); Ses.oku(cumle.ja, true); };
+                satir.append(sesCumle);
+                cb.append(satir, el('div', 'kd-cumle-ro', cumle.ro), el('div', 'kd-cumle-tr', cumle.tr));
+                kart.append(cb);
+            }
+
+            // 3) Harflerine ayırma — kanji öğrenmeye hazırlık
+            const harfler = harflereAyir(k.ja);
+            const hb = el('div', 'kd-bolum');
+            hb.append(el('div', 'kd-bolum-baslik', 'g��� Harfleri'));
+            const hkap = el('div', 'kd-harfler');
+            harfler.forEach(h => {
+                const ci = el('div', 'kd-harf');
+                ci.append(el('b', '', h));
+                // Romanize edilmiş parçayı tahmin et: kelimenin romajisini harf sayısına böl
+                ci.title = 'Dinlemek için tıkla';
+                ci.onclick = (ev) => { ev.stopPropagation(); Ses.oku(h, true); };
+                hkap.append(ci);
+            });
+            hb.append(hkap);
+            hb.append(el('div', 'kd-not', 'Kanji öğrenirken bu harflerin kanji karşılıklarını göreceksin.'));
+            kart.append(hb);
+
+            // 4) Öğrenme istiği + ilerleme çubuğu
+            const sb = el('div', 'kd-bolum');
+            sb.append(el('div', 'kd-bolum-baslik', 'g��� Öğrenme durumu'));
+            const oran = Math.round(x.oran * 100);
+            const barKap = el('div', 'kd-bar-kap');
+            const bar = el('div', 'kd-bar');
+            bar.style.width = Math.max(oran, 4) + '%';
+            bar.style.background = oran >= 80 ? 'var(--turkuaz)' : (oran >= 50 ? 'var(--altin)' : 'var(--kirmizi)');
+            barKap.append(bar);
+            sb.append(barKap);
+
+            const ist = el('div', 'kd-ist');
+            const satirlar = [
+                ['Doğru', String(x.dogru)],
+                ['Yanlış', String(x.yanlis)],
+                ['Başarı', oran + '%'],
+                ['İlk gördüğün', tarihYaz(x.ilk)],
+                ['Son tekrar', tarihYaz(x.son)]
+            ];
+            satirlar.forEach(([etiket, deger]) => {
+                const s = el('div', 'kd-ist-satir');
+                s.append(el('span', 'kd-ist-etiket', etiket), el('span', 'kd-ist-deger', deger));
+                ist.append(s);
+            });
+            sb.append(ist);
+            kart.append(sb);
+
+            // 5) KANJİ ALANI — gerçek veri varsa göster
+            const kj = kanjiBilgisi(k);
+            const kb = el('div', 'kd-bolum kd-kanji');
+            kb.append(el('div', 'kd-bolum-baslik', '漢 Kanji yazımı'));
+            if (kj) {
+                const satir = el('div', 'kd-kanji-satir');
+                satir.append(el('div', 'kd-kanji-yazi', kj.k));
+                const ses = el('button', 'kd-ses-kucuk', 'g���');
+                ses.title = 'Kanji okunuşunu dinle';
+                ses.onclick = (ev) => { ev.stopPropagation(); Ses.oku(kj.ro, true); };
+                satir.append(ses);
+                kb.append(satir);
+                kb.append(el('div', 'kd-kanji-ro', kj.ro));
+                kb.append(el('div', 'kd-not',
+                    'Bu kelimeyi kanji ile de yazabilirsin. İkisi de doğru; günlük yazıda kanji, çocuk kitaplarında kana kullanılır.'));
+            } else {
+                kb.append(el('div', 'kanji-yer',
+                    'Bu kelimenin kanji karşılığı sözlükte yok. İleride eklenecek.'));
+            }
+            kart.append(kb);
+
+            return kart;
+        }
+
+        // ---------- TEKRAR DERSİ ----------
+        // Defterdeki zayıf (yanlışı olan) kelimelerden 8 soruluk kısa bir çalışma üretir
+        // ve ders motoruna (oyun.html) devreder. Sorular sessionStorage'da taşınır;
+        // oyun.html bunları bulursa dojo yerine bu dersi oynatır.
+        function tekrarSeridiGuncelle(hepsi) {
+            const serit = document.getElementById('tekrarSerit');
+            const zor = hepsi.filter(x => x.yanlis > 0);
+            const toplam = hepsi.length;
+
+            // En az 4 kelime yoksa tekrar dersi anlamlı olmaz
+            if (toplam < 4) { serit.hidden = true; return; }
+
+            // Tekrar sırası: en çok zorlandığın önce, sonra en eski tekrar
+            const sirali = (zor.length >= 4 ? zor : hepsi).slice().sort((a, b) => {
+                if (a.oran !== b.oran) return a.oran - b.oran;      // başarısı düğük önce
+                return (a.son || '').localeCompare(b.son || '');     // eski tekrar önce
+            });
+            const secilecek = sirali.slice(0, 8);
+
+            // KARTLARLA ÇALI�? şeridi: en az 8 kelime varsa aktif hatırlama önerilir.
+            // (Liste gezmek öğrenme değil; kart destesi aktif hatırlama sağlar.)
+            const calisSerit = document.getElementById('calisSerit');
+            if (toplam >= 8) {
+                calisSerit.hidden = false;
+                const kartSayisi = Math.min(15, toplam);
+                document.getElementById('calisYazi').textContent =
+                    kartSayisi + ' kartlik hızlı çalışma · zayıf kelimeler önce';
+                document.getElementById('calisBtn').onclick = () => calismayiBaslat(hepsi);
+            } else {
+                calisSerit.hidden = true;
+            }
+
+            serit.hidden = false;
+            document.getElementById('tsBaslik').textContent =
+                zor.length >= 4 ? 'g��? Tekrar zamanı' : 'g���️ Kelimeleri pekiştir';
+            document.getElementById('tsYazi').textContent =
+                secilecek.length + ' kelime ile kısa bir tekrar' +
+                (zor.length ? ' · ' + zor.length + ' kelimede zorlanmışsın' : '');
+
+            document.getElementById('tsBtn').onclick = () => {
+                // Soruları toplama (app.js 'kelime' tipini bekler)
+                const adimlar = [];
+                secilecek.forEach(x => {
+                    adimlar.push({ tip: 'kelime-ogret', kelime: x.kelime });
+                    // Anlam sorusu: şıklar sözlükten
+                    const sik = anlamSiklar(x.kelime);
+                    if (sik) {
+                        adimlar.push({
+                            tip: 'kelime', kelime: x.kelime,
+                            soru: 'Bu kelimenin anlamı ne?',
+                            dogru: x.kelime.tr, siklar: sik
+                        });
+                    }
+                    // Dinleme sorusu: sesi duy, kelimeyi seç
+                    const dinleSik = kelimeSiklar(x.kelime);
+                    if (dinleSik) {
+                        adimlar.push({
+                            tip: 'dinle-cumle', kelime: x.kelime,
+                            soru: 'Dinle: hangi kelime?',
+                            ses: x.kelime.ja,
+                            dogru: x.kelime.ja, siklar: dinleSik
+                        });
+                    }
+                });
+                if (!adimlar.length) return;
+
+                try {
+                    sessionStorage.setItem('sakar_tekrar_ders', JSON.stringify({
+                        baslik: 'Kelime tekrarı',
+                        xp: 40, can: 4,
+                        adimlar: adimlar
+                    }));
+                } catch (e) { }
+                window.location.href = 'oyun.html?ders=tekrar-kelime';
+            };
+        }
+
+        // Anlam sorusu için şıklar (biri doğru, üçü sözlükten)
+        function anlamSiklar(kelime) {
+            const sozluk = (window.READING && window.READING.SOZLUK) ? window.READING.SOZLUK : [];
+            const aday = sozluk.filter(k => k.tr && k.tr !== kelime.tr);
+            const sec = [];
+            const gorulen = { [kelime.tr]: true };
+            for (const k of karistir(aday)) {
+                if (gorulen[k.tr]) continue;
+                gorulen[k.tr] = true;
+                sec.push(k.tr);
+                if (sec.length >= 3) break;
+            }
+            if (sec.length < 2) return null;
+            return [kelime.tr].concat(sec);
+        }
+
+        // Dinleme sorusu için şıklar (Japonca yazımlar)
+        function kelimeSiklar(kelime) {
+            const sozluk = (window.READING && window.READING.SOZLUK) ? window.READING.SOZLUK : [];
+            const aday = sozluk.filter(k => k.ja !== kelime.ja && k.kana === kelime.kana);
+            const sec = [];
+            const gorulen = { [kelime.ja]: true };
+            for (const k of karistir(aday)) {
+                if (gorulen[k.ja]) continue;
+                gorulen[k.ja] = true;
+                sec.push(k.ja);
+                if (sec.length >= 3) break;
+            }
+            if (sec.length < 2) return null;
+            return [kelime.ja].concat(sec);
+        }
+
+        function karistir(dizi) {
+            const a = dizi.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                const t = a[i]; a[i] = a[j]; a[j] = t;
+            }
+            return a;
+        }
+
+        // ---------- ÇALI�?MA MODU (kart destesi) ----------
+        // Defterdeki kelimelerle kart tekrar: önce Japonca görünür,
+        // dokunca anlam + romaji + kanji + örnek cümle açılır.
+        // Sonra "Bilemedim / Biliyorum" ile ilerlenir.
+        //
+        // Neden ayrı bir mod? Liste gezmek öğrenme değil; aktif hatırlama gerekir.
+        // Bu mod, kanji öncesi kana pekiştirmesi için en verimli yöntem.
+        let ckDeste = [];
+        let ckIndex = 0;
+        let ckDogru = 0;
+
+        function calismayiBaslat(liste) {
+            if (!liste || liste.length < 2) return;
+            // En zayıflar önce, sonra gerisi karışık
+            const zayiflar = liste.filter(x => x.yanlis > 0).sort((a, b) => a.oran - b.oran);
+            const digerleri = karistir(liste.filter(x => x.yanlis === 0));
+            ckDeste = zayiflar.concat(digerleri).slice(0, 15);
+            ckIndex = 0; ckDogru = 0;
+            document.getElementById('calisKatman').hidden = false;
+            ckCiz();
+            document.addEventListener('keydown', ckKlavye);
+        }
+
+        function ckKapat() {
+            document.getElementById('calisKatman').hidden = true;
+            document.removeEventListener('keydown', ckKlavye);
+            listeyiCiz();
+        }
+
+        function ckKlavye(e) {
+            if (e.key === 'Escape') { ckKapat(); return; }
+            if (e.key === String.fromCharCode(32) || e.key === "Enter") { e.preventDefault(); ckCevir(); return; }
+            if (e.key === '1') { e.preventDefault(); ckIsaretle(false); }
+            if (e.key === '2') { e.preventDefault(); ckIsaretle(true); }
+        }
+
+        function ckCevir() {
+            document.getElementById('ckOn').hidden = true;
+            document.getElementById('ckArka').hidden = false;
+        }
+
+        function ckCiz() {
+            const x = ckDeste[ckIndex];
+            if (!x) return ckBitir();
+            const k = x.kelime;
+            document.getElementById('ckSayac').textContent = (ckIndex + 1) + ' / ' + ckDeste.length;
+            document.getElementById('ckJa').textContent = k.ja;
+            document.getElementById('ckTr').textContent = k.tr || '—';
+            document.getElementById('ckRo').textContent = k.ro || '';
+            document.getElementById('ckOn').hidden = false;
+            document.getElementById('ckArka').hidden = true;
+
+            // Kanji varsa göster
+            const kanjiEl = document.getElementById('ckKanji');
+            const kj = kanjiBilgisi(k);
+            if (kj) {
+                kanjiEl.hidden = false;
+                kanjiEl.textContent = 'æ¼¢ ' + kj.k;
+            } else {
+                kanjiEl.hidden = true;
+            }
+
+            // Örnek cümle varsa göster
+            const cumleEl = document.getElementById('ckCumle');
+            const c = ornekCumle(k);
+            if (c) {
+                cumleEl.hidden = false;
+                cumleEl.textContent = c.ja + ' — ' + c.tr;
+            } else {
+                cumleEl.hidden = true;
+            }
+        }
+
+        function ckIsaretle(bildi) {
+            const x = ckDeste[ckIndex];
+            if (!x) return;
+            // Bilgi kaydet (defter istiği güncellenir)
+            KelimeDefteri.cevap(x.kelime, bildi);
+            if (bildi) ckDogru++;
+            ckIndex++;
+            if (ckIndex >= ckDeste.length) ckBitir();
+            else ckCiz();
+        }
+
+        function ckBitir() {
+            const oran = ckDeste.length ? Math.round(ckDogru / ckDeste.length * 100) : 0;
+            const kutu = document.querySelector('.ck-kutu');
+            const mesaj = oran >= 80 ? 'Harika!' : oran >= 50 ? 'İyi gidiyorsun!' : 'Tekrar iyi gelecek.';
+            kutu.replaceChildren();
+            const son = el('div', 'ck-son');
+            son.append(
+                el('div', 'ck-son-simge', oran >= 80 ? '✅' : 'g���'),
+                el('div', 'ck-son-baslik', mesaj),
+                el('div', 'ck-son-oran', ckDogru + ' / ' + ckDeste.length + ' doğru (%' + oran + ')'),
+            );
+            const kapatBtn = el('button', 'ck-btn iyi', 'LİSTEYE DÖN');
+            kapatBtn.onclick = ckKapat;
+            son.append(kapatBtn);
+            kutu.append(son);
+            Ses.sensei(oran >= 80 ? 'hedef-tamam' : 'tekrar-bitti');
+            document.removeEventListener('keydown', ckKlavye);
+        }
+
+        function karistir(dizi) {
+            const a = dizi.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                const t = a[i]; a[i] = a[j]; a[j] = t;
+            }
+            return a;
+        }
+
+        // ---------- Olaylar ----------
+        document.getElementById('geriBtn').onclick = () => window.location.href = 'dojo.html';
+        document.getElementById('ckKapat').onclick = ckKapat;
+        document.getElementById('ckOn').onclick = ckCevir;
+        document.getElementById('ckZor').onclick = () => ckIsaretle(false);
+        document.getElementById('ckKolay').onclick = () => ckIsaretle(true);
+        document.getElementById('calisKatman').onclick = (ev) => { if (ev.target.id === 'calisKatman') ckKapat(); };
+        document.querySelectorAll('#suzgec button').forEach(b => {
+            b.onclick = () => {
+                suzgec = b.dataset.filtre;
+                document.querySelectorAll('#suzgec button').forEach(x => x.classList.toggle('aktif', x === b));
+                listeyiCiz();
+            };
+        });
+        document.getElementById('arama').addEventListener('input', e => {
+            aramaMetni = e.target.value.trim();
+            listeyiCiz();
+        });
+
+        listeyiCiz();
+    </script>
+    <!-- SURUM GUNCELLEME BILDIRIMI (guncelleme.js) -->
+    <script src="guncelleme.js?v=1"></script>
+    <script src="sahne3d.js?v=1"></script>
+    <!-- VİDEO ARKA PLAN: videolar/yatay|dikey/arkaplan.webm döngüde oynar.
+         Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
+         KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli (aynı negatif
+         z-index'te sonra gelen katman üstte görünür). -->
+    <script src="video-arkaplan.js?v=4"></script>
+</body>
+</html>

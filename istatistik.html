@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakar Paisen | İstatistikler</title>
+    <meta name="theme-color" content="#7b5cf0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="stylesheet" href="uygulama.css?v=14">
+    <meta name="sp-sayfa" content="istatistik">
+    <style>
+        .kapsayici { max-width: 760px; margin: 0 auto; padding: 20px 16px 80px; }
+
+        .kart { background: var(--kart); border: 2px solid var(--cizgi); border-radius: 20px;
+                padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 0 var(--cizgi); }
+        .kart h2 { margin: 0 0 4px; font-size: 17px; }
+        .kart > p { margin: 0 0 14px; font-size: 13px; font-weight: 600; color: var(--yazi-soluk); line-height: 1.5; }
+
+        /* ---------- Büyük rakamlar ---------- */
+        .buyuk-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+        .bg-kutu { background: var(--zemin-2); border-radius: 16px; padding: 14px 16px; }
+        .bg-kutu b { display: block; font-size: 28px; line-height: 1.15; }
+        .bg-kutu small { font-size: 12.5px; font-weight: 700; color: var(--yazi-soluk); }
+
+        /* ---------- Grafik ---------- */
+        canvas { width: 100%; height: auto; display: block; touch-action: none; }
+        .grafik-bos { text-align: center; padding: 30px 10px; color: var(--yazi-soluk);
+                      font-size: 14px; font-weight: 600; }
+
+        /* ---------- Isı haritası (son 12 hafta) ---------- */
+        .isi { display: grid; grid-template-columns: repeat(12, 1fr); gap: 5px; }
+        .isi-kutu { aspect-ratio: 1; border-radius: 6px; background: var(--zemin-2); }
+        .isi-alt { display: flex; justify-content: space-between; font-size: 11.5px;
+                   font-weight: 700; color: var(--yazi-soluk); margin-top: 8px; }
+
+        /* ---------- Harf listesi ---------- */
+        .harf-liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); gap: 8px; }
+        .harf-kart { background: var(--zemin-2); border-radius: 12px; padding: 9px 6px; text-align: center; }
+        .harf-kart .h-jp { font-size: 26px; font-weight: 800; line-height: 1.2; }
+        .harf-kart .h-ro { font-size: 12px; font-weight: 700; color: var(--yazi-soluk); }
+        .harf-kart .h-al { font-size: 10px; font-weight: 700; color: var(--yazi-soluk); opacity: .75; margin-top: 1px; }
+        .harf-kart .h-bar { height: 5px; border-radius: 999px; background: var(--cizgi); margin-top: 6px; overflow: hidden; }
+        .harf-kart .h-ic { height: 100%; border-radius: 999px; }
+        .harf-kart.iyi .h-jp { color: var(--turkuaz-koyu); }
+        .harf-kart.orta .h-jp { color: var(--altin-koyu); }
+        .harf-kart.zayif .h-jp { color: var(--kirmizi); }
+
+        .sekme { display: flex; gap: 6px; background: var(--zemin-2); border-radius: 14px; padding: 4px; margin-bottom: 16px; }
+        .sekme button { flex: 1; border: none; background: none; font-family: inherit; font-size: 14px;
+                        font-weight: 800; color: var(--yazi-soluk); padding: 10px; border-radius: 11px; cursor: pointer; }
+        .sekme button.aktif { background: var(--kart); color: var(--mor); box-shadow: 0 2px 0 var(--cizgi); }
+        .bos-not { text-align: center; padding: 40px 16px; color: var(--yazi-soluk); font-weight: 600; }
+        #zayifBtn { margin-bottom: 14px; }
+    </style>
+</head>
+<body class="sp">
+    <nav class="sp-ust">
+        <button class="sp-pill tikla" id="geriBtn" title="Haritaya dön" aria-label="Haritaya dön">←</button>
+        <div class="sp-logo">g��� <span>İstatistikler</span></div>
+        <div class="sp-istatistik"><span class="sp-pill altin" id="xpRozet">0 XP</span></div>
+    </nav>
+
+    <div class="kapsayici">
+        <div id="kok"></div>
+    </div>
+
+    <script src="ilerleme.js?v=11"></script>
+    <script src="kana.js?v=17"></script>
+    <script src="pwa.js?v=5"></script>
+    <script src="bulut.js?v=3"></script>
+    <script src="kelime.js?v=10"></script>
+    <script src="analitik.js?v=2" defer></script>
+    <script>window.addEventListener('load', function () { if (window.Analitik) window.Analitik.sayfa('istatistik'); });</script>
+    <script src="ayarlar.js?v=1"></script>
+    <!-- BA�?ARIMLAR: istatistik sayfasının alt bölümünde tam liste gösterilir -->
+    <script src="basarimlar.js?v=2"></script>
+    <script src="gorevler.js?v=2"></script>
+    <script src="kombo.js?v=1"></script>
+    <!-- DURUM �?ERİDİ: seri/XP/rütbe/görev/hediye tek satırda (serit.js) -->
+    <script src="hediye.js?v=2"></script>
+    <script src="serit.js?v=1"></script>
+    <!-- YANLI�? DEFTERİ: "hangi harfi hangisiyle karıştırdın" bölümü için -->
+    <script src="yanlis.js?v=1"></script>
+    <script src="istatistik.js?v=5"></script>
+    <script>
+        document.getElementById('geriBtn').onclick = () => {
+            window.location.href = Ilerleme.isim() ? 'dojo.html' : 'index.html';
+        };
+        // �?erit üst menünün HEMEN altına gelir (sabit menüyü itmez)
+        Serit.kur('.sp-ust', { yuzen: false });
+        Istatistik.ciz(document.getElementById('kok'));
+        document.getElementById('xpRozet').textContent = Ilerleme.xp() + ' XP';
+    </script>
+    <!-- SURUM GUNCELLEME BILDIRIMI (guncelleme.js) -->
+    <script src="guncelleme.js?v=1"></script>
+    <script src="sahne3d.js?v=1"></script>
+    <!-- VİDEO ARKA PLAN: videolar/yatay|dikey/arkaplan.webm döngüde oynar.
+         Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
+         KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli (aynı negatif
+         z-index'te sonra gelen katman üstte görünür). -->
+    <script src="video-arkaplan.js?v=4"></script>
+</body>
+</html>

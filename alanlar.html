@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakar Paisen | Çalışma Alanları</title>
+    <meta name="theme-color" content="#7b5cf0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="stylesheet" href="uygulama.css?v=14">
+    <meta name="sp-sayfa" content="alanlar">
+    <style>
+        body { margin: 0; }
+        .kapsayici { max-width: 980px; margin: 0 auto; padding: 24px 16px 70px; }
+
+        .baslik-alan { margin-bottom: 22px; }
+        .baslik-alan h1 { margin: 0 0 6px; font-size: 26px; }
+        .baslik-alan p { margin: 0; color: var(--yazi-soluk); font-weight: 700; font-size: 14px; line-height: 1.5; }
+
+        /* Bugün için öneri: karar yorgunluğunu engeller (plan.js) */
+        .oneri { background: linear-gradient(135deg, color-mix(in srgb, var(--mor) 12%, var(--kart)), var(--kart));
+                 border: 2px solid color-mix(in srgb, var(--mor) 35%, var(--cizgi)); border-radius: 20px;
+                 padding: 18px 20px; margin-bottom: 26px; box-shadow: 0 5px 0 var(--cizgi); }
+        .oneri h3 { margin: 0 0 10px; font-size: 15px; color: var(--mor); }
+        .oneri-liste { display: flex; flex-direction: column; gap: 8px; }
+        .oneri-satir { display: flex; align-items: center; gap: 12px; background: var(--kart);
+                       border: 2px solid var(--cizgi); border-radius: 14px; padding: 11px 14px;
+                       text-decoration: none; color: inherit; transition: border-color .15s, transform .12s; }
+        .oneri-satir:hover { border-color: var(--mor); transform: translateX(3px); }
+        .oneri-satir .simge { font-size: 21px; }
+        .oneri-satir .ad { font-weight: 800; font-size: 14px; }
+        .oneri-satir .acik { font-size: 12px; color: var(--yazi-soluk); font-weight: 700; }
+        .oneri-satir .sure { margin-left: auto; font-size: 12px; font-weight: 800; color: var(--mor); white-space: nowrap; }
+
+        /* Alan grupları */
+        .grup { margin-bottom: 28px; }
+        .grup h2 { font-size: 15px; margin: 0 0 12px; color: var(--yazi-soluk);
+                   text-transform: uppercase; letter-spacing: .6px; }
+
+        /* ALAN KARTLARI: dojo haritasından bağımsız, kendi başına duran araçlar.
+           Her kart "ne yaparım" sorusunu tek cümleyle yanıtlar. */
+        .alanlar { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+        .alan { display: block; background: var(--kart); border: 2px solid var(--cizgi);
+                border-radius: 20px; padding: 18px; text-decoration: none; color: inherit;
+                box-shadow: 0 4px 0 var(--cizgi); transition: transform .14s, border-color .15s, box-shadow .14s; }
+        .alan:hover { transform: translateY(-4px); border-color: var(--mor); box-shadow: 0 8px 0 var(--cizgi); }
+        .alan .a-simge { font-size: 30px; line-height: 1; margin-bottom: 10px; display: block; }
+        .alan h3 { margin: 0 0 6px; font-size: 16px; }
+        .alan p { margin: 0; color: var(--yazi-soluk); font-size: 13px; font-weight: 700; line-height: 1.5; }
+        .alan .a-not { display: inline-block; margin-top: 10px; padding: 4px 10px; border-radius: 999px;
+                       background: var(--zemin-2); color: var(--yazi-soluk); font-size: 11px; font-weight: 800; }
+        /* Kilitli alan: koşulu sağlanmadan açılmaz (ör. kanji için harf bilgisi) */
+        .alan.kilitli { opacity: .55; cursor: not-allowed; }
+        .alan.kilitli:hover { transform: none; border-color: var(--cizgi); box-shadow: 0 4px 0 var(--cizgi); }
+        .alan .a-kilit { display: inline-block; margin-top: 10px; padding: 4px 10px; border-radius: 999px;
+                         background: var(--zemin-2); color: var(--yazi-soluk); font-size: 11px; font-weight: 800; }
+
+        @media (max-width: 560px) {
+            .alanlar { grid-template-columns: 1fr; }
+            .baslik-alan h1 { font-size: 22px; }
+        }
+    </style>
+</head>
+<body class="sp">
+    <nav class="sp-ust">
+        <button class="sp-pill tikla" id="geriBtn" title="Dojo haritasına dön" aria-label="Dojo haritasına dön">←</button>
+        <div class="sp-logo">g��� <span>Çalışma Alanları</span></div>
+        <div class="sp-istatistik">
+            <span class="sp-pill altin">✨ <span id="xpRozet">0</span> XP</span>
+            <span class="sp-pill seri">g��� <span id="seriRozet">0</span></span>
+        </div>
+    </nav>
+
+    <div class="kapsayici">
+        <div class="baslik-alan">
+            <h1>Nereden çalışmak istersin?</h1>
+            <p>Dojo haritası dersleri sırayla verir. Burada ise canın ne isterse onu çalışırsın: harf yazma, kelime kurma, kanji inceleme, cümle dizme.</p>
+        </div>
+
+        <!-- Bugün önerisi (plan.js) -->
+        <div class="oneri" id="oneri" hidden>
+            <h3>g��� Bugün için öneri</h3>
+            <div class="oneri-liste" id="oneriListe"></div>
+        </div>
+
+        <div class="grup">
+            <h2>Harfler üzerine</h2>
+            <div class="alanlar">
+                <a class="alan" href="dinleme.html">
+                    <span class="a-simge">g�?�</span>
+                    <h3>Dinleme alıştırması</h3>
+                    <p>Sesi duy, harfi seç. Kulağını Japonca seslere alıştırır.</p>
+                    <span class="a-not">12 soruluk tur · XP verir</span>
+                </a>
+                <a class="alan" href="yazma.html">
+                    <span class="a-simge">✍️</span>
+                    <h3>Yazma atölyesi</h3>
+                    <p>Harfi gör, okunuşunu kendin yaz. Tanıma değil, hatırlama çalışır.</p>
+                    <span class="a-not">Can yok · sınırsız deneme</span>
+                </a>
+                <a class="alan" href="sozluk.html">
+                    <span class="a-simge">g��?</span>
+                    <h3>Sözlük</h3>
+                    <p>Harf, kelime ve kanji ara. Aklına takılanı buradan bul.</p>
+                    <span class="a-not">Arama · tek yerden içerik</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="grup">
+            <h2>Kelime ve cümle</h2>
+            <div class="alanlar">
+                <a class="alan" href="birlestirme.html">
+                    <span class="a-simge">g���</span>
+                    <h3>Harf birleştirme</h3>
+                    <p>Öğrendiğin harflerden gerçek kelimeyi kendin kur: ね + こ = ねこ</p>
+                    <span class="a-not">Öğrenilen harflerden kelime</span>
+                </a>
+                <a class="alan" href="cumle.html">
+                    <span class="a-simge">g���</span>
+                    <h3>Cümle atölyesi</h3>
+                    <p>Türkçesi verilir, Japonca sırayı sen kurarsın. Yüklem sonda!</p>
+                    <span class="a-not">Parçacık bilgisi dahil</span>
+                </a>
+                <a class="alan" href="kelime.html">
+                    <span class="a-simge">g���</span>
+                    <h3>Kelime defterim</h3>
+                    <p>Öğrendiğin kelimeler birikir; zayıf olanları buradan görürsün.</p>
+                    <span class="a-not">Kişisel kelime listesi</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="grup">
+            <h2>Kanji ve video</h2>
+            <div class="alanlar">
+                <a class="alan" href="kanji.html" id="kanjiAlan">
+                    <span class="a-simge">g���</span>
+                    <h3>Kanji çalışma</h3>
+                    <p>Kanji kütüphanesi: gruplara göre süz, ara, detayını incele, kartlarla çalış.</p>
+                    <span class="a-not" id="kanjiNot">Kütüphane · kart çalışması</span>
+                </a>
+                <a class="alan" href="video.html">
+                    <span class="a-simge">g�?�</span>
+                    <h3>Video dersler</h3>
+                    <p>Hiragana ve Katakana anlatımları. İzleyip dinleyerek öğrenmeyi seçenler için.</p>
+                    <span class="a-not">Kendi kanalımdan</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="grup">
+            <h2>Gelişimini takip et</h2>
+            <div class="alanlar">
+                <a class="alan" href="istatistik.html">
+                    <span class="a-simge">g���</span>
+                    <h3>İstatistiklerim</h3>
+                    <p>Günlük grafik, ısı haritası ve en çok karıştırdığın harfler.</p>
+                    <span class="a-not">Nerede zayıfsın?</span>
+                </a>
+                <a class="alan" href="dojo.html#geri">
+                    <span class="a-simge">g���</span>
+                    <h3>Geri bildirim</h3>
+                    <p>Hata mı var, bir istek mi var? Sensei'ye doğrudan yaz.</p>
+                    <span class="a-not">Formspree ile gönderilir</span>
+                </a>
+                <a class="alan" href="ayarlar.html">
+                    <span class="a-simge">⚙️</span>
+                    <h3>Ayarlar</h3>
+                    <p>Tema, ses, zorluk ve kayıt yönetimi. Tercihlerini buradan ayarla.</p>
+                    <span class="a-not">Koyu / gece teması dahil</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="mufredat.js?v=3"></script>
+    <script src="ilerleme.js?v=11"></script>
+    <script src="ses.js?v=5"></script>
+    <script src="kana.js?v=18"></script>
+    <script src="reading.js?v=14"></script>
+    <script src="kanji.js?v=2"></script>
+    <script src="kelime.js?v=10"></script>
+    <script src="pwa.js?v=5"></script>
+    <script src="gorevler.js?v=2"></script>
+    <script src="basarimlar.js?v=2"></script>
+    <script src="hediye.js?v=2"></script>
+    <script src="serit.js?v=1"></script>
+    <script src="yanlis.js?v=1"></script>
+    <script src="sinav.js?v=1"></script>
+    <script src="plan.js?v=2"></script>
+    <script src="bulut.js?v=3"></script>
+    <script src="analitik.js?v=2" defer></script>
+    <script>window.addEventListener('load', function () { if (window.Analitik) window.Analitik.sayfa('alanlar'); });</script>
+    <script src="ayarlar.js?v=1"></script>
+    <script src="alanlar.js?v=1"></script>
+    <!-- SÜRÜM GÜNCELLEME BİLDİRİMİ (guncelleme.js) -->
+    <script src="guncelleme.js?v=1"></script>
+    <script src="sahne3d.js?v=1"></script>
+    <!-- VİDEO ARKA PLAN: videolar/yatay|dikey/arkaplan.webm döngüde oynar.
+         Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
+         KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli (aynı negatif
+         z-index'te sonra gelen katman üstte görünür). -->
+    <script src="video-arkaplan.js?v=4"></script>
+</body>
+</html>

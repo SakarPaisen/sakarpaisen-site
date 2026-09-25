@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakar Paisen | Cümle Atölyesi</title>
+    <meta name="theme-color" content="#7b5cf0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="stylesheet" href="uygulama.css?v=14">
+    <meta name="sp-sayfa" content="cumle">
+    <style>
+        body {
+            margin: 0;
+        }
+
+        .kapsayici {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 22px 16px 64px;
+        }
+
+        /* ---------- Çoğu şerit ---------- */
+        .cm-ust {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        .cm-bar {
+            flex: 1;
+            background: var(--zemin-2);
+            border-radius: 999px;
+            height: 16px;
+            overflow: hidden;
+            border: 2px solid var(--cizgi);
+        }
+
+        .cm-bar>div {
+            height: 100%;
+            width: 0%;
+            background: var(--mor);
+            border-radius: 999px;
+            transition: width .35s;
+        }
+
+        .cm-sayac {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--yazi-soluk);
+            white-space: nowrap;
+        }
+
+        /* ---------- Soru kutusu ---------- */
+        .cm-soru {
+            background: var(--kart);
+            border: 2px solid var(--cizgi);
+            border-radius: 22px;
+            padding: 20px;
+            box-shadow: 0 6px 0 var(--cizgi);
+            margin-bottom: 18px;
+        }
+
+        .cm-soru .etiket {
+            font-size: 12.5px;
+            font-weight: 800;
+            color: var(--yazi-soluk);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .cm-soru .tr {
+            font-size: 21px;
+            font-weight: 800;
+            margin-top: 8px;
+            line-height: 1.35;
+        }
+
+        /* Türkçe cümleyi dinle: cümlenin tamamı Japonca okunur */
+        .cm-soru .dinle {
+            margin-top: 12px;
+        }
+
+        /* ---------- Kurulan cümle şeridi ---------- */
+        .cm-cevap {
+            min-height: 84px;
+            background: var(--zemin-2);
+            border: 2px dashed var(--cizgi);
+            border-radius: 18px;
+            padding: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 18px;
+            transition: border-color .2s;
+        }
+
+        .cm-cevap.dolu {
+            border-style: solid;
+            border-color: var(--mor);
+        }
+
+        .cm-cevap.dogru {
+            border-color: var(--turkuaz);
+            background: #f0fdfa;
+        }
+
+        .cm-cevap.hata {
+            border-color: var(--kirmizi);
+            background: #fff5f7;
+        }
+
+        .cm-ipucu {
+            color: var(--yazi-soluk);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        /* ---------- Kelime parçaları ---------- */
+        .cm-havuz {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-bottom: 18px;
+        }
+
+        .cm-parca {
+            background: var(--kart);
+            border: 2px solid var(--cizgi);
+            border-radius: 14px;
+            padding: 10px 15px;
+            font-size: 19px;
+            font-weight: 800;
+            font-family: inherit;
+            color: var(--yazi);
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--cizgi);
+            transition: transform .08s, box-shadow .08s, border-color .15s;
+        }
+
+        .cm-parca:hover {
+            border-color: var(--mor);
+        }
+
+        .cm-parca:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .cm-parca.kullanildi {
+            opacity: .26;
+            pointer-events: none;
+        }
+
+        .cm-parca small {
+            display: block;
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--yazi-soluk);
+            margin-top: 2px;
+        }
+
+        /* Cevap şeridindeki parçalar */
+        .cm-cevap .cm-parca {
+            box-shadow: none;
+            background: #f3f0ff;
+            border-color: var(--mor);
+        }
+
+        /* ---------- Geri bildirim ve düğmeler ---------- */
+        .cm-geri {
+            min-height: 30px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .cm-geri.iyi {
+            color: var(--turkuaz-koyu);
+        }
+
+        .cm-geri.hata {
+            color: var(--kirmizi);
+        }
+
+        .cm-alt {
+            display: flex;
+            gap: 10px;
+        }
+
+        .cm-alt .sp-btn {
+            flex: 1;
+        }
+
+        .sp-btn[hidden] {
+            display: none;
+        }
+
+        /* ---------- Tur sonu ---------- */
+        .cm-sonuc {
+            background: var(--kart);
+            border: 2px solid var(--cizgi);
+            border-radius: 24px;
+            padding: 26px 20px;
+            text-align: center;
+            box-shadow: 0 6px 0 var(--cizgi);
+        }
+
+        .cm-sonuc .buyuk {
+            font-size: 62px;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .cm-sonuc h2 {
+            margin: 0 0 8px;
+            font-size: 23px;
+        }
+
+        .cm-sonuc p {
+            margin: 0 0 18px;
+            color: var(--yazi-soluk);
+            font-weight: 700;
+        }
+
+        .cm-ozet {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .cm-ozet div {
+            background: var(--zemin-2);
+            border: 2px solid var(--cizgi);
+            border-radius: 14px;
+            padding: 12px 8px;
+        }
+
+        .cm-ozet b {
+            display: block;
+            font-size: 22px;
+        }
+
+        .cm-ozet small {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--yazi-soluk);
+        }
+
+        /* Turda kurulan cümleler: tekrar okunacak liste */
+        .cm-liste {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .cm-satir {
+            background: var(--zemin-2);
+            border: 2px solid var(--cizgi);
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cm-satir .ja {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .cm-satir .alt {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--yazi-soluk);
+            margin-top: 3px;
+        }
+
+        @media (max-width: 520px) {
+            .cm-parca {
+                padding: 8px 12px;
+                font-size: 17px;
+            }
+
+            .cm-soru .tr {
+                font-size: 18px;
+            }
+
+            .cm-ozet {
+                gap: 7px;
+            }
+        }
+    </style>
+</head>
+
+<body class="sp">
+    <nav class="sp-ust">
+        <button class="sp-pill tikla" id="geriBtn" title="Haritaya dön" aria-label="Haritaya dön">←</button>
+        <div class="sp-logo">g���️ <span>Cümle Atölyesi</span></div>
+        <div class="sp-istatistik"><span class="sp-pill mor" id="xpRozet">✨ 0</span></div>
+    </nav>
+
+    <div class="kapsayici" id="kok"></div>
+
+    <script src="mufredat.js?v=3"></script>
+    <script src="ilerleme.js?v=11"></script>
+    <script src="ses.js?v=5"></script>
+    <script src="kana.js?v=18"></script>
+    <script src="reading.js?v=14"></script>
+    <script src="kelime.js?v=10"></script>
+    <script src="pwa.js?v=5"></script>
+    <script src="bulut.js?v=3"></script>
+    <script src="analitik.js?v=2" defer></script>
+    <script>window.addEventListener('load', function () { if (window.Analitik) window.Analitik.sayfa('cumle'); });</script>
+    <script src="ayarlar.js?v=1"></script>
+    <!-- CÜMLE ATÖLYESİ MOTORU: kelimeleri doğru sıraya dizerek cümle kurma -->
+    <script src="cumle.js?v=1"></script>
+    <!-- SURUM GUNCELLEME BILDIRIMI (guncelleme.js) -->
+    <script src="guncelleme.js?v=1"></script>
+    <script src="sahne3d.js?v=1"></script>
+    <!-- VİDEO ARKA PLAN: videolar/yatay|dikey/arkaplan.webm döngüde oynar.
+         Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
+         KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli (aynı negatif
+         z-index'te sonra gelen katman üstte görünür). -->
+    <script src="video-arkaplan.js?v=4"></script>
+</body>
+
+</html>

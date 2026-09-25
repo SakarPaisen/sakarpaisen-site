@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakar Paisen | Kanji Çalışma</title>
+    <meta name="theme-color" content="#7b5cf0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="stylesheet" href="uygulama.css?v=14">
+    <meta name="sp-sayfa" content="kanji">
+    <style>
+        body {
+            margin: 0;
+        }
+
+        .kapsayici {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px 16px 64px;
+        }
+
+        /* ---------- Süzgeç çubuğu (grup seçimi) ---------- */
+        .kj-arac {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .kj-gruplar {
+            display: flex;
+            gap: 6px;
+            background: var(--zemin-2);
+            border-radius: 14px;
+            padding: 4px;
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        .kj-grup {
+            background: none;
+            border: none;
+            border-radius: 11px;
+            padding: 9px 14px;
+            font-family: inherit;
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--yazi-soluk);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: 0.15s;
+        }
+
+        .kj-grup:hover {
+            color: var(--mor);
+        }
+
+        .kj-grup.aktif {
+            background: var(--kart);
+            color: var(--mor);
+            box-shadow: 0 2px 0 var(--cizgi);
+        }
+
+        .kj-arama {
+            flex: 1;
+            min-width: 150px;
+            background: var(--kart);
+            border: 2px solid var(--cizgi);
+            border-radius: 14px;
+            padding: 11px 14px;
+            font-size: 15px;
+            font-family: inherit;
+            color: var(--yazi);
+            outline: none;
+            box-shadow: 0 3px 0 var(--cizgi);
+        }
+
+        .kj-arama:focus {
+            border-color: var(--mor);
+        }
+
+        .kj-sayac {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--yazi-soluk);
+            margin-bottom: 14px;
+        }
+
+        /* ---------- Kanji kart ızgarası ---------- */
+        /* KENDİ BA�?INA DURAN ALAN: ders akışı yok, istediğin kanjiye tıklarsın.
+           Duolingo'nun "alfabe sayfası" mantığı: tüm içerik tek bakışta görünür. */
+        .kj-izgara {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+            gap: 12px;
+        }
+
+        .kj-kart {
+            background: var(--kart);
+            border: 2px solid var(--cizgi);
+            border-radius: 18px;
+            padding: 14px 10px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--cizgi);
+            transition: transform .12s, border-color .15s, box-shadow .12s;
+            font-family: inherit;
+            color: var(--yazi);
+        }
+
+        .kj-kart:hover {
+            transform: translateY(-3px);
+            border-color: var(--mor);
+            box-shadow: 0 7px 0 var(--cizgi);
+        }
+
+        .kj-kart:active {
+            transform: translateY(3px);
+            box-shadow: none;
+        }
+
+        .kj-kart .harf {
+            font-size: 40px;
+            line-height: 1.15;
+            font-weight: 700;
+        }
+
+        .kj-kart .anlam {
+            font-size: 12.5px;
+            font-weight: 800;
+            margin-top: 5px;
+            color: var(--yazi);
+        }
+
+        .kj-kart .oku {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--yazi-soluk);
+            margin-top: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Durum rozeti: öğrenilmiş / tekrar zamanı / yeni */
+        .kj-kart .durum {
+            display: inline-block;
+            margin-top: 7px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .3px;
+        }
+
+        .kj-kart .durum.yeni {
+            background: var(--zemin-2);
+            color: var(--yazi-soluk);
+        }
+
+        .kj-kart .durum.ogrenildi {
+            background: #e6f9f4;
+            color: var(--turkuaz-koyu);
+        }
+
+        .kj-kart .durum.tekrar {
+            background: #fff4d6;
+            color: #8a6100;
+        }
+
+        .kj-kart .durum.zor {
+            background: #ffe8ec;
+            color: var(--kirmizi-koyu);
+        }
+
+        /* ---------- Detay paneli (karta tıklayınca) ---------- */
+        .kj-perde {
+            position: fixed;
+            inset: 0;
+            background: rgba(20, 18, 30, .55);
+            backdrop-filter: blur(3px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 90;
+        }
+
+        .kj-perde[hidden] {
+            display: none;
+        }
+
+        .kj-detay {
+            background: var(--kart);
+            border: 2px solid var(--cizgi);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 460px;
+            max-height: 88vh;
+            overflow-y: auto;
+            padding: 24px;
+            box-shadow: 0 12px 0 rgba(0, 0, 0, .12);
+            position: relative;
+        }
+
+        .kj-detay .harf-buyuk {
+            font-size: 96px;
+            line-height: 1.05;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .kj-detay .anlam-buyuk {
+            text-align: center;
+            font-size: 21px;
+            font-weight: 800;
+            margin-top: 6px;
+        }
+
+        .kj-kapat {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--zemin-2);
+            border: 2px solid var(--cizgi);
+            cursor: pointer;
+            font-size: 19px;
+            color: var(--yazi-soluk);
+            line-height: 1;
+        }
+
+        .kj-kapat:hover {
+            border-color: var(--kirmizi);
+            color: var(--kirmizi);
+        }
+
+        .kj-satir {
+            display: flex;
+            gap: 10px;
+            align-items: baseline;
+            padding: 11px 0;
+            border-bottom: 2px solid var(--zemin-2);
+        }
+
+        .kj-satir:last-of-type {
+            border-bottom: none;
+        }
+
+        .kj-satir .etiket {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--yazi-soluk);
+            min-width: 96px;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+
+        .kj-satir .deger {
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        /* Örnek kelime: kanjinin gerçek kullanımı */
+        .kj-ornek {
+            margin-top: 16px;
+            padding: 15px;
+            background: var(--zemin-2);
+            border-radius: 16px;
+        }
+
+        .kj-ornek .ja {
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .kj-ornek .ro {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--mor);
+            margin-top: 3px;
+        }
+
+        .kj-ornek .tr {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--yazi-soluk);
+            margin-top: 2px;
+        }
+
+        .kj-ornek .ses {
+            margin-top: 10px;
+        }
+
+        /* İlerleme durumu: kutu ve doğru/yanlış sayısı */
+        .kj-istat {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .kj-istat div {
+            background: var(--zemin-2);
+            border-radius: 12px;
+            padding: 10px 6px;
+            text-align: center;
+        }
+
+        .kj-istat b {
+            display: block;
+            font-size: 19px;
+        }
+
+        .kj-istat small {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--yazi-soluk);
+        }
+
+        .kj-alt {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .kj-alt .sp-btn {
+            flex: 1;
+        }
+
+        /* ---------- Boş durum ---------- */
+        .kj-bos {
+            text-align: center;
+            padding: 46px 20px;
+        }
+
+        .kj-bos .buyuk {
+            font-size: 62px;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .kj-bos h2 {
+            margin: 0 0 10px;
+            font-size: 22px;
+        }
+
+        .kj-bos p {
+            margin: 0 auto 20px;
+            max-width: 420px;
+            color: var(--yazi-soluk);
+            font-weight: 700;
+            line-height: 1.55;
+        }
+
+        @media (max-width: 520px) {
+            .kj-izgara {
+                grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+                gap: 9px;
+            }
+
+            .kj-kart .harf {
+                font-size: 33px;
+            }
+
+            .kj-detay .harf-buyuk {
+                font-size: 76px;
+            }
+
+            .kj-satir .etiket {
+                min-width: 78px;
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+
+<body class="sp">
+    <nav class="sp-ust">
+        <button class="sp-pill tikla" id="geriBtn" title="Haritaya dön" aria-label="Haritaya dön">←</button>
+        <div class="sp-logo">g��� <span>Kanji Çalışma</span></div>
+        <div class="sp-istatistik">
+            <span class="sp-pill" id="ogrenilenRozet">0 / 0</span>
+            <button class="sp-pill tikla mor" id="falBtn" title="Bilmediğin kanjilerle kart çalış">g��� Kart
+                çalış</button>
+        </div>
+    </nav>
+
+    <div class="kapsayici">
+        <div class="kj-arac">
+            <div class="kj-gruplar" id="gruplar" role="tablist" aria-label="Kanji grupları"></div>
+            <input class="kj-arama" id="arama" type="search" placeholder="Kanji, anlam veya okunuş ara..."
+                aria-label="Kanji ara">
+        </div>
+        <div class="kj-sayac" id="sayac"></div>
+        <div class="kj-izgara" id="izgara"></div>
+    </div>
+
+    <!-- Detay paneli: karta tıklayınca açılır -->
+    <div class="kj-perde" id="perde" hidden>
+        <div class="kj-detay" id="detay" role="dialog" aria-modal="true" aria-label="Kanji detayı"></div>
+    </div>
+
+    <!-- ERKEN OTURUM KONTROLÜ: kayıt (isim) varsa sayfa hemen işaretlenir.
+         NEDEN: kanji-calisma.js kayıt kontrolünü script'lerin EN SONUNDA
+         yapıyordu; o ana kadar kana.js/reading.js/kanji.js gibi ağır dosyalar
+         iniyor ve kullanıcı boş kütüphaneye bakıyordu (kayıt yoksa hepsi boşa
+         inerdi). Artık kayıtlıysa işaret konur ve ağır dosyalar yalnızca bu
+         işaret varsa yüklenir (bkz. dosya sonundaki koşullu yükleme).
+         DİKKAT: Burada location.replace ile yönlendirme YAPILMAZ — Ilerleme
+         bu noktada genelde henüz yüklenmemiş olur ve kayıtlı kullanıcı da
+         boşuna giriş ekranına atılırdı (yaşandı ve ölçümle doğrulandı). -->
+    <script>
+        window.SP_OTURUM = false;
+        try { window.SP_OTURUM = !!(window.Ilerleme && Ilerleme.isim()); } catch (e) { }
+    </script>
+    <script src="mufredat.js?v=3"></script>
+    <script src="ilerleme.js?v=11"></script>
+    <!-- AĞIR KÜTÜPHANELER YALNIZCA OTURUM VARSA inilir (SP_OTURUM, yukarıda
+         script'lerden önce işaretlendi). Kayıt yoksa kanji-calisma.js zaten
+         index.html'e yönlendirir; boşuna yüzlerce KB indirmenin anlamı yok. -->
+    <script>
+        if (window.SP_OTURUM) document.write('<script src="ses.js?v=5"><\/script>');
+    </script>
+    <script src="kana.js?v=18"></script>
+    <script>
+        if (window.SP_OTURUM) document.write('<script src="reading.js?v=14"><\/script>');
+    </script>
+    <script>
+        if (window.SP_OTURUM) document.write('<script src="kanji.js?v=2"><\/script>');
+    </script>
+    <script>
+        if (window.SP_OTURUM) document.write('<script src="kanji-cumle.js?v=1"><\/script>');
+    </script>
+    <script src="pwa.js?v=5"></script>
+    <script src="bulut.js?v=3"></script>
+    <script src="analitik.js?v=2" defer></script>
+    <script>window.addEventListener('load', function () { if (window.Analitik) window.Analitik.sayfa('kanji'); });</script>
+    <script src="ayarlar.js?v=1"></script>
+    <!-- KANJI ÇALI�?MA MOTORU: kendi başına duran kanji kütüphanesi + kart çalışması -->
+    <script>
+        if (window.SP_OTURUM) document.write('<script src="kanji-calisma.js?v=1"><\/script>');
+    </script>
+    <!-- SURUM GUNCELLEME BILDIRIMI (guncelleme.js) -->
+    <script src="guncelleme.js?v=1"></script>
+    <script src="sahne3d.js?v=1"></script>
+    <!-- VİDEO ARKA PLAN: videolar/yatay|dikey/arkaplan.webm döngüde oynar.
+         Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
+         KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli; video kök
+         elemanı body'nin ilk çocuğu olarak eklenir ve böylece 3D kökünün
+         ÖNÜNE geçer (aynı negatif z-index'te sonra gelen üstte kalır). -->
+    <script src="video-arkaplan.js?v=4"></script>
+</body>
+
+</html>

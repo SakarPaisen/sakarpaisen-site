@@ -1,0 +1,253 @@
+{
+  "_aciklama": "Tüm sesler için ORTAK ayarlar burada. Scene / Director's Notes / Sample Context'i değiştirirsen hepsi aynı havada üretilir. Tek tek sesleri 'gruplar' altında düzenle: dosya = dosya adı (uzantısız), metin = okunacak şey.",
+  "model": "gemini-3.1-flash-tts-preview",
+  "ses": "Sulafat",
+  "profil": {
+    "ad": "Sakar Paisen",
+    "rol": "The Warm and Patient Japanese Senpai"
+  },
+  "sahne_baslik": "The Quiet Study Room",
+  "sahne": "A cosy, quiet Japanese study room in the evening. A warm desk lamp glows, soft rain taps on the window, and the room is acoustically calm with almost no echo. Sakar Paisen sits close to the microphone with a gentle smile, coaching a beginner student one-on-one.",
+  "yonerge": "Style: Warm, patient and encouraging, with a soft \"vocal smile\". Never rushed, never dramatic.\nPacing: Calm and slightly slow, so a beginner can hear every sound clearly.\nAccent: Standard Tokyo Japanese for Japanese text. Natural, friendly Istanbul Turkish for Turkish text.\nConsistency: Keep the same volume, pitch and mic distance in every take.\nSingle syllables: When the transcript is a single Japanese kana, say that one syllable once, clearly. Do not add any other word, translation or explanation.",
+  "ornek_baglam": "Sakar Paisen has just started today's lesson with a beginner student. Now they read the next item out loud, slowly and clearly, so the student can listen and repeat.",
+  "gruplar": [
+    {
+      "ad": "kana",
+      "klasor": "audio/kana",
+      "aciklama": "Harf sesleri. Hiragana ve Katakana aynı sesi paylaşır, o yüzden romaji başına tek dosya.",
+      "ogeler": [
+        {
+          "dosya": "a",
+          "metin": "あ"
+        },
+        {
+          "dosya": "i",
+          "metin": "い"
+        },
+        {
+          "dosya": "u",
+          "metin": "う"
+        },
+        {
+          "dosya": "e",
+          "metin": "え"
+        },
+        {
+          "dosya": "o",
+          "metin": "お"
+        },
+        {
+          "dosya": "ka",
+          "metin": "か"
+        },
+        {
+          "dosya": "ki",
+          "metin": "き"
+        },
+        {
+          "dosya": "ku",
+          "metin": "く"
+        },
+        {
+          "dosya": "ke",
+          "metin": "け"
+        },
+        {
+          "dosya": "ko",
+          "metin": "こ"
+        },
+        {
+          "dosya": "sa",
+          "metin": "さ"
+        },
+        {
+          "dosya": "shi",
+          "metin": "し"
+        },
+        {
+          "dosya": "su",
+          "metin": "す"
+        },
+        {
+          "dosya": "se",
+          "metin": "せ"
+        },
+        {
+          "dosya": "so",
+          "metin": "そ"
+        },
+        {
+          "dosya": "ta",
+          "metin": "た"
+        },
+        {
+          "dosya": "chi",
+          "metin": "ち"
+        },
+        {
+          "dosya": "tsu",
+          "metin": "つ"
+        },
+        {
+          "dosya": "te",
+          "metin": "て"
+        },
+        {
+          "dosya": "to",
+          "metin": "と"
+        },
+        {
+          "dosya": "na",
+          "metin": "な"
+        },
+        {
+          "dosya": "ni",
+          "metin": "に"
+        },
+        {
+          "dosya": "nu",
+          "metin": "ぬ"
+        },
+        {
+          "dosya": "ne",
+          "metin": "ね"
+        },
+        {
+          "dosya": "no",
+          "metin": "の"
+        },
+        {
+          "dosya": "ha",
+          "metin": "は"
+        },
+        {
+          "dosya": "hi",
+          "metin": "ひ"
+        },
+        {
+          "dosya": "fu",
+          "metin": "ふ"
+        },
+        {
+          "dosya": "he",
+          "metin": "へ"
+        },
+        {
+          "dosya": "ho",
+          "metin": "ほ"
+        },
+        {
+          "dosya": "ma",
+          "metin": "ま"
+        },
+        {
+          "dosya": "mi",
+          "metin": "み"
+        },
+        {
+          "dosya": "mu",
+          "metin": "む"
+        },
+        {
+          "dosya": "me",
+          "metin": "め"
+        },
+        {
+          "dosya": "mo",
+          "metin": "も"
+        },
+        {
+          "dosya": "ya",
+          "metin": "や"
+        },
+        {
+          "dosya": "yu",
+          "metin": "ゆ"
+        },
+        {
+          "dosya": "yo",
+          "metin": "よ"
+        },
+        {
+          "dosya": "ra",
+          "metin": "ら"
+        },
+        {
+          "dosya": "ri",
+          "metin": "り"
+        },
+        {
+          "dosya": "ru",
+          "metin": "る"
+        },
+        {
+          "dosya": "re",
+          "metin": "れ"
+        },
+        {
+          "dosya": "ro",
+          "metin": "ろ"
+        },
+        {
+          "dosya": "wa",
+          "metin": "わ"
+        },
+        {
+          "dosya": "wo",
+          "metin": "を"
+        },
+        {
+          "dosya": "n",
+          "metin": "ん"
+        }
+      ]
+    },
+    {
+      "ad": "sensei",
+      "klasor": "audio/sensei",
+      "aciklama": "Sensei'nin kısa Türkçe tepkileri. Oyun bunları ders sırasında ara sıra çalar.",
+      "ogeler": [
+        {
+          "dosya": "dogru-1",
+          "metin": "[warmly] Harika!"
+        },
+        {
+          "dosya": "dogru-2",
+          "metin": "[warmly] Aferin sana!"
+        },
+        {
+          "dosya": "dogru-3",
+          "metin": "[excited] Tam isabet!"
+        },
+        {
+          "dosya": "dogru-4",
+          "metin": "[warmly] Süper gidiyorsun!"
+        },
+        {
+          "dosya": "yanlis-1",
+          "metin": "[gently] Olsun, bir daha bakalım."
+        },
+        {
+          "dosya": "yanlis-2",
+          "metin": "[gently] Az kaldı, bunu tekrar edeceğiz."
+        },
+        {
+          "dosya": "ders-bitti",
+          "metin": "[warmly] Ders tamam! Çok güzel çalıştın."
+        },
+        {
+          "dosya": "tekrar-bitti",
+          "metin": "[warmly] Tekrar tamam! Harfler artık daha sağlam."
+        },
+        {
+          "dosya": "hedef-tamam",
+          "metin": "[excited] Günlük hedef tamam! Yarın yine görüşürüz."
+        },
+        {
+          "dosya": "can-bitti",
+          "metin": "[gently] Canların bitti, ama sorun değil. Bir daha deneyelim!"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakar Paisen | Harf Birleştirme</title>
+    <meta name="theme-color" content="#7b5cf0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="stylesheet" href="uygulama.css?v=14">
+    <meta name="sp-sayfa" content="birlestirme">
+    <style>
+        body {
+            margin: 0;
+        }
+
+        .kapsayici {
+            max-width: 620px;
+            margin: 0 auto;
+            padding: 22px 16px 60px;
+        }
+
+        /* ---------- Soru ---------- */
+        .br-soru {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .br-soru h2 {
+            margin: 0 0 6px;
+            font-size: 20px;
+        }
+
+        .br-soru p {
+            margin: 0;
+            color: var(--yazi-soluk);
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        /* ---------- Cevap şeridi (harfleri buraya diziyoruz) ---------- */
+        .br-cevap {
+            min-height: 78px;
+            background: var(--kart);
+            border: 2px dashed var(--cizgi);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            flex-wrap: wrap;
+            transition: border-color .2s;
+        }
+
+        .br-cevap.dolu {
+            border-style: solid;
+            border-color: var(--mor);
+        }
+
+        .br-cevap.dogru {
+            border-color: var(--turkuaz);
+            background: #f0fdfa;
+        }
+
+        .br-cevap.hata {
+            border-color: var(--kirmizi);
+            background: #fff5f7;
+        }
+
+        .br-yer {
+            width: 46px;
+            height: 54px;
+            border-bottom: 3px solid var(--cizgi);
+        }
+
+        .br-ipucu-yazi {
+            color: var(--yazi-soluk);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        /* ---------- Seçilebilir harf taşları ---------- */
+        .br-havuz {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .br-tas {
+            background: var(--kart);
+            border: 2px solid var(--cizgi);
+            border-radius: 14px;
+            width: 56px;
+            height: 62px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            font-weight: 700;
+            font-family: inherit;
+            color: var(--yazi);
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--cizgi);
+            transition: transform .08s, box-shadow .08s, border-color .15s;
+        }
+
+        .br-tas:hover {
+            border-color: var(--mor);
+        }
+
+        .br-tas:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .br-tas.kullanildi {
+            opacity: .28;
+            pointer-events: none;
+        }
+
+        /* Seçilen harf cevap şeridinde de aynı görünsün (görsel süreklilik) */
+        .br-tas.secili {
+            background: #f3f0ff;
+            border-color: var(--mor);
+        }
+
+        /* ---------- Geri bildirim ve düğmeler ---------- */
+        .br-geri {
+            min-height: 26px;
+            text-align: center;
+            font-size: 15.5px;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+
+        .br-geri.iyi {
+            color: var(--turkuaz-koyu);
+        }
+
+        .br-geri.hata {
+            color: var(--kirmizi);
+        }
+
+        .br-alt {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .br-alt .sp-btn {
+            flex: 1;
+        }
+
+        .sp-btn[hidden] {
+            display: none;
+        }
+
+        /* ---------- Çoğu şerit ---------- */
+        .br-ust {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        .br-bar {
+            flex: 1;
+            background: var(--zemin-2);
+            border-radius: 999px;
+            height: 16px;
+            overflow: hidden;
+            border: 2px solid var(--cizgi);
+        }
+
+        .br-bar>div {
+            height: 100%;
+            width: 0%;
+            background: var(--mor);
+            border-radius: 999px;
+            transition: width .35s;
+        }
+
+        .br-sayac {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--yazi-soluk);
+            white-space: nowrap;
+        }
+
+        /* ---------- Kelime kutusu (sorulan kelimenin anlamı) ---------- */
+        .br-kelime {
+            background: var(--kart);
+            border: 2px solid var(--cizgi);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 6px 0 var(--cizgi);
+        }
+
+        .br-kelime .kanji {
+            font-size: 30px;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        .br-kelime .tr {
+            margin-top: 8px;
+            color: var(--yazi-soluk);
+            font-weight: 800;
+            font-size: 15px;
+        }
+
+        .br-kelime .ro {
+            margin-top: 4px;
+            color: var(--mor);
+            font-weight: 800;
+            font-size: 14px;
+        }
+
+        /* ---------- Tur sonu ---------- */
+        .br-sonuc {
+            text-align: center;
+        }
+
+        .br-sonuc .buyuk {
+            font-size: 62px;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .br-sonuc h2 {
+            margin: 0 0 8px;
+            font-size: 23px;
+        }
+
+        .br-ozet {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 18px 0;
+        }
+
+        .br-ozet div {
+            background: var(--zemin-2);
+            border: 2px solid var(--cizgi);
+            border-radius: 14px;
+            padding: 12px;
+        }
+
+        .br-ozet b {
+            display: block;
+            font-size: 22px;
+        }
+
+        .br-ozet small {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--yazi-soluk);
+        }
+
+        /* Kelime listesi: turda kurulan kelimeler tek yerde toplanır (tekrar değeri) */
+        .br-liste {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 16px 0;
+            text-align: left;
+        }
+
+        .br-satir {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--zemin-2);
+            border: 2px solid var(--cizgi);
+            border-radius: 14px;
+            padding: 10px 13px;
+        }
+
+        .br-satir b {
+            font-size: 19px;
+        }
+
+        .br-satir small {
+            color: var(--yazi-soluk);
+            font-weight: 700;
+            font-size: 12.5px;
+        }
+
+        @media (max-width: 520px) {
+            .br-tas {
+                width: 48px;
+                height: 54px;
+                font-size: 25px;
+            }
+
+            .br-yer {
+                width: 40px;
+                height: 48px;
+            }
+
+            .br-kelime .kanji {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body class="sp">
+    <nav class="sp-ust">
+        <button class="sp-pill tikla" id="geriBtn" title="Haritaya dön" aria-label="Haritaya dön">←</button>
+        <div class="sp-logo">g���️ <span>Harf Birleştirme</span></div>
+        <div class="sp-istatistik"><span class="sp-pill" id="xpRozet">✨ 0</span></div>
+    </nav>
+
+    <div class="kapsayici" id="kok"></div>
+
+    <script src="mufredat.js?v=3"></script>
+    <script src="ilerleme.js?v=11"></script>
+    <script src="ses.js?v=5"></script>
+    <script src="kana.js?v=18"></script>
+    <script src="reading.js?v=14"></script>
+    <script src="kelime.js?v=10"></script>
+    <script src="pwa.js?v=5"></script>
+    <script src="bulut.js?v=3"></script>
+    <script src="analitik.js?v=2" defer></script>
+    <script>window.addEventListener('load', function () { if (window.Analitik) window.Analitik.sayfa('birlestirme'); });</script>
+    <script src="ayarlar.js?v=1"></script>
+    <!-- HARF BİRLE�?TİRME MOTORU: öğretilen harflerden gerçek kelime kurma -->
+    <script src="birlestirme.js?v=1"></script>
+    <!-- SURUM GUNCELLEME BILDIRIMI (guncelleme.js) -->
+    <script src="guncelleme.js?v=1"></script>
+    <script src="sahne3d.js?v=1"></script>
+    <!-- VİDEO ARKA PLAN: videolar/yatay|dikey/arkaplan.webm döngüde oynar.
+         Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
+         KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli (aynı negatif
+         z-index'te sonra gelen katman üstte görünür). -->
+    <script src="video-arkaplan.js?v=4"></script>
+</body>
+
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakar Paisen | Sözlük</title>
+    <meta name="theme-color" content="#7b5cf0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="stylesheet" href="uygulama.css?v=14">
+    <meta name="sp-sayfa" content="sozluk">
+    <style>
+        .kapsayici { max-width: 760px; margin: 0 auto; padding: 20px 16px 80px; }
+
+        /* ---------- Arama kutusu ---------- */
+        .ara-kap { position: relative; margin-bottom: 14px; }
+        .ara {
+            width: 100%; box-sizing: border-box;
+            background: var(--kart); color: var(--yazi);
+            border: 2px solid var(--cizgi); border-radius: 16px;
+            padding: 14px 48px 14px 18px;   /* sağda temizle düğmesine yer */
+            font-size: 17px; font-weight: 700;
+            font-family: inherit; outline: none; box-shadow: 0 4px 0 var(--cizgi);
+            transition: border-color .15s;
+        }
+        .ara:focus { border-color: var(--mor); }
+        .ara::placeholder { color: #b3aa9b; font-weight: 600; }
+        /* Temizle düğmesi kutunun İÇİNDE durur: ayrı bir kutu kaplamaz */
+        .temizle {
+            position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+            width: 34px; height: 34px; border-radius: 50%;
+            background: var(--zemin-2); border: none;
+            font-size: 16px; cursor: pointer; color: var(--yazi-soluk);
+            font-family: inherit; line-height: 1;
+        }
+        .temizle:hover { background: var(--cizgi); color: var(--kirmizi); }
+
+        /* ---------- Tür filtreleri ---------- */
+        .tur-sec { display: flex; gap: 6px; background: var(--zemin-2); border-radius: 14px;
+                   padding: 4px; margin-bottom: 18px; flex-wrap: wrap; }
+        .tur-sec button { border: none; background: none; font-family: inherit; font-size: 13.5px;
+                          font-weight: 800; color: var(--yazi-soluk); padding: 9px 14px;
+                          border-radius: 11px; cursor: pointer; transition: .15s; }
+        .tur-sec button:hover { color: var(--yazi); }
+        .tur-sec button.aktif { background: var(--kart); color: var(--mor); box-shadow: 0 2px 0 var(--cizgi); }
+
+        /* ---------- Sonuç listesi ---------- */
+        .sonuc { display: flex; flex-direction: column; gap: 8px; }
+        .s-satir {
+            display: flex; align-items: center; gap: 14px;
+            background: var(--kart); border: 2px solid var(--cizgi);
+            border-radius: 16px; padding: 12px 16px; box-shadow: 0 3px 0 var(--cizgi);
+            cursor: pointer; transition: .15s; text-decoration: none; color: inherit;
+        }
+        .s-satir:hover { border-color: var(--mor); transform: translateY(-2px); }
+        .s-ja { font-size: 26px; font-weight: 800; min-width: 70px; }
+        .s-orta { flex: 1; min-width: 0; }
+        .s-ro { font-size: 15px; color: var(--yazi-soluk); font-weight: 700; }
+        .s-tr { font-size: 15px; font-weight: 800; color: var(--turkuaz-koyu); }
+        .s-tur { font-size: 10.5px; font-weight: 800; border-radius: 999px; padding: 3px 9px;
+                 background: var(--zemin-2); color: var(--yazi-soluk);
+                 border: 1.5px solid var(--cizgi); flex: none; text-transform: uppercase; }
+        .s-tur.harf { background: #f3f0ff; color: var(--mor); border-color: #dcd3ff; }
+        .s-tur.kanji { background: #fff8e8; color: var(--altin-koyu); border-color: var(--altin); }
+        .s-tur.defter { background: #e6f8f4; color: var(--turkuaz-koyu); border-color: #b9ece2; }
+        :root[data-tema] .s-tur.harf { background: #262040; border-color: #3d3170; }
+        :root[data-tema] .s-tur.kanji { background: #2e2814; border-color: #5c4d1f; }
+        :root[data-tema] .s-tur.defter { background: #16332e; border-color: #235b51; }
+
+        /* ---------- Boş / açılış ekranı ---------- */
+        .bos { text-align: center; padding: 40px 20px; }
+        .bos .simge { font-size: 56px; margin-bottom: 12px; }
+        .bos h3 { margin: 0 0 8px; font-size: 19px; }
+        .bos p { margin: 0 0 16px; color: var(--yazi-soluk); font-weight: 600; line-height: 1.5; }
+        .one-cikan { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+        .one-cikan button {
+            background: var(--zemin-2); border: 2px solid var(--cizgi); border-radius: 999px;
+            padding: 8px 16px; font-family: inherit; font-size: 13.5px; font-weight: 800;
+            color: var(--yazi-soluk); cursor: pointer;
+        }
+        .one-cikan button:hover { border-color: var(--mor); color: var(--mor); }
+    </style>
+</head>
+<body class="sp">
+    <nav class="sp-ust">
+        <button class="sp-pill tikla" id="geriBtn" title="Haritaya dön" aria-label="Haritaya dön">←</button>
+        <div class="sp-logo">g��? <span>Sözlük</span></div>
+        <div class="sp-istatistik"><span class="sp-pill" id="sayiRozet">—</span></div>
+    </nav>
+
+    <div class="kapsayici">
+        <div class="ara-kap">
+            <input class="ara" id="araKutu" type="search" autocomplete="off"
+                   placeholder="Japonca, romaji veya Türkçe yaz...">
+            <button class="temizle" id="temizleBtn" title="Temizle" aria-label="Aramayı temizle">✅</button>
+        </div>
+
+        <div class="tur-sec" id="turSec">
+            <button data-tur="hepsi" class="aktif">Hepsi</button>
+            <button data-tur="harf">Harf</button>
+            <button data-tur="kelime">Kelime</button>
+            <button data-tur="kanji">Kanji</button>
+            <button data-tur="defter">Defterim</button>
+        </div>
+
+        <div id="kok"></div>
+    </div>
+
+    <script src="mufredat.js?v=3"></script>
+    <script src="ilerleme.js?v=11"></script>
+    <script src="ses.js?v=5"></script>
+    <script src="kana.js?v=17"></script>
+    <script src="reading.js?v=15"></script>
+    <script src="kanji.js?v=2"></script>
+    <script src="kelime.js?v=10"></script>
+    <script src="pwa.js?v=5"></script>
+    <script src="bulut.js?v=3"></script>
+    <script src="analitik.js?v=2" defer></script>
+    <script>window.addEventListener('load', function () { if (window.Analitik) window.Analitik.sayfa('sozluk'); });</script>
+    <script src="ayarlar.js?v=1"></script>
+    <!-- SÖZLÜK: tüm içeriği tek yerden aranabilir yapar -->
+    <script src="sozluk.js?v=1"></script>
+    <script>
+        const el = (t, c, m) => {
+            const e = document.createElement(t);
+            if (c) e.className = c;
+            if (m != null) e.textContent = m;
+            return e;
+        };
+        const kok = document.getElementById('kok');
+        const kutu = document.getElementById('araKutu');
+        let aktifTur = 'hepsi';
+
+        document.getElementById('geriBtn').onclick = () => {
+            window.location.href = Ilerleme.isim() ? 'dojo.html' : 'index.html';
+        };
+
+        // ---------- Arama ----------
+        function ciz() {
+            const q = kutu.value.trim();
+            if (!q) { acilisEkrani(); return; }
+
+            const sonuc = Sozluk.ara(q, aktifTur);
+            kok.replaceChildren();
+
+            if (!sonuc.length) {
+                const b = el('div', 'bos');
+                b.append(
+                    el('div', 'simge', 'g��?'),
+                    el('h3', '', '\"' + q + '\" bulunamadı'),
+                    el('p', '', 'Farklı bir yazım dene: romaji (ka), Japonca (あ) veya Türkçe anlam.')
+                );
+                kok.append(b);
+                return;
+            }
+
+            const baslik = el('div', 's-tur', sonuc.length + ' sonuç');
+            baslik.style.cssText = 'display:inline-block;margin-bottom:12px';
+            kok.append(baslik);
+
+            const liste = el('div', 'sonuc');
+            sonuc.forEach(x => {
+                const a = el('a', 's-satir');
+                a.href = x.url;
+                a.append(
+                    el('div', 's-ja', x.ja),
+                    (function () {
+                        const o = el('div', 's-orta');
+                        if (x.ro) o.append(el('div', 's-ro', x.ro));
+                        if (x.tr || x.tur === 'harf') o.append(el('div', 's-tr', x.tr || ''));
+                        return o;
+                    })(),
+                    el('span', 's-tur ' + x.tur, x.tur === 'defter' ? 'defterim' : x.tur)
+                );
+                // Harfler için dinleme düğmesi (öğrenmeye doğrudan katkı)
+                if (x.tur === 'harf') {
+                    const ses = el('button', 's-tur', 'gY"S');
+                    ses.title = 'Dinle';
+                    ses.onclick = (ev) => {
+                        ev.preventDefault();   // bağlantıyı açma
+                        try { if (window.Ses && Ses.harf) Ses.harf(x.ja); } catch (e) { }
+                    };
+                    a.append(ses);
+                }
+                liste.append(a);
+            });
+            kok.append(liste);
+        }
+
+        // ---------- Açılış ekranı ----------
+        function acilisEkrani() {
+            const s = Sozluk.sayilar();
+            document.getElementById('sayiRozet').textContent = s.toplam + ' kayıt';
+            kok.replaceChildren();
+            const b = el('div', 'bos');
+            b.append(
+                el('div', 'simge', 'g��?'),
+                el('h3', '', 'Ne aramak istersin?'),
+                el('p', '', s.harf + ' harf · ' + s.kelime + ' kelime · ' + s.kanji +
+                    ' kanji · ' + s.defter + ' defter kaydı aranabilir.')
+            );
+
+            const one = el('div', 'one-cikan');
+            ['a', 'ka', 'shi', 'つ', 'kanji', 'hiragana'].forEach(o => {
+                const btn = el('button', '', o);
+                btn.onclick = () => { kutu.value = o; ciz(); };
+                one.append(btn);
+            });
+            b.append(el('p', '', 'Hızlı denemeler:'), one);
+            kok.append(b);
+        }
+
+        // ---------- Olaylar ----------
+        kutu.addEventListener('input', ciz);
+        document.getElementById('temizleBtn').onclick = () => {
+            kutu.value = ''; acilisEkrani(); kutu.focus();
+        };
+
+        document.getElementById('turSec').addEventListener('click', (e) => {
+            const b = e.target.closest('button');
+            if (!b) return;
+            aktifTur = b.dataset.tur;
+            [].forEach.call(e.currentTarget.children, c => c.classList.toggle('aktif', c === b));
+            ciz();
+        });
+
+        acilisEkrani();
+        kutu.focus();
+    </script>
+    <!-- SURUM GUNCELLEME BILDIRIMI (guncelleme.js) -->
+    <script src="guncelleme.js?v=1"></script>
+    <script src="sahne3d.js?v=1"></script>
+    <!-- VİDEO ARKA PLAN: videolar/yatay|dikey/arkaplan.webm döngüde oynar.
+         Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
+         KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli (aynı negatif
+         z-index'te sonra gelen katman üstte görünür). -->
+    <script src="video-arkaplan.js?v=4"></script>
+</body>
+</html>

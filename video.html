@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakar Paisen | Video Dersler</title>
+    <meta name="theme-color" content="#7b5cf0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="stylesheet" href="uygulama.css?v=14">
+    <meta name="sp-sayfa" content="video">
+    <style>
+        body { margin: 0; }
+        .kapsayici { max-width: 960px; margin: 0 auto; padding: 22px 16px 70px; }
+
+        .vd-giris { margin-bottom: 22px; }
+        .vd-giris h1 { margin: 0 0 7px; font-size: 25px; }
+        .vd-giris p { margin: 0; color: var(--yazi-soluk); font-weight: 700; font-size: 14px; line-height: 1.5; }
+
+        /* ---------- Video oynatıcı (tıkla-oynat) ---------- */
+        /* NEDEN TIKLA-OYNAT: iframe doğrudan gömülürse sayfa açılır açılmaz
+           YouTube'a istek gider ve çerez yazılabilir. Kapak görseli + buton
+           kullanınca kullanıcı tıklayana kadar hiçbir dış istek olmaz.
+           Bu projede analitik/reklam da aynı ilkeyle kapalı tutuluyor. */
+        .vd-oynatici { position: relative; width: 100%; aspect-ratio: 16 / 9; background: var(--zemin-2);
+                       border: 2px solid var(--cizgi); border-radius: 20px; overflow: hidden;
+                       box-shadow: 0 6px 0 var(--cizgi); margin-bottom: 22px; }
+        .vd-oynatici iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+        .vd-kapak { position: absolute; inset: 0; display: flex; flex-direction: column;
+                    align-items: center; justify-content: center; gap: 14px;
+                    background: linear-gradient(135deg, color-mix(in srgb, var(--mor) 22%, var(--zemin-2)), var(--zemin-2));
+                    cursor: pointer; border: none; width: 100%; font-family: inherit; color: var(--yazi); }
+        .vd-kapak:hover .vd-oynat { transform: scale(1.08); }
+        .vd-oynat { width: 78px; height: 78px; border-radius: 50%; background: var(--mor); color: #fff;
+                    display: grid; place-items: center; font-size: 30px; flex: none;
+                    box-shadow: 0 6px 0 var(--mor-golge); transition: transform .16s;
+                    /* Üçgen, daireye göre hafif sağa kaydırılırsa ortalanmış görünür */
+                    padding-left: 5px; }
+        .vd-kapak .vd-kapak-yazi { font-size: 14px; font-weight: 800; color: var(--yazi-soluk); }
+
+        /* ---------- Video bilgisi ---------- */
+        .vd-bilgi { background: var(--kart); border: 2px solid var(--cizgi); border-radius: 18px;
+                    padding: 18px; box-shadow: 0 4px 0 var(--cizgi); margin-bottom: 26px; }
+        .vd-bilgi h2 { margin: 0 0 8px; font-size: 20px; }
+        .vd-bilgi .vd-acik { color: var(--yazi-soluk); font-weight: 700; font-size: 13.5px; line-height: 1.55; margin: 0 0 14px; }
+        .vd-etiketler { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 14px; }
+        .vd-etiket { padding: 5px 11px; border-radius: 999px; background: var(--zemin-2);
+                     color: var(--yazi-soluk); font-size: 11px; font-weight: 800; }
+        .vd-etiket.mor { background: color-mix(in srgb, var(--mor) 15%, var(--kart)); color: var(--mor); }
+        .vd-alt { display: flex; flex-wrap: wrap; gap: 10px; }
+        .vd-alt .sp-btn { flex: 1; min-width: 150px; }
+
+        /* ---------- Bölüm başlıkları ve video listesi ---------- */
+        .vd-bolum { margin-bottom: 26px; }
+        .vd-bolum h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 12px;
+                       font-size: 15px; color: var(--yazi-soluk); text-transform: uppercase;
+                       letter-spacing: .5px; }
+        .vd-liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+
+        /* Video kartı: küçük kapak + başlık + açıklama */
+        .vd-kart { display: block; background: var(--kart); border: 2px solid var(--cizgi);
+                   border-radius: 18px; overflow: hidden; text-decoration: none; color: inherit;
+                   box-shadow: 0 4px 0 var(--cizgi); transition: transform .14s, border-color .15s, box-shadow .14s;
+                   cursor: pointer; text-align: left; font-family: inherit; padding: 0; width: 100%; }
+        .vd-kart:hover { transform: translateY(-4px); border-color: var(--mor); box-shadow: 0 8px 0 var(--cizgi); }
+        .vd-kart.secili { border-color: var(--mor); box-shadow: 0 4px 0 var(--mor-golge); }
+        .vd-kart .k-kapak { position: relative; aspect-ratio: 16 / 9; background: var(--zemin-2);
+                            display: grid; place-items: center; font-size: 36px; }
+        .vd-kart .k-sure { position: absolute; right: 8px; bottom: 8px; background: rgba(0,0,0,.75);
+                           color: #fff; font-size: 10.5px; font-weight: 800; padding: 3px 8px; border-radius: 8px; }
+        .vd-kart .k-govde { padding: 13px 14px 15px; }
+        .vd-kart .k-ad { font-size: 14px; font-weight: 800; display: block; }
+        .vd-kart .k-acik { font-size: 12px; font-weight: 700; color: var(--yazi-soluk);
+                           line-height: 1.45; margin-top: 5px; display: block; }
+
+        /* ---------- Yakında (öneri listesi) ---------- */
+        .vd-yakinda { background: var(--zemin-2); border: 2px dashed var(--cizgi); border-radius: 18px;
+                      padding: 18px; }
+        .vd-yakinda h3 { margin: 0 0 6px; font-size: 15px; }
+        .vd-yakinda > p { margin: 0 0 14px; color: var(--yazi-soluk); font-size: 13px; font-weight: 700; }
+        .vd-yakinda-liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 9px; }
+        .vd-yakinda-satir { display: flex; align-items: flex-start; gap: 9px; background: var(--kart);
+                            border: 2px solid var(--cizgi); border-radius: 13px; padding: 10px 12px; }
+        .vd-yakinda-satir .y-simge { font-size: 17px; flex: none; }
+        .vd-yakinda-satir b { display: block; font-size: 12.5px; font-weight: 800; }
+        .vd-yakinda-satir small { display: block; color: var(--yazi-soluk); font-size: 11.5px;
+                                  font-weight: 700; margin-top: 2px; line-height: 1.4; }
+
+        /* ---------- Boş durum ve kanal çağrısı ---------- */
+        .vd-cagri { background: linear-gradient(135deg, color-mix(in srgb, var(--turkuaz) 12%, var(--kart)), var(--kart));
+                    border: 2px solid color-mix(in srgb, var(--turkuaz) 35%, var(--cizgi)); border-radius: 18px;
+                    padding: 18px; margin-top: 26px; text-align: center; }
+        .vd-cagri p { margin: 0 0 12px; font-weight: 700; color: var(--yazi-soluk); font-size: 13.5px; }
+
+        /* ---------- İzleme durumu ---------- */
+        /* NEDEN: Video izlemek de öğrenmedir. Kullanıcı hangi videoyu izlediğini
+           görmeli; yoksa aynı videoyu tekrar açıp zaman kaybediyor. */
+        .vd-izle { display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+                   margin-top: 14px; padding-top: 14px; border-top: 2px solid var(--zemin-2); }
+        .vd-izle-btn { background: var(--turkuaz); color: #fff; border: none; border-radius: 12px;
+                       padding: 11px 18px; font-family: inherit; font-size: 14px; font-weight: 800;
+                       letter-spacing: .3px; cursor: pointer; box-shadow: 0 4px 0 var(--turkuaz-koyu);
+                       transition: transform .08s, box-shadow .08s; }
+        .vd-izle-btn:hover { filter: brightness(1.05); }
+        .vd-izle-btn:active { transform: translateY(4px); box-shadow: none; }
+        .vd-izle-btn.tamam { background: var(--zemin-2); color: var(--turkuaz-koyu);
+                             box-shadow: none; cursor: default; }
+        .vd-izle-not { font-size: 12.5px; font-weight: 700; color: var(--yazi-soluk); }
+
+        /* Kart üzerinde izlendi rozeti */
+        .vd-kart .k-izlendi { position: absolute; left: 8px; top: 8px; background: var(--turkuaz);
+                              color: #fff; font-size: 10.5px; font-weight: 800; padding: 3px 9px;
+                              border-radius: 8px; }
+
+        /* Kanal çağrısı kutusu: abone ol düğmesi */
+        .vd-cagri-icerik { display: flex; align-items: center; justify-content: center;
+                           gap: 12px; flex-wrap: wrap; }
+        .vd-cagri .kanal-ad { font-weight: 800; font-size: 15px; display: flex;
+                              align-items: center; gap: 7px; }
+        .vd-abone { background: #ff0033; color: #fff; border: none; border-radius: 12px;
+                    padding: 11px 18px; font-family: inherit; font-size: 13.5px; font-weight: 800;
+                    text-decoration: none; display: inline-flex; align-items: center; gap: 7px;
+                    box-shadow: 0 4px 0 #b3001f; transition: transform .08s, box-shadow .08s; }
+        .vd-abone:active { transform: translateY(4px); box-shadow: none; }
+
+        @media (max-width: 620px) {
+            .vd-giris h1 { font-size: 21px; }
+            .vd-oynat { width: 62px; height: 62px; font-size: 24px; }
+            .vd-liste { grid-template-columns: 1fr; }
+            .vd-alt .sp-btn { min-width: 100%; }
+        }
+    </style>
+</head>
+<body class="sp">
+    <nav class="sp-ust">
+        <button class="sp-pill tikla" id="geriBtn" title="Haritaya dön" aria-label="Haritaya dön">←</button>
+        <div class="sp-logo">g�?� <span>Video Dersler</span></div>
+        <div class="sp-istatistik">
+            <a class="sp-pill tikla mor" href="dojo.html">Dojo'ya git</a>
+        </div>
+    </nav>
+
+    <div class="kapsayici">
+        <div class="vd-giris">
+            <h1>İzleyerek öğren</h1>
+            <p>Yazılı derslerin videolu hâli. Okumak yerine dinleyip izleyerek öğrenmeyi seçenler için.</p>
+        </div>
+
+        <!-- OYNATICI: tıkla-oynat. Video seçilince burada açılır. -->
+        <div class="vd-oynatici" id="oynatici"></div>
+
+        <!-- SEÇİLİ VİDEO BİLGİSİ -->
+        <div class="vd-bilgi" id="bilgi"></div>
+
+        <!-- BÖLÜMLERE GÖRE VİDEO LİSTESİ -->
+        <div id="liste"></div>
+
+        <!-- VİDEO BA�?LANTISI YOKSA / HER DURUMDA: kanal çağrısı -->
+        <div class="vd-cagri" id="cagri" hidden>
+            <p>Bu videolar Sakar Paisen'in kendi kanalından. Yeni dersler eklendikçe burada görünecek.</p>
+            <div class="vd-cagri-icerik" id="kanalAlan"></div>
+        </div>
+
+        <!-- YAKINDA: hazırlanan video fikirleri -->
+        <div class="vd-yakinda" id="yakinda" hidden>
+            <h3>g�?� Yapılacak videolar</h3>
+            <p>Bu konular kanalda planlanıyor. Fikrini Sensei'ye yazarsan sırayı birlikte belirleriz.</p>
+            <div class="vd-yakinda-liste" id="yakindaListe"></div>
+        </div>
+    </div>
+
+    <script src="mufredat.js?v=3"></script>
+    <script src="ilerleme.js?v=11"></script>
+    <script src="ses.js?v=5"></script>
+    <script src="kana.js?v=18"></script>
+    <script src="pwa.js?v=5"></script>
+    <script src="bulut.js?v=3"></script>
+    <script src="analitik.js?v=2" defer></script>
+    <script>window.addEventListener('load', function () { if (window.Analitik) window.Analitik.sayfa('video'); });</script>
+    <script src="ayarlar.js?v=1"></script>
+    <!-- VİDEO VERİSİ + SAYFA MOTORU -->
+    <script src="video.js?v=1"></script>
+    <script src="video-sayfa.js?v=1"></script>
+    <script src="guncelleme.js?v=1"></script>
+    <script src="sahne3d.js?v=1"></script>
+    <!-- VİDEO ARKA PLAN: videolar/yatay|dikey/arkaplan.webm döngüde oynar.
+         Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
+         KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli (aynı negatif
+         z-index'te sonra gelen katman üstte görünür). -->
+    <script src="video-arkaplan.js?v=4"></script>
+</body>
+</html>

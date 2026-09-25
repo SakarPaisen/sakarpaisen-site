@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakar Paisen | Dojo Haritası</title>
+    <meta name="theme-color" content="#7b5cf0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="stylesheet" href="uygulama.css?v=14">
+    <link rel="stylesheet" href="dojo.css?v=3">
+    <style>
+        /* Sayfaya ozel ince ayarlar. Tema renkleri uygulama.css'ten gelir. */
+
+        /* İÇERİK KATMANI: 3D sahne arkada (z-index:0) kalır. */
+        .ust-menu, .ana-kapsayici { position: relative; z-index: 1; }
+        /* Harita paneli hafif saydam: arkadaki sahne kenarlardan görünür,
+           metin okunurluğu bozulmaz. */
+        .sag-panel { background-color: color-mix(in srgb, var(--kart) 94%, transparent); backdrop-filter: blur(4px); }
+        @media (min-width: 761px) {
+            .ana-kapsayici { gap: 40px; }
+            .ust-menu { padding: 12px 26px; border-bottom: 2px solid var(--cizgi); }
+            .sag { margin-left: 0; } .sol { margin-right: 0; }
+        }
+
+                /* Sayfa ici ozel kural yok; tum stiller uygulama.css + dojo.css'te. */
+
+        /* REKLAM ALANI: sağ panelin en altında. Ayar boşken gizli. Bkz. reklam.js */
+        .sag-panel .reklam-alani { min-height: 250px; margin-top: 14px; background: var(--zemin-2);
+                                   border: 2px dashed var(--cizgi); border-radius: 16px;
+                                   display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .reklam-alani[hidden] { display: none; }
+        .reklam-alani .reklam-etiket { font-size: 11px; font-weight: 800; color: var(--yazi-soluk);
+                                       text-transform: uppercase; letter-spacing: 1px; }
+    </style>
+</head>
+<body class="sp dojo">
+    <nav class="ust-menu">
+        <div class="logo" onclick="window.location.href='index.html'">⛩️ Sakar <span>Paisen</span></div>
+        <div class="istatistikler">
+            <div class="stat-kutu seri-kutu" title="Günlük seri">g��� <span id="seriGosterge">0</span></div>
+            <!-- Seri koruma: bir gün kaçırınca seriyi kurtarır (7 günde 1 kazanılır, en fazla 2) -->
+            <div class="stat-kutu koruma-kutu" id="korumaKutu" hidden
+                 title="Seri koruma: bir gün ara verirsen serin kırılmaz">g���️ <span id="korumaGosterge">0</span></div>
+            <div class="stat-kutu" id="rutbeKutu" title="Rütben"></div>
+            <div class="stat-kutu">⭐ <span id="xpGosterge" style="color: var(--altin-renk);">0</span> XP</div>
+        </div>
+        <div class="istatistikler" id="sagMenu">
+            <!-- ÇALI�?MA ALANLARI: dojo haritasından bağımsız araç merkezi (alanlar.html) -->
+            <div class="stat-kutu" id="alanBtn" title="Çalışma alanları: yazma, kelime, kanji, cümle" role="button" tabindex="0">g���</div>
+            <!-- İstatistikler: gelişimini grafiklerle gör -->
+            <div class="stat-kutu" id="statBtn" title="İstatistiklerim" role="button" tabindex="0">g���</div>
+            <!-- Ayarlar: tema, ses, zorluk, veri yönetimi -->
+            <div class="stat-kutu" id="ayarBtn" title="Ayarlar" role="button" tabindex="0">⚙️</div>
+            <div class="stat-kutu yardim" id="yardim" title="Nasıl oynanır?">❓</div>
+            <div class="stat-kutu profil" id="profil" title="Tıkla: ilerlemeyi sıfırla"></div>
+        </div>
+    </nav>
+
+    <div class="ana-kapsayici">
+        <main class="harita-alani" id="dinamikHarita"></main>
+
+        <aside class="sag-panel">
+            <!-- ÇALI�?MA PLANI: "bugün ne çalışayım" sorusunu yanıtlar (plan.js).
+                 Karar yorgunluğunu engeller: kullanıcı tek bir adıma tıklar. -->
+            <div class="kart-kutu" id="planKutu" hidden>
+                <h4>g��� Bugün planı <span id="planSure"></span></h4>
+                <div id="planListe"></div>
+            </div>
+
+            <h3>Sensei'nin Yolu</h3>
+            <div class="bar"><div id="gorevBar"></div></div>
+            <div class="kucuk" id="ilerlemeYazi"></div>
+            <div class="chibi-kap" id="chibiAlan"></div>
+            <div class="balon" id="balon"></div>
+            <!-- SENSEİ Ö�?ÜDÜ: duruma göre akıllı ipucu (ogut.js) -->
+            <div class="ogut-balon" id="ogutBalon" hidden></div>
+
+            <!-- GÜNLÜK HEDİYE SANDI�?I: günde bir kez açılır (hediye.js) -->
+            <button class="sandik-btn" id="sandikBtn" hidden>
+                <span class="sb-simge">g�?�</span>
+                <span>Günlük hediyeni al<span class="sb-alt" id="sandikAlt">Bugün için hazır</span></span>
+            </button>
+
+            <div class="kart-kutu">
+                <h4>g�?� Günlük hedef</h4>
+                <div class="bar altin"><div id="gunlukBar"></div></div>
+                <div class="kucuk" style="margin-bottom:0" id="gunlukYazi"></div>
+            </div>
+
+            <!-- GÜNLÜK GÖREVLER: her gün 3 küçük hedef (gorevler.js). Tamamlayınca
+                 ekstra XP verir. İçerik JS ile doldurulur, boşsa gizlenir. -->
+            <div class="kart-kutu" id="gorevKutu" hidden>
+                <h4>g��� Günlük görevler <span id="gorevSayi"></span></h4>
+                <div id="gorevListe"></div>
+            </div>
+
+            <div class="kart-kutu" id="tekrarKutu"></div>
+            <div class="kart-kutu" id="zayifKutu" hidden></div>
+
+            <!-- Kelime defteri: öğrenilen kelimeler tek yerde toplanır -->
+            <a class="kart-kutu kelime-kutu" id="kelimeKutu" href="kelime.html">
+                <h4>g��� Kelime defterim</h4>
+                <div class="bar"><div id="kelimeBar"></div></div>
+                <div class="kucuk" id="kelimeYazi" style="margin-bottom:0">Öğrendiğin kelimeler burada birikir.</div>
+                <div class="kelime-uyari" id="kelimeUyari" hidden></div>
+            </a>
+
+            <!-- Geri bildirim: kullanıcı bir şey söylemek isterse -->
+            <div class="kart-kutu geri-kutu">
+                <h4>g��� Sensei'ye söyle</h4>
+                <textarea id="geriMetin" rows="3" maxlength="600"
+                          placeholder="Hata mı var, bir istek mi var? Yaz buraya..."></textarea>
+                <div class="geri-alt">
+                    <input id="geriMail" type="email" maxlength="80" placeholder="E-posta (isteğe bağlı)">
+                    <button class="tekrar-btn" id="geriGonder">GÖNDER</button>
+                </div>
+                <!-- Hata oluşursa bu not kendiliğinden görünür -->
+                <div class="geri-hata-notu" id="geriHataNotu" hidden></div>
+                <label class="geri-teknik-satir" title="Hangi sayfada olduğun, ekran boyutun ve varsa hata mesajı gönderilir. Adın veya e-postan gönderilmez.">
+                    <input type="checkbox" id="geriTeknik">
+                    <span>Teknik bilgi de gönder (hata varsa sebebini bulmak için)</span>
+                </label>
+                <pre class="geri-onizleme" id="geriOnizleme" hidden></pre>
+                <div class="geri-durum" id="geriDurum"></div>
+            </div>
+
+            <!-- SINAV MODU: rastgele karışık sınav (sinav.js). Her zaman açık. -->
+            <a class="kart-kutu" href="oyun.html?ders=sinav" style="text-decoration:none;color:inherit">
+                <h4>g�?� Karışık Sınav</h4>
+                <div class="kucuk" style="margin-bottom:0">20 rastgele soru · 3 can · 120 XP. Ne kadar bildiğini test et!</div>
+            </a>
+
+            <!-- Dinleme alıştırması: kulak eğitimi (dinleme.html) -->
+            <a class="kart-kutu" href="dinleme.html" style="text-decoration:none;color:inherit">
+                <h4>g�?� Dinleme alıştırması</h4>
+                <div class="kucuk" style="margin-bottom:0">Sesi duy, harfi seç. 12 soruluk tur.</div>
+            </a>
+
+            <!-- YAZMA ATÖLYESİ: harfi gör, okunuşunu klavyeden yaz (yazma.html).
+                 Tanıma değil HATIRLAMA çalışır; can yok, sınırsız deneme var. -->
+            <a class="kart-kutu" href="yazma.html" style="text-decoration:none;color:inherit">
+                <h4>✍️ Yazma atölyesi</h4>
+                <div class="kucuk" style="margin-bottom:0">Harfi gör, okunuşunu yaz. Can yok, istediğin kadar dene.</div>
+            </a>
+
+            <!-- HARF BİRLE�?TİRME: öğrenilen harflerden gerçek kelime kurma (birlestirme.html).
+                 "Harfleri biliyorum ama kelime okuyamıyorum" duvarını yıkar. -->
+            <a class="kart-kutu" href="birlestirme.html" style="text-decoration:none;color:inherit">
+                <h4>g��� Harf birleştirme</h4>
+                <div class="kucuk" style="margin-bottom:0">Öğrendiğin harflerle gerçek kelimeler kur: ね + こ = ねこ</div>
+            </a>
+
+            <!-- CÜMLE ATÖLYESİ: kelimeleri doğru sıraya dizerek cümle kurma (cumle.html).
+                 Japonca cümlede yüklem sonda olur; bu alan o sırayı öğretir. -->
+            <a class="kart-kutu" href="cumle.html" style="text-decoration:none;color:inherit">
+                <h4>g��� Cümle atölyesi</h4>
+                <div class="kucuk" style="margin-bottom:0">Türkçesi verilir, Japonca sırayı sen kur.</div>
+            </a>
+
+            <!-- KANJİ ÇALI�?MA: dojo'dan bağımsız kanji kütüphanesi (kanji.html).
+                 Ders akışı yok: ara, süz, istediğin kanjiyi incele, kart çalış. -->
+            <a class="kart-kutu" href="kanji.html" style="text-decoration:none;color:inherit">
+                <h4>g��� Kanji çalışma</h4>
+                <div class="kucuk" style="margin-bottom:0">Kanji kütüphanesi: ara, incele, kartlarla çalış.</div>
+            </a>
+
+            <!-- VİDEO DERSLER: kanaldaki anlatımlar (video.html).
+                 Yazılı derslerin videolu hali; farkli ogrenme bicimi sunar. -->
+            <a class="kart-kutu" href="video.html" style="text-decoration:none;color:inherit">
+                <h4>g�?� Video dersler</h4>
+                <div class="kucuk" style="margin-bottom:0">Hiragana ve Katakana anlatımları izleyerek öğren.</div>
+            </a>
+
+            <!-- Sözlük: tüm içeriği tek yerden ara (sozluk.html) -->
+            <a class="kart-kutu" href="sozluk.html" style="text-decoration:none;color:inherit">
+                <h4>g��? Sözlük</h4>
+                <div class="kucuk" style="margin-bottom:0">Harf, kelime ve kanji ara. "tsu" yaz mesela.</div>
+            </a>
+
+            <!-- İstatistikler: gelişimini grafiklerle gör (canvas, dış kütüphane yok) -->
+            <a class="kart-kutu" href="istatistik.html" style="text-decoration:none;color:inherit">
+                <h4>g��� İstatistiklerim</h4>
+                <div class="kucuk" style="margin-bottom:0">Günlük grafik, ısı haritası ve zayıf harflerin.</div>
+            </a>
+
+            <!-- Başarımlar: açılan rozetler (basarimlar.js) -->
+            <div class="kart-kutu" id="basarimKutu">
+                <h4>g��� Başarımlar</h4>
+                <div class="bar"><div id="basarimBar"></div></div>
+                <div class="kucuk" style="margin-bottom:0" id="basarimYazi"></div>
+                <div id="basarimMini" class="basarim-izgara" style="margin-top:10px"></div>
+            </div>
+
+            <!-- Ayarlar: tema, ses, zorluk, veri yönetimi -->
+            <a class="kart-kutu" href="ayarlar.html" style="text-decoration:none;color:inherit">
+                <h4>⚙️ Ayarlar</h4>
+                <div class="kucuk" style="margin-bottom:0">Tema, ses, zorluk ve kayıt yönetimi.</div>
+            </a>
+
+            <!-- Destek: Kreosus -->
+            <a class="destek-btn" href="https://kreosus.com/sakarpaisen" target="_blank" rel="noopener">
+                <span class="destek-emoji">☕</span><span class="destek-yazi">Sensei'ye çay ısmarla</span>
+            </a>
+
+            <button class="kur-btn" id="kurBtn" hidden>g��� Uygulamayı telefona / bilgisayara yükle</button>
+
+            <!-- REKLAM: panelin en altında; haritayı ve ders butonlarını kaydırmaz.
+                 reklam.js ayarı boşken gizli kalır. Bkz. reklam.js -->
+            <div class="reklam-alani" data-reklam="1" hidden>
+                <span class="reklam-etiket">Reklam</span>
+            </div>
+        </aside>
+    </div>
+
+    <script src="mufredat.js?v=3"></script>
+    <script src="ilerleme.js?v=11"></script>
+    <script src="ses.js?v=5"></script>
+    <script src="kana.js?v=18"></script>
+    <script src="reading.js?v=14"></script>
+    <script src="kelime.js?v=10"></script>
+    <script src="pwa.js?v=5"></script>
+    <!-- GÜNLÜK GÖREVLER + BA�?ARIMLAR: dojo panelinde gösterilir, derslerde ilerler. -->
+    <script src="gorevler.js?v=2"></script>
+    <script src="basarimlar.js?v=2"></script>
+    <!-- HEDİYE SANDI�?I + SENSEİ Ö�?ÜDÜ: dojo açılışında çalışır -->
+    <script src="hediye.js?v=2"></script>
+    <script src="ogut.js?v=1"></script>
+    <!-- KOMBO: dojo'da kullanılmıyor ama testler ve tutarlılık için yüklenir -->
+    <script src="kombo.js?v=1"></script>
+    <!-- YANLI�? DEFTERİ: hangi harfleri karıştırdığın (sinav.js kullanır) -->
+    <script src="yanlis.js?v=1"></script>
+    <script src="sinav.js?v=1"></script>
+    <!-- ÇALI�?MA PLANI: "bugün ne çalışayım" önerisi (plan.js) -->
+    <script src="plan.js?v=1"></script>
+    <!-- DURUM �?ERİDİ: dojo'nun kendi zengin üst menüsü var (seri/XP/rütbe),
+         bu yüzden şerit burada KURULMAZ; diğer sayfalarda kullanılır. -->
+    <script src="serit.js?v=1"></script>
+    <!-- BULUT KAYIT: ayar boşken kapalı, site yerel çalışır. Bkz. bulut.js -->
+    <script src="bulut.js?v=3"></script>
+    <!-- ANALİTİK: token girilene kadar kapalı. Bkz. analitik.js -->
+    <script src="analitik.js?v=2" defer></script>
+    <script>window.addEventListener('load', function () { if (window.Analitik) window.Analitik.sayfa('dojo'); });</script>
+    <!-- REKLAM: ayar boşken tamamen kapalı. Bkz. reklam.js -->
+    <script src="reklam.js?v=1" defer></script>
+    <!-- AYARLAR: tema/ses/zorluk. Sayfa açılır açılmaz tema uygulanır. Bkz. ayarlar.js -->
+    <script src="ayarlar.js?v=1"></script>
+    <script src="hata-rapor.js?v=3"></script>
+    <script src="tur.js?v=3"></script>
+    <script src="dojo-yol.js?v=5"></script>
+    <!-- SÜRÜM GÜNCELLEME BİLDİRİMİ: yeni sürüm hazır olduğunda "yenile" bildirimi.
+         Bu olayı dinleyen kod eksikti; eski önbellek sessizce çalışıyordu. -->
+    <script src="guncelleme.js?v=1"></script>
+    <!-- 3D SAHNE: arka planda yüzen Japonca karakterler (saf WebGL).
+         Harita burada en önemli içerik; sahne hafif saydam kalır,
+         üst menü ve harita zaten kendi katmanında (z-index) durur. -->
+    <script src="sahne3d.js?v=1"></script>
+    <!-- VİDEO ARKA PLAN: videolar/yatay|dikey/arkaplan.webm döngüde oynar.
+         Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
+         KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli (aynı negatif
+         z-index'te sonra gelen katman üstte görünür). -->
+    <script src="video-arkaplan.js?v=4"></script>
+    <script>
+        // SERBEST_MOD acik: tum dersler denenebilir (test/serbest gezinme).
+        // Gercek sirayla kilit istersen bunu false yap (oyun.html'de de aynisi var).
+        const SERBEST_MOD = true;
+
+        // Sag paneldeki chibi (dosya yoksa emoji gosterir)
+        const CHIBI = { normal: 'images/mutlu.webp', bilge: 'images/bilge.webp', basari: 'images/basari.webp' };
+
+        // Hata dinleyicileri her durumda kurulsun (giriş yapılmamışsa da).
+        HataRapor.kur();
+
+        const isim = Ilerleme.isim();
+        if (!isim) {
+            window.location.replace('index.html');   // kayıt olmadan harita açılmaz
+        } else {
+            baslat();
+            geriBildirimKur();
+            hataDurumunuIzle();
+        }
+
+        // index.html'deki "g��� Geri bildirim" linki (dojo.html#geri) kutuya kaydırsın
+        if (window.location.hash === '#geri') {
+            setTimeout(function () {
+                const k = document.querySelector('.geri-kutu');
+                if (k) { k.scrollIntoView({ behavior: 'smooth', block: 'center' }); k.querySelector('textarea').focus(); }
+            }, 500);
+        }
+
+        // ============================================================
+        // GERİ BİLDİRİM KUTUSU
+        // Formspree uç noktası: aşağıya kendi form ID'ni yaz (formspree.io'dan alınır).
+        // Boş bırakılırsa kutu kullanıcıya e-posta ile gönderim seçeneği sunar.
+        // ============================================================
+        const FORMSPREE = 'https://formspree.io/f/mwlplvbw';
+        function geriBildirimKur() {
+            const btn = document.getElementById('geriGonder');
+            const metin = document.getElementById('geriMetin');
+            const mail = document.getElementById('geriMail');
+            const durum = document.getElementById('geriDurum');
+            const teknikKutu = document.getElementById('geriTeknik');
+
+            // Teknik bilgi kutusu: kullanıcı "hata bildirdim" diyorsa açılır.
+            // Varsayılan KAPALI: kimse istemediği hâlde tarayıcı bilgisi göndermesin.
+            function teknikDurum() {
+                try { return localStorage.getItem('sakar_teknik') === '1'; } catch (e) { return false; }
+            }
+            function teknikYaz() {
+                teknikKutu.checked = teknikDurum();
+                teknikKutu.onchange = () => {
+                    try { localStorage.setItem('sakar_teknik', teknikKutu.checked ? '1' : '0'); } catch (e) { }
+                };
+            }
+            teknikYaz();
+
+            btn.onclick = async () => {
+                const m = metin.value.trim();
+                if (m.length < 5) {
+                    durum.textContent = 'Birkaç kelime daha yaz lütfen.';
+                    durum.className = 'geri-durum hata';
+                    metin.focus();
+                    return;
+                }
+                btn.disabled = true;
+                durum.textContent = 'Gönderiliyor...';
+                durum.className = 'geri-durum';
+
+                // Teknik bilgi istenirse: hata özeti + tarayıcı/ilerleme bilgisi eklenir.
+                // Formspree alanları düz metin olduğu için tek blok hâlinde gönderilir.
+                const teknik = teknikKutu.checked ? HataRapor.ozet() : '';
+                const paket = teknik ? (m + '\n\n' + teknik) : m;
+
+                // Form ID girilmemişse: kullanıcının kendi e-posta uygulamasını aç
+                if (FORMSPREE.indexOf('BURAYA_FORM_ID') !== -1) {
+                    const konu = encodeURIComponent('Sakar Paisen - geri bildirim');
+                    const govde = encodeURIComponent(paket + '\n\n--\n' + (mail.value.trim() || 'e-posta verilmedi'));
+                    window.location.href = 'mailto:?subject=' + konu + '&body=' + govde;
+                    durum.textContent = 'E-posta uygulaman açıldı.';
+                    durum.className = 'geri-durum iyi';
+                    btn.disabled = false;
+                    return;
+                }
+
+                try {
+                    const cevap = await fetch(FORMSPREE, {
+                        method: 'POST',
+                        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            mesaj: paket,
+                            eposta: mail.value.trim() || '(verilmedi)',
+                            ilerleme: Ilerleme.seviye() + '. ders, ' + Ilerleme.xp() + ' XP',
+                            tarih: new Date().toLocaleString('tr-TR'),
+                            teknik: teknikKutu.checked ? 'var' : 'yok'
+                        })
+                    });
+                    if (cevap.ok) {
+                        metin.value = ''; mail.value = '';
+                        durum.textContent = 'Teşekkürler, ulaştı! g���';
+                        durum.className = 'geri-durum iyi';
+                        HataRapor.temizle();
+                    } else {
+                        throw new Error('HTTP ' + cevap.status);
+                    }
+                } catch (e) {
+                    durum.textContent = 'Gönderilemedi. İnternet bağlantını kontrol et.';
+                    durum.className = 'geri-durum hata';
+                }
+                btn.disabled = false;
+            };
+        }
+
+        // Sayfada bir hata yakalanırsa kullanıcıya fark ettirmeden kutuyu hazırla:
+        // teknik bilgi seçeneği işaretlenir ve kutuya nazik bir not düşülür.
+        function hataDurumunuIzle() {
+            const kutu = document.getElementById('geriTeknik');
+            const not = document.getElementById('geriHataNotu');
+            function guncelle() {
+                const var_ = HataRapor.varmi();
+                not.hidden = !var_;
+                if (var_) {
+                    kutu.checked = true;
+                    not.textContent = '⚠️ Bu oturumda bir hata oluştu. Bildirsen düzeltmek kolay olur. (Teknik detay eklenecek) ';
+                    const goster = document.createElement('button');
+                    goster.type = 'button';
+                    goster.className = 'geri-detay';
+                    goster.textContent = 'detayı gör';
+                    goster.onclick = () => {
+                        const onizleme = document.getElementById('geriOnizleme');
+                        onizleme.textContent = HataRapor.ozet();
+                        onizleme.hidden = !onizleme.hidden ? true : false;
+                    };
+                    // Eski düğmeyi temizle, yenisini ekle
+                    const eski = not.querySelector('.geri-detay');
+                    if (eski) eski.remove();
+                    not.append(goster);
+                }
+            }
+            window.addEventListener('hata-rapor-guncellendi', guncelle);
+            guncelle();
+        }
+
+        function yaziEl(tag, sinif, metin) { const e = document.createElement(tag); if (sinif) e.className = sinif; if (metin !== undefined) e.textContent = metin; return e; }
+
+        function baslat() {
+            const seviye = Ilerleme.seviye();
+            const xp = Ilerleme.xp();
+            const oynanabilir = MUFREDAT.filter(m => m.tip !== 'yakinda').length;
+            const seri = Ilerleme.seri();
+            const rutbe = Ilerleme.rutbe(xp);
+
+            document.getElementById('xpGosterge').textContent = xp;
+            document.getElementById('seriGosterge').textContent = seri.sayi;
+
+            // Seri koruma göstergesi: hak varsa göster (yoksa gizli kalsın, gürültü yapmasın)
+            const kor = Ilerleme.seriKoruma();
+            const korKutu = document.getElementById('korumaKutu');
+            if (kor.kalan > 0) {
+                korKutu.hidden = false;
+                document.getElementById('korumaGosterge').textContent = kor.kalan;
+                korKutu.title = 'Seri koruma: ' + kor.kalan + ' hak kaldı. Bir gün ara verirsen serin kırılmaz.';
+            } else {
+                korKutu.hidden = true;
+            }
+            document.getElementById('rutbeKutu').textContent = 'g��� ' + rutbe.ad;
+            document.getElementById('rutbeKutu').title = rutbe.sonraki ? 'Sonraki rütbe: ' + rutbe.sonraki.ad + ' (' + rutbe.sonraki.min + ' XP)' : 'En yüksek rütbe!';
+            document.getElementById('profil').textContent = 'g��� ' + isim;
+            document.getElementById('profil').onclick = ilerlemeyiSifirla;
+            document.getElementById('sagMenu').prepend(Ses.buton());
+
+            // ---------- ÇALI�?MA PLANI ----------
+            // "Bugün ne çalışayım" sorusunu yanıtlar. En önemli 3 adım.
+            planCiz();
+
+            // ---------- GÜNLÜK GÖREVLER ----------
+            // Her gün 3 görev. Tamamlananlar yeşil işaretti. (gorevler.js)
+            gorevleriCiz();
+
+            // ---------- BA�?ARIMLAR ----------
+            // Önce kontrol et: kullanıcı geçmişte hak ettiği bir başarımı
+            // henüz almamışsa (örn. yeni eklendiyse) burada açılır.
+            if (window.Basarimlar) {
+                try {
+                    const yeni = Basarimlar.kontrol();
+                    if (yeni.length) Basarimlar.kutlamaGoster(yeni, document.body);
+                } catch (e) { }
+            }
+            basarimlariCiz();
+
+            // ---------- SENSEİ Ö�?ÜDÜ ----------
+            // Maskot kullanıcının GERÇEK durumuna göre konuşur (ogut.js).
+            // ÖNEMLİ: Görüntülemeden ÖNCE çağrılıp sonra ziyaret kaydedilir;
+            // böylece "kaç gündür gelmedi" hesabı doğru çıkar.
+            if (window.Ogut) {
+                try {
+                    const o = Ogut.soyle();
+                    const balon = document.getElementById('ogutBalon');
+                    if (balon && o && o.metin) {
+                        balon.hidden = false;
+                        balon.replaceChildren(
+                            yaziEl('span', 'ob-simge', o.simge || 'g���'),
+                            document.createTextNode(o.metin)
+                        );
+                    }
+                    Ogut.ziyaretKaydet();   // tarih ANCAK gösterdikten sonra yazılır
+                } catch (e) { }
+            }
+
+            // ---------- GÜNLÜK HEDİYE SANDI�?I ----------
+            // Günde bir kez açılabilir. Bugün açıldıysa buton gizlenir.
+            if (window.Hediye) {
+                try {
+                    const btn = document.getElementById('sandikBtn');
+                    const alt = document.getElementById('sandikAlt');
+                    if (btn && Hediye.acilabilir()) {
+                        btn.hidden = false;
+                        const seri = Ilerleme.seri().sayi;
+                        const o = Hediye.odulHesapla(seri);
+                        alt.textContent = '+' + o.xp + ' XP' + (o.koruma ? ' ve seri koruma' : '') + ' seni bekliyor';
+                        btn.onclick = () => sandikAc();
+                    }
+                } catch (e) { }
+            }
+
+            // Tanıtım: ❓ butonu istendiğinde açar; ilk kez gelen kullanıcıya kendiliğinden gösterilir.
+            document.getElementById('yardim').onclick = () => Tur.ac();
+            if (Tur.gerekli()) setTimeout(() => Tur.baslat(), 700);
+
+            // İstatistikler ve Ayarlar: üst menüdeki g��� / ⚙️ kısayolları.
+            // Tıklama + klavye (Enter/Space) desteklenir: erişilebilirlik.
+            const git = url => () => { window.location.href = url; };
+            const statBtn = document.getElementById('statBtn');
+            const ayarBtn = document.getElementById('ayarBtn');
+            const alanBtn = document.getElementById('alanBtn');
+            statBtn.onclick = git('istatistik.html');
+            ayarBtn.onclick = git('ayarlar.html');
+            alanBtn.onclick = git('alanlar.html');
+            [statBtn, ayarBtn, alanBtn].forEach(b => b.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); b.click(); }
+            }));
+
+            const biten = Math.min(seviye - 1, oynanabilir);
+            document.getElementById('gorevBar').style.width = (biten / oynanabilir * 100) + '%';
+            document.getElementById('ilerlemeYazi').textContent = biten + ' / ' + oynanabilir + ' daire tamamlandı';
+
+            // Günlük hedef
+            const gunluk = Ilerleme.gunlukXp(), hedef = Ilerleme.HEDEF_XP;
+            document.getElementById('gunlukBar').style.width = Math.min(gunluk / hedef * 100, 100) + '%';
+            document.getElementById('gunlukYazi').textContent = gunluk >= hedef ? '✅ Bugünkü hedef tamam! (' + gunluk + ' XP)' : gunluk + ' / ' + hedef + ' XP';
+
+            // Sensei'nin konuşması
+            const aktif = MUFREDAT.find(m => m.id === seviye);
+            const tekrarSayisi = Ilerleme.tekrarSayisi();
+            let konusma = 'Devam et ' + isim + ', harika gidiyorsun!';
+            let chibi = CHIBI.normal;
+            if (seviye === 1) konusma = 'Hazır mısın ' + isim + '? İlk 5 harften başlıyoruz!';
+            else if (aktif && aktif.tip === 'yakinda') { konusma = 'Hiragana ve Katakana bitti, ' + isim + '! Kelimeler çok yakında.'; chibi = CHIBI.basari; }
+            else if (aktif && aktif.tip === 'test') { konusma = 'Test zamanı! �?imdiye kadar öğrendiklerini göster.'; chibi = CHIBI.bilge; }
+            else if (aktif && aktif.tip === 'boss') { konusma = aktif.alfabe === 'hk' ? 'Büyük Sınav! Hiragana ve Katakana bir arada.' : 'Sınav geldi! Tüm ' + (aktif.alfabe === 'k' ? 'Katakana' : 'Hiragana') + ' burada.'; chibi = CHIBI.bilge; }
+            else if (seri.sayi > 0 && !seri.bugunYapildi) konusma = 'Serini kaybetme! ' + seri.sayi + ' günlük seri seni bekliyor g���';
+            else if (tekrarSayisi >= 3) konusma = tekrarSayisi + ' harf tekrar bekliyor. Kısa bir tekrar iyi gelir!';
+            document.getElementById('balon').textContent = konusma;
+
+            const alan = document.getElementById('chibiAlan');
+            const img = document.createElement('img');
+            img.className = 'chibi'; img.src = chibi; img.alt = 'Sensei';
+            img.onerror = () => { alan.innerHTML = '<div class="chibi-emoji">g���</div>'; };
+            alan.append(img);
+
+            tekrarKutusu(tekrarSayisi);
+            zayifKutusu();
+            kelimeKutusu();
+
+            // Uygulamayı yükle
+            const kurBtn = document.getElementById('kurBtn');
+            const kurGoster = () => { kurBtn.hidden = !PWA.kurulabilir(); };
+            kurBtn.onclick = () => PWA.kur();
+            document.addEventListener('pwa-hazir', kurGoster);
+            document.addEventListener('pwa-kuruldu', kurGoster);
+            kurGoster();
+
+            haritaCiz(seviye);
+        }
+
+        // Kelime defteri kutusu: kaç kelime öğrenildiğini, katakana sayısını,
+        // genel başarı oranını ve tekrar edilecek kelime uyarısını gösterir.
+        function kelimeKutusu() {
+            const yazi = document.getElementById('kelimeYazi');
+            if (!yazi) return;
+            const hepsi = KelimeDefteri.liste();
+            const bar = document.getElementById('kelimeBar');
+            const uyari = document.getElementById('kelimeUyari');
+
+            if (!hepsi.length) {
+                yazi.textContent = 'Henüz kelime yok. Derslerde öğrendiklerin burada birikir.';
+                if (bar) bar.style.width = '0%';
+                if (uyari) uyari.hidden = true;
+                return;
+            }
+
+            const katakana = hepsi.filter(x => x.kelime.kana === 'k' || x.kelime.kana === 'hk').length;
+            const zor = hepsi.filter(x => x.yanlis > 0);
+
+            // Genel başarı oranı: doğru / (doğru + yanlış)
+            const dTop = hepsi.reduce((t, x) => t + x.dogru, 0);
+            const yTop = hepsi.reduce((t, x) => t + x.yanlis, 0);
+            const basari = (dTop + yTop) > 0 ? Math.round(dTop / (dTop + yTop) * 100) : 0;
+
+            // İlerleme çubuğu: başarı oranı, renkli
+            if (bar) {
+                bar.style.width = Math.max(basari, 3) + '%';
+                bar.style.background = basari >= 80 ? 'var(--turkuaz)' : (basari >= 50 ? 'var(--altin)' : 'var(--kirmizi)');
+            }
+
+            const parcalar = [hepsi.length + ' kelime'];
+            if (katakana) parcalar.push(katakana + ' katakana');
+            if (dTop + yTop > 0) parcalar.push(basari + '% başarı');
+            yazi.textContent = parcalar.join(' · ');
+
+            // Tekrar uyarısı: yeterince zayıf kelime varsa dikkat çek
+            if (uyari) {
+                if (zor.length >= 3) {
+                    uyari.hidden = false;
+                    uyari.textContent = 'g��� ' + zor.length + ' kelime tekrar bekliyor';
+                } else {
+                    uyari.hidden = true;
+                }
+            }
+        }
+
+        function tekrarKutusu(sayi) {
+            const kutu = document.getElementById('tekrarKutu');
+            kutu.append(yaziEl('h4', '', 'g��� Tekrar'));
+            const btn = yaziEl('button', 'tekrar-btn');
+            if (sayi > 0) {
+                btn.textContent = sayi + ' harf tekrar bekliyor';
+                btn.onclick = () => window.location.href = 'oyun.html?ders=tekrar';
+            } else {
+                btn.textContent = '�?imdilik tekrar yok g���';
+                btn.className = 'tekrar-btn pasif';
+                btn.disabled = true;
+            }
+            kutu.append(btn);
+        }
+
+        function zayifKutusu() {
+            const zayif = Ilerleme.zayif(6).filter(x => KANA[x.id]);
+            if (!zayif.length) return;
+            const kutu = document.getElementById('zayifKutu');
+            kutu.hidden = false;
+            kutu.append(yaziEl('h4', '', 'g��� Çalışman gereken harfler'));
+            const kap = yaziEl('div', 'chip-kap');
+            zayif.forEach(x => {
+                const e = KANA[x.id];
+                const c = yaziEl('div', 'chip');
+                c.title = e.r + ' (' + KANA_ISIM[e.a] + ')';
+                c.append(yaziEl('b', '', e.j), yaziEl('small', '', e.r + ' · %' + Math.round(x.oran * 100) + ' hata'));
+                kap.append(c);
+            });
+            kutu.append(kap);
+        }
+
+        // ---------- GÜNLÜK HEDİYE SANDI�?I ----------
+        // Sandık EKRANI artık hediye.js içinde (ortak kod): giriş ekranı ve
+        // dojo aynı fonksiyonu kullanır. Burada sadece ince bir sarmalayıcı
+        // var; böylece eski çağrılar (sandikAc()) bozulmadan çalışmaya devam eder
+        // ve durum şeridi (serit.js) de aynı fonksiyonu çağırabilir.
+        function sandikAc() {
+            if (window.Hediye && Hediye.sandikAc) Hediye.sandikAc();
+        }
+        // �?erit modülü sayfa kapsamındaki fonksiyona erişemez: pencereye açıyoruz.
+        window.sandikAc = sandikAc;
+
+        // ---------- ÇALI�?MA PLANI ----------
+        // Kullanıcının gerçek durumuna göre en önemli 3 adımı listeler.
+        // Neden gerekli: onlarca daire arasından seçim yapmak karar yorgunluğu
+        // yaratır ve oyunu bırakmaya yol açar. Plan tek bir "ilk adım" verir.
+        function planCiz() {
+            if (!window.Plan) return;
+            const kutu = document.getElementById('planKutu');
+            const kap = document.getElementById('planListe');
+            if (!kutu || !kap) return;
+
+            const plan = Plan.kur(3);
+            if (!plan.length) return;
+
+            kutu.hidden = false;
+            document.getElementById('planSure').textContent =
+                '~' + Plan.toplamSure(plan) + ' dk';
+
+            kap.replaceChildren();
+            plan.forEach((a, i) => {
+                const satir = yaziEl('a', 'plan-satir' + (i === 0 ? ' ilk' : ''));
+                satir.href = a.url;
+                satir.append(
+                    yaziEl('div', 'ps-simge', a.simge),
+                    (function () {
+                        const o = yaziEl('div', 'ps-orta');
+                        o.append(
+                            yaziEl('b', '', a.ad),
+                            yaziEl('small', '', a.aciklama)
+                        );
+                        return o;
+                    })(),
+                    yaziEl('div', 'ps-sure', a.sure)
+                );
+                satir.title = a.ad + ' — ' + a.aciklama;
+                kap.append(satir);
+            });
+        }
+
+        // ---------- GÜNLÜK GÖREVLER PANELİ ----------
+        // Her gün 3 görev verilir (gorevler.js). Tamamlanınca ✓ ve yeşil.
+        // Görevler bittiğinde panel kutlama metni gösterir.
+        function gorevleriCiz() {
+            if (!window.Gorevler) return;
+            const kutu = document.getElementById('gorevKutu');
+            if (!kutu) return;
+            const liste = Gorevler.liste();
+            if (!liste.length) return;
+
+            kutu.hidden = false;
+            const ozet = Gorevler.ozet();
+            document.getElementById('gorevSayi').textContent =
+                ozet.hepsiTamam ? 'g���' : ozet.tamam + '/' + ozet.toplam;
+
+            const kap = document.getElementById('gorevListe');
+            kap.replaceChildren();
+            liste.forEach(g => {
+                const satir = yaziEl('div', 'gorev-satir' + (g.tamam ? ' tamam' : ''));
+                satir.append(
+                    yaziEl('div', 'gorev-simge', g.tamam ? '✓' : g.simge),
+                    (function () {
+                        const orta = yaziEl('div', 'gorev-orta');
+                        orta.append(
+                            yaziEl('b', '', g.ad),
+                            yaziEl('small', '', g.ilerleme + ' / ' + g.hedef)
+                        );
+                        const bar = yaziEl('div', 'gorev-bar');
+                        const ic = yaziEl('div');
+                        ic.style.width = Math.round(g.ilerleme / g.hedef * 100) + '%';
+                        bar.append(ic);
+                        orta.append(bar);
+                        return orta;
+                    })(),
+                    yaziEl('div', 'gorev-odul', '+' + g.odul)
+                );
+                kap.append(satir);
+            });
+        }
+
+        // ---------- BA�?ARIM PANELİ ----------
+        // Açılan rozetler renkli, kilitliler gri. En fazla 8 gösterilir
+        // (panel şişmesin); tamamı istatistik sayfasında.
+        function basarimlariCiz() {
+            if (!window.Basarimlar) return;
+            const kap = document.getElementById('basarimMini');
+            const bar = document.getElementById('basarimBar');
+            const yazi = document.getElementById('basarimYazi');
+            if (!kap) return;
+
+            const ozet = Basarimlar.ozet();
+            bar.style.width = Math.round(ozet.oran * 100) + '%';
+            yazi.textContent = ozet.acilan + ' / ' + ozet.toplam + ' başarım açıldı' +
+                (ozet.acilan === 0 ? ' — ilkini kazanmak için bir ders yap!' : '');
+
+            // Açılanlar önce, sonra kilitliler
+            const hepsi = Basarimlar.hepsi();
+            const sirali = hepsi.filter(b => b.acik).concat(hepsi.filter(b => !b.acik));
+            kap.replaceChildren();
+            sirali.slice(0, 8).forEach(b => {
+                const k = yaziEl('div', 'basarim-kutu ' + (b.acik ? 'acik' : 'kilitli'));
+                k.append(
+                    yaziEl('span', 'bk-simge', b.acik ? b.simge : 'g���'),
+                    yaziEl('div', 'bk-ad', b.ad)
+                );
+                k.title = b.ad + ' — ' + b.aciklama + (b.acik ? ' (açıldı)' : ' (kilitli)');
+                kap.append(k);
+            });
+
+            // Tamamını görmek için istatistik sayfasına git
+            if (hepsi.length > 8) {
+                const git = yaziEl('a', 'metin-btn', 'Tüm başarımları gör →');
+                git.href = 'istatistik.html#basarim';
+                git.style.display = 'block';
+                git.style.marginTop = '8px';
+                kap.parentElement.append(git);
+            }
+        }
+
+        // Haritayi cizen yer: Duolingo tarzi zikzak yol (dojo-yol.js)
+        function haritaCiz(seviye) {
+            DojoYol.ciz(document.getElementById('dinamikHarita'), {
+                mufredat: MUFREDAT,
+                // SERBEST_MOD'da da "aktif ders" gorunsun: kayitli seviye gecerli,
+                // tum daireler tiklanabilir oldugu icin kilit zaten yok.
+                seviye: Math.min(seviye, MUFREDAT.length),
+                yildizlar: Ilerleme.yildizlar(),
+                bolumIlerleme: bolumIlerleme,
+                secildi: daireTikla
+            });
+        }
+
+        function _eskiHaritaKaldirildi(seviye) {
+            const harita = document.getElementById('dinamikHarita');
+            const yildizlar = Ilerleme.yildizlar();
+            let yonSol = true;
+
+            MUFREDAT.forEach(ders => {
+                if (ders.bolum) {
+                    const b = document.createElement('div');
+                    b.className = 'bolum-ayirici'; b.textContent = ders.bolum;
+                    harita.append(b);
+                    yonSol = true;
+                }
+
+                let yon = '';
+                if (ders.tip === 'boss') yon = 'boss-tasarim';
+                else { yon = yonSol ? 'sol' : 'sag'; yonSol = !yonSol; }
+
+                let durum, ikon, etiketRenk = '#333';
+                const buyukSinav = ders.alfabe === 'hk';
+                if (ders.tip === 'yakinda') { durum = 'kilitli'; ikon = 'g���'; }
+                else if (SERBEST_MOD) {
+                    // Serbest mod: hepsi açık. Tamamlananlar yine ✅ ve yıldızlı görünür.
+                    if (ders.id < seviye) { durum = 'tamamlanmis'; ikon = '✅'; }
+                    else {
+                        durum = ders.tip === 'boss' ? 'boss-acik' : 'acik';
+                        ikon = dersIkon(ders, buyukSinav);
+                        if (ders.tip === 'boss') etiketRenk = 'var(--altin-renk)';
+                    }
+                }
+                else if (ders.id < seviye) { durum = 'tamamlanmis'; ikon = '✅'; }
+                else if (ders.id === seviye) {
+                    durum = ders.tip === 'boss' ? 'boss-acik' : 'acik';
+                    ikon = dersIkon(ders, buyukSinav);
+                    if (ders.tip === 'boss') etiketRenk = 'var(--altin-renk)';
+                } else { durum = 'kilitli'; ikon = ders.tip === 'boss' && buyukSinav ? 'g���' : 'g���'; }
+
+                const d = document.createElement('div');
+                d.className = 'ders-dairesi ' + durum + ' ' + yon;
+                d.id = 'ders_' + ders.id;
+                d.onclick = () => derseGit(ders, seviye);
+                const et = document.createElement('div');
+                et.className = 'ders-etiketi'; et.style.color = etiketRenk; et.textContent = ders.baslik;
+                const ik = document.createElement('span'); ik.textContent = ikon;
+                d.append(et, ik);
+                if (durum === 'tamamlanmis' && yildizlar[ders.id]) {
+                    d.append(yaziEl('div', 'yildiz', '⭐'.repeat(yildizlar[ders.id])));
+                }
+                harita.append(d);
+            });
+
+            const hedef = document.getElementById('ders_' + seviye);
+            if (hedef) setTimeout(() => hedef.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+        }
+
+        // ---- Bolum basina tamamlanan / toplam ders ----
+        function bolumIlerleme(ad) {
+            const liste = MUFREDAT.filter(d => bolumAdi(d) === ad);
+            const biten = liste.filter(d => d.id < Ilerleme.seviye()).length;
+            return { biten: biten, toplam: liste.length };
+        }
+
+        // Bir dairenin hangi bolume ait oldugunu bulur (bolum alani yalnizca ilk dairede yazar)
+        function bolumAdi(ders) {
+            let aktif = '';
+            for (const d of MUFREDAT) {
+                if (d.bolum) aktif = d.bolum;
+                if (d.id === ders.id) return aktif;
+            }
+            return aktif;
+        }
+
+        // DERS SÜRE TAHMİNİ
+        // Kullanıcı "ne kadar sürer?" bilmek ister; 15 soru ile 40 soru aynı görünmesin.
+        // Hesap: soru tipine göre ortalama süre + öğretim kartı süresi.
+        //   • Harf/şıklı soru : ~8 sn  (oku + seç + geri bildirim)
+        //   • Dinleme sorusu  : ~10 sn (sesi iki kez dinleme payı)
+        //   • Yazma sorusu    : ~15 sn (klavyeyle yazma)
+        //   • Cümle kartı     : ~18 sn (okuma + kelimelere dokunma)
+        //   • Öğretim kartı   : ~12 sn (anımsatıcı + örnek kelime okuma)
+        // Tahmin ders başlığından çıkarılır (ders hazır olmadan adım sayısı bilinmez).
+        // SÜRE TAHMİNİ
+        // Ölçülen gerçek değerlere dayanır (önceki sürüm sınavları kısa gösteriyordu):
+        //
+        //  Ölçüm (kendi testimden): ders 1 = 17 adım, soru başına ~9 sn
+        //  Adım süresi: harf/şık sorusu 9 sn, dinleme 11 sn, yazma 15 sn,
+        //               cümle/dikte 18 sn, öğretim kartı 12 sn
+        //
+        //  Ders tipine göre adım sayısı:
+        //    normal harf dersi : 5 öğretim + 2 sınama + 5 soru + 1 yaz + 3 kelime/cümle = 17
+        //    test              : soru sayısı + 1 (sınav sonu kartı)
+        //    boss (büyük sınav): soru sayısı × 1.2 (daha zor sorular daha yavaş)
+        //    pekiştir          : ölçülen 14
+        //    reading/kelime    : soru × 2 (her kelime: öğret + sor)
+        //    reading/cümle     : soru × 2
+        //    reading/dikte     : soru × 3 (öğret + dikte + tekrar)
+        function tahminiSure(ders) {
+            const tip = ders.tip || 'ders';
+            let adim, snAdim;
+
+            if (tip === 'test') {
+                adim = (ders.soru || 10) + 1; snAdim = 9;
+            } else if (tip === 'boss') {
+                adim = Math.round((ders.soru || 20) * 1.2); snAdim = 11;
+            } else if (tip === 'pekistir') {
+                adim = 14; snAdim = 10;
+            } else if (tip === 'reading') {
+                if (ders.reading === 'dikte') { adim = (ders.soru || 5) * 3; snAdim = 18; }
+                else if (ders.reading === 'cumle') { adim = (ders.soru || 6) * 2 + 1; snAdim = 16; }
+                else { adim = (ders.soru || 8) * 2; snAdim = 13; }
+            } else if (ders.grup) {
+                adim = 16; snAdim = 10;                    // türev harf dersi
+            } else {
+                adim = 17; snAdim = 9;                     // normal harf dersi (ölçüldü)
+            }
+
+            const dakika = (adim * snAdim) / 60;
+            if (dakika < 1) return '<1 dk';
+            // 1 dakikanın üzerini yukarı yuvarla (kullanıcı "daha kısa sürdü" desin)
+            return Math.ceil(dakika) + ' dk';
+        }
+
+        // Ders önizlemesinde "ne öğreneceksin" özeti.
+        // Kullanıcı daireye basınca ne bulacağını bilmek ister.
+        function dersIcerikOzeti(ders) {
+            const tip = ders.tip || 'ders';
+            if (tip === 'test') return 'g��� Karışık sorularla pekiştirme';
+            if (tip === 'boss') return 'g��� Bölüm sonu sınavı';
+            if (tip === 'pekistir') return 'g��� Zayıf harflerine özel tekrar';
+            if (tip === 'reading') {
+                if (ders.reading === 'dikte') return 'g�?� Dinle ve romaji yaz';
+                if (ders.reading === 'cumle') return 'g��� Cümle okuma ve anlam';
+                return 'g��� Gerçek kelimeler ve anlamları';
+            }
+            if (ders.grup) return '✏️ Yumuşak sesler + örnek kelimeler';
+            if (ders.harfler) {
+                const n = ders.harfler.length;
+                return 'あ ' + n + ' yeni harf + örnek kelime + okuma cümlesi';
+            }
+            return 'Ders içeriği';
+        }
+
+        // BÖLÜM TAMAMLAMA KUTLAMASI
+        // Bir bölümdeki tüm daireler bitince kullanıcıya bunu bildir.
+        // (Eskiden hiçbir geri bildirim yoktu; kullanıcı bölümü bitirdiğini anlamıyordu.)
+        function bolumTamamlandiMi(bolumAdi) {
+            const bilgi = MUFREDAT.filter(m => m.bolum === bolumAdi && m.tip !== 'yakinda');
+            if (!bilgi.length) return false;
+            const seviye = Ilerleme.seviye();
+            const biten = bilgi.filter(m => m.id < seviye).length;
+            return biten >= bilgi.length;
+        }
+
+        // Daireye basinca kucuk onizleme paneli acilir (Duolingo'daki ders balonu gibi)
+        function daireTikla(ders, kap) {
+            const eski = document.querySelector('.onizleme');
+            if (eski) eski.remove();
+
+            const seviye = Ilerleme.seviye();
+            const kilitli = !SERBEST_MOD && ders.id > seviye;
+            const bitmisMi = ders.id < seviye;
+            const yildiz = Ilerleme.yildizlar()[ders.id] || 0;
+            const renk = kilitli ? '#c9c1b4' : (bitmisMi ? '#18c2a6' : DojoYol.renk(0));
+
+            const kutu = document.createElement('div');
+            kutu.className = 'onizleme';
+            kutu.innerHTML =
+                '<div class="onizleme-ust"><div class="onizleme-renk" style="background:' + renk + '"></div>' +
+                '<div class="onizleme-ad">' + DojoYol.dersIkon(ders) + '&nbsp;' + ders.baslik + '</div></div>' +
+                '<div class="onizleme-alt">' + dersBilgi(ders) + '</div>' +
+                '<div class="onizleme-icerik">' + dersIcerikOzeti(ders) + '</div>' +
+                '<div class="onizleme-istat">' +
+                '<span>+' + (ders.xp || 50) + ' XP</span>' +
+                '<span>❤️ ' + (ders.can || 4) + '</span>' +
+                '<span title="Tahmini süre">⏱ ' + tahminiSure(ders) + '</span>' +
+                (yildiz ? '<span>⭐ ' + yildiz + '/3</span>' : '') +
+                (kilitli ? '<span>g��� Kilitli</span>' : '') +
+                '</div>';
+
+            const btnler = document.createElement('div');
+            btnler.className = 'onizleme-btnler';
+            const basla = document.createElement('button');
+            basla.className = 'sp-btn genis';
+            basla.textContent = kilitli ? 'KİLİTLİ g���' : (bitmisMi ? 'TEKRAR ET' : 'BA�?LA');
+            basla.disabled = kilitli;
+            basla.onclick = () => derseGit(ders);
+            // ENTER ile hızlı başlama: önizleme açıkken Enter'a basınca ders başlar.
+            // (Klavyeyle gezinmeyi sevenler için önemli bir kolaylık.)
+            if (!kilitli) {
+                const escDinle = (ev) => {
+                    if (ev.key === 'Enter') { ev.preventDefault(); document.removeEventListener('keydown', escDinle); derseGit(ders); }
+                    if (ev.key === 'Escape') { document.removeEventListener('keydown', escDinle); kutu.remove(); }
+                };
+                document.addEventListener('keydown', escDinle);
+            }
+
+            const kapat = document.createElement('button');
+            kapat.className = 'sp-btn cizgili kucuk';
+            kapat.textContent = '✕';
+            kapat.onclick = () => kutu.remove();
+            btnler.append(basla, kapat);
+
+            const ok = document.createElement('div');
+            ok.className = 'onizleme-ok';
+            kutu.append(btnler, ok);
+
+            const alan = document.querySelector('.harita-alani');
+            alan.append(kutu);
+
+            // Paneli dairenin altina, ekran sinirindan tasmadan yerlestir
+            const duzlem = alan.getBoundingClientRect();
+            const d = kap.getBoundingClientRect();
+            let sol = d.left - duzlem.left + d.width / 2 - kutu.offsetWidth / 2;
+            sol = Math.max(6, Math.min(sol, duzlem.width - kutu.offsetWidth - 6));
+            kutu.style.left = sol + 'px';
+            kutu.style.top = (d.bottom - duzlem.top + 14) + 'px';
+        }
+
+        // Bir dairenin icerigini kisa bir cumleyle anlatir
+        function dersBilgi(ders) {
+            if (ders.tip === 'yakinda') return 'Bu bölüm henüz hazır değil.';
+            if (ders.tip === 'test') return 'Buraya kadar öğrendiğin harflerden ' + (ders.soru || 10) + ' soru.';
+            if (ders.tip === 'boss') return 'Sınav! ' + (ders.soru || 20) + ' soru, daha çetin bir tekrar.';
+            if (ders.tip === 'pekistir') return 'Zayıf harflerine odaklanan kısa bir antrenman.';
+            if (ders.tip === 'reading') return ders.reading === 'cumle' ? 'Kelime kelime çözeceğin cümleler.' : 'Yeni kelimeler öğreniyorsun.';
+            if (ders.harfler) return ders.harfler.length + ' harf öğreniyorsun.';
+            return 'Bu dersin soruları hazır bekliyor.';
+        }
+
+        function derseGit(ders) {
+            if (ders.tip === 'yakinda') { alert('Bu bölüm çok yakında! g���'); return; }
+            if (SERBEST_MOD || ders.id <= Ilerleme.seviye()) window.location.href = 'oyun.html?ders=' + ders.id;
+            else alert('Samuray, burası henüz sana kapalı! Önceki dersleri bitir.');
+        }
+
+        function ilerlemeyiSifirla() {
+            if (confirm('Kayıt ve tüm ilerleme silinecek, baştan başlayacaksın. Emin misin?')) {
+                Ilerleme.sifirla();
+                window.location.href = 'index.html';
+            }
+        }
+
+        // ---------- ÇIKI�? (hesaptan çık) ----------
+        // ÖNEMLİ AYRIM: Profil kutusu ilerlemeyi SİLER (sıfırlama). Çıkış ise
+        // yalnızca oturumu kapatır, ilerleme kalır. İkisi ayrı iş; kullanıcı
+        // cihazı paylaşıyorsa ilerlemeyi kaybetmeden çıkabilmeli.
+        // NOT: giris.js'teki window.sakarCikis zaten bu işi yapar; dojo
+        // sayfasında giris.js yüklü olmadığı için burada da tanımlıyoruz.
+        function cikisYap() {
+            try { if (window.Bulut && Bulut.cikis) Bulut.cikis(); } catch (e) { }
+            try {
+                localStorage.removeItem('sakar_isim');
+                localStorage.removeItem('sakar_avatar');
+                localStorage.removeItem('sakar_email');
+                localStorage.removeItem('sakar_oturum');
+            } catch (e) { }
+            window.location.href = 'index.html';
+        }
+
+        // Çıkış kutusunu üst menüye ekle (profil kutusunun soluna).
+        (function cikisKur() {
+            const sag = document.getElementById('sagMenu');
+            if (!sag) return;
+            const k = document.createElement('div');
+            k.className = 'stat-kutu';
+            k.id = 'cikisKutu';
+            k.title = 'Çıkış yap (ilerlemen silinmez)';
+            k.setAttribute('role', 'button');
+            k.setAttribute('tabindex', '0');
+            k.textContent = 'g���';
+            k.onclick = function () {
+                if (confirm('Çıkış yapılsın mı? İlerlemen silinmez; tekrar girince kaldığın yerden devam edersin.')) {
+                    cikisYap();
+                }
+            };
+            k.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); k.click(); }
+            });
+            sag.append(k);
+        })();
+    </script>
+</body>
+</html>

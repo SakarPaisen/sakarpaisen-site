@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakar Paisen | Ayarlar</title>
+    <meta name="theme-color" content="#7b5cf0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="stylesheet" href="uygulama.css?v=14">
+    <!-- Sayfa kimliği: otomatik testler ve hata raporu doğru sayfayı doğrulasın -->
+    <meta name="sp-sayfa" content="ayarlar">
+    <style>
+        .kapsayici {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 20px 16px 80px;
+        }
+
+        /* ---------- Ayar grupları ---------- */
+        .grup {
+            background: var(--kart);
+            border: 2px solid var(--cizgi);
+            border-radius: 20px;
+            padding: 18px 18px 6px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 0 var(--cizgi);
+        }
+
+        .grup>h2 {
+            margin: 0 0 4px;
+            font-size: 17px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .grup>p {
+            margin: 0 0 14px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--yazi-soluk);
+            line-height: 1.5;
+        }
+
+        .satir {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 13px 0;
+            flex-wrap: wrap;
+            border-top: 2px solid var(--zemin-2);
+        }
+
+        .satir:first-of-type {
+            border-top: none;
+        }
+
+        .satir-ana {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .satir-ana b {
+            display: block;
+            font-size: 15px;
+        }
+
+        .satir-ana small {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--yazi-soluk);
+            line-height: 1.45;
+        }
+
+        /* Bilgi notu: "hareketi azalt açık" gibi durumları açıklar.
+           data-animasyon="0" olsa da görünür kalır — çünkü bu metin
+           animasyon DE�?İL, erişilebilirlik bilgisidir. */
+        .not-kucuk {
+            margin: 10px 0 0;
+            padding: 10px 13px;
+            background: var(--zemin-2);
+            border-radius: 12px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--yazi-soluk);
+            line-height: 1.5;
+        }
+        .not-kucuk[hidden] { display: none; }
+
+        /* ---------- Seçenek düğmeleri (segment) ---------- */
+        .secenekler {
+            display: flex;
+            gap: 6px;
+            background: var(--zemin-2);
+            border-radius: 14px;
+            padding: 4px;
+            flex-wrap: wrap;
+        }
+
+        .sec {
+            border: none;
+            background: none;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--yazi-soluk);
+            padding: 9px 14px;
+            border-radius: 11px;
+            cursor: pointer;
+            transition: 0.15s;
+            white-space: nowrap;
+        }
+
+        .sec:hover {
+            color: var(--yazi);
+        }
+
+        .sec.aktif {
+            background: var(--kart);
+            color: var(--mor);
+            box-shadow: 0 2px 0 var(--cizgi);
+        }
+
+        .sec.aktif[data-tema-swatch] {
+            color: var(--yazi);
+        }
+
+        /* Tema seçeneklerinde renk örneği */
+        .swatch {
+            display: inline-block;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            margin-right: 6px;
+            vertical-align: -1px;
+            border: 2px solid rgba(0, 0, 0, .12);
+        }
+
+        /* ---------- Anahtar (aç/kapa) ---------- */
+        .anahtar {
+            position: relative;
+            width: 56px;
+            height: 32px;
+            flex: none;
+            background: var(--cizgi-koyu);
+            border-radius: 999px;
+            cursor: pointer;
+            border: none;
+            transition: background .18s;
+        }
+
+        .anahtar::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 26px;
+            height: 26px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform .18s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+        }
+
+        .anahtar[aria-checked="true"] {
+            background: var(--turkuaz);
+        }
+
+        .anahtar[aria-checked="true"]::after {
+            transform: translateX(24px);
+        }
+
+        /* ---------- Kayıt özeti ---------- */
+        .ozet-kutular {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .ok-kutu {
+            background: var(--zemin-2);
+            border-radius: 14px;
+            padding: 12px 14px;
+        }
+
+        .ok-kutu b {
+            display: block;
+            font-size: 22px;
+            line-height: 1.2;
+        }
+
+        .ok-kutu small {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--yazi-soluk);
+        }
+
+        /* ---------- Tehlike bölgesi ---------- */
+        .tehlike {
+            border-color: #ffd0d7;
+        }
+
+        .tehlike>h2 {
+            color: var(--kirmizi);
+        }
+
+        .sil-btn {
+            background: var(--kirmizi);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            padding: 12px 20px;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--kirmizi-koyu);
+        }
+
+        .sil-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .sil-btn[disabled] {
+            opacity: .4;
+            cursor: not-allowed;
+        }
+
+        .not {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--turkuaz-koyu);
+            min-height: 18px;
+            margin: 10px 0 0;
+        }
+    </style>
+</head>
+
+<body class="sp">
+    <nav class="sp-ust">
+        <button class="sp-pill tikla" id="geriBtn" title="Haritaya dön" aria-label="Haritaya dön">←</button>
+        <div class="sp-logo">⚙️ <span>Ayarlar</span></div>
+        <div class="sp-istatistik"><span class="sp-pill" id="zorlukRozet">—</span></div>
+    </nav>
+
+    <div class="kapsayici">
+
+        <!-- ---------- GÖRÜNÜM ---------- -->
+        <section class="grup">
+            <h2>g���️ Görünüm</h2>
+            <p>Sitenin rengini ve yazı büyüklüğünü kendine göre ayarla.</p>
+
+            <div class="satir">
+                <div class="satir-ana">
+                    <b>Tema</b>
+                    <small>Göz yormayan bir renk seç. Gece teması karanlıkta iyidir.</small>
+                </div>
+                <div class="secenekler" id="temaSecenekler" data-ayar="tema"></div>
+            </div>
+
+            <div class="satir">
+                <div class="satir-ana">
+                    <b>Yazı büyüklüğü</b>
+                    <small>Küçük yazıları okumakta zorlanıyorsan büyüt.</small>
+                </div>
+                <div class="secenekler" data-ayar="yaziBoy"></div>
+            </div>
+
+            <div class="satir">
+                <div class="satir-ana">
+                    <b>Animasyonlar</b>
+                    <small>Konfeti ve geçiş efektleri. Hareket rahatsız ediyorsa kapat.</small>
+                </div>
+                <button class="anahtar" role="switch" aria-checked="true" data-ayar-anahtar="animasyon"
+                    aria-label="Animasyonları aç/kapat"></button>
+            </div>
+
+            <!-- 3D SAHNE: arka planda yüzen Japonca karakterler (saf WebGL).
+                 Kapatıldığında sayfa sadeleşir; yavaş cihazlarda da işe yarar. -->
+            <div class="satir">
+                <div class="satir-ana">
+                    <b>3D arka plan</b>
+                    <small>Arka planda yüzen Japonca karakterler. Yavaş cihazlarda kapatabilirsin.</small>
+                </div>
+                <button class="anahtar" role="switch" aria-checked="true" data-ayar-anahtar="sahne3d"
+                    aria-label="3D arka planı aç/kapat"></button>
+            </div>
+
+            <!-- HAREKET AZALTMA bilgisi: sistem tercihi animasyonları zaten kapatır.
+                 Kullanıcı "kapattım ama hâlâ oynuyor" demesin diye açıkça yazıyoruz. -->
+            <p class="not-kucuk" id="hareketNotu" hidden>
+                ℹ️ İşletim sisteminde “hareketi azalt” açık olduğu için animasyonlar
+                ve 3D sahne hareketi otomatik olarak durduruldu.
+            </p>
+        </section>
+
+        <!-- ---------- OYUN ---------- -->
+        <section class="grup">
+            <h2>g���️ Oyun</h2>
+            <p>Zorluk, can sayısını ve ders uzunluğunu değiştir.</p>
+
+            <div class="satir">
+                <div class="satir-ana">
+                    <b>Zorluk</b>
+                    <small id="zorlukAciklama">—</small>
+                </div>
+                <div class="secenekler" data-ayar="zorluk"></div>
+            </div>
+
+            <div class="satir">
+                <div class="satir-ana">
+                    <b>Sesli okuma</b>
+                    <small>Japonca telaffuzları dinle. Kulaklıkla daha iyi olur.</small>
+                </div>
+                <button class="anahtar" role="switch" aria-checked="false" data-ayar-anahtar="ses"
+                    aria-label="Sesi aç/kapat"></button>
+            </div>
+        </section>
+
+        <!-- ---------- KAYIT ---------- -->
+        <section class="grup">
+            <h2>g��� Kayıt ve veriler</h2>
+            <p>İlerlemen tarayıcında saklanır ve mümkünse buluta yedeklenir.</p>
+
+            <div class="ozet-kutular" id="ozetKutular"></div>
+            <div class="satir">
+                <div class="satir-ana">
+                    <b>Bulut kayıt</b>
+                    <small id="bulutDurum">Kontrol ediliyor←</small>
+                </div>
+                <span class="sp-pill" id="bulutRozet">←</span>
+            </div>
+            <div class="satir">
+                <div class="satir-ana">
+                    <b>�?imdi yedekle</b>
+                    <small>Başka cihazda devam etmek istersen ilerlemeni buluta gönder.</small>
+                </div>
+                <button class="sp-btn kucuk cizgili" id="yedekleBtn">YEDEKLE</button>
+            </div>
+            <p class="not" id="yedekNot"></p>
+        </section>
+
+        <!-- ---------- TEHLİKE ---------- -->
+        <section class="grup tehlike">
+            <h2>⚠️ Sıfırlama</h2>
+            <p>Alttaki işlem geri alınamaz. Ama önce son bir ders yapmak ister misin? ⚠️</p>
+
+            <div class="satir">
+                <div class="satir-ana">
+                    <b>Sadece ayarları sıfırla</b>
+                    <small>Tema, ses ve zorluk varsayılana döner. İlerlemen SİLİNMEZ.</small>
+                </div>
+                <button class="sp-btn kucuk cizgili" id="ayarSifirla">SIFIRLA</button>
+            </div>
+
+            <div class="satir">
+                <div class="satir-ana">
+                    <b>Her şeyi sil</b>
+                    <small>Kayıt, XP, seri, kanji ve kelime defteri tamamen silinir.</small>
+                </div>
+                <button class="sil-btn" id="tumSifirla">HER �?EYİ SİL</button>
+            </div>
+        </section>
+
+    </div>
+
+    <script src="ilerleme.js?v=6"></script>
+    <script src="pwa.js?v=5"></script>
+    <script src="bulut.js?v=3"></script>
+    <script src="kelime.js?v=6"></script>
+    <script src="analitik.js?v=2" defer></script>
+    <script>window.addEventListener('load', function () { if (window.Analitik) window.Analitik.sayfa('ayarlar'); });</script>
+    <!-- AYARLAR: tema/ses/zorluk/veri. Bu sayfanın asıl motoru. -->
+    <script src="ayarlar.js?v=1"></script>
+    <!-- DURUM �?ERİDİ: her sayfada oyun durumu görünsün (serit.js) -->
+    <script src="gorevler.js?v=2"></script>
+    <script src="hediye.js?v=2"></script>
+    <script src="serit.js?v=1"></script>
+    <script>
+        // ---------- Kısa yardımcılar ----------
+        const el = (tag, sinif, metin) => {
+            const e = document.createElement(tag);
+            if (sinif) e.className = sinif;
+            if (metin != null) e.textContent = metin;
+            return e;
+        };
+        const not = (metin, kirmizi) => {
+            const n = document.getElementById('yedekNot');
+            n.textContent = metin;
+            n.style.color = kirmizi ? 'var(--kirmizi)' : '';
+            setTimeout(() => { n.textContent = ''; }, 4000);
+        };
+
+        // ---------- Kayıt yoksa girişe gönder ----------
+        if (!Ilerleme.isim()) window.location.replace('index.html');
+
+        // Durum şeridi: üst menünün altına yerleşir
+        Serit.kur('.sp-ust', { yuzen: false });
+
+        // ---------- TEMA ----------
+        const TEMA_RENK = { acik: '#fbf8f2', koyu: '#20222b', gece: '#14131a' };
+        (function temaKur() {
+            const kap = document.getElementById('temaSecenekler');
+            const suanki = Ayarlar.al('tema');
+            Object.keys(Ayarlar.TEMALAR).forEach(k => {
+                const b = el('button', 'sec');
+                b.dataset.deger = k;
+                b.dataset.temaSwatch = '1';
+                const sw = el('span', 'swatch');
+                sw.style.background = TEMA_RENK[k];
+                b.append(sw, document.createTextNode(Ayarlar.TEMALAR[k].ad));
+                if (k === suanki) b.classList.add('aktif');
+                b.onclick = () => {
+                    Ayarlar.ayarla('tema', k);
+                    [].forEach.call(kap.children, c => c.classList.toggle('aktif', c === b));
+                };
+                kap.append(b);
+            });
+        })();
+
+        // ---------- Seçenek grubu kur (yaziBoy, zorluk) ----------
+        function grupKur(ad, secenekler, secimYap) {
+            const kap = document.querySelector('.secenekler[data-ayar="' + ad + '"]');
+            if (!kap) return;
+            kap.replaceChildren();
+            const suanki = Ayarlar.al(ad);
+            secenekler.forEach(s => {
+                const b = el('button', 'sec', s.ad);
+                b.dataset.deger = s.deger;
+                if (String(s.deger) === String(suanki)) b.classList.add('aktif');
+                b.onclick = () => {
+                    Ayarlar.ayarla(ad, s.deger);
+                    [].forEach.call(kap.children, c => c.classList.toggle('aktif', c === b));
+                    if (secimYap) secimYap(s.deger);
+                };
+                kap.append(b);
+            });
+        }
+
+        grupKur('yaziBoy', [
+            { deger: '1', ad: 'Normal' },
+            { deger: '1.15', ad: 'Büyük' },
+            { deger: '1.3', ad: 'Çok büyük' }
+        ]);
+
+        grupKur('zorluk', Object.keys(Ayarlar.ZORLUKLAR).map(k => ({
+            deger: k, ad: Ayarlar.ZORLUKLAR[k].ad
+        })), zorlukYaz);
+
+        function zorlukYaz() {
+            document.getElementById('zorlukAciklama').textContent = Ayarlar.zorluk().aciklama;
+            document.getElementById('zorlukRozet').textContent = 'g���️ ' + Ayarlar.zorlukAdi();
+        }
+        zorlukYaz();
+
+        // ---------- ANAHTARLAR (aç/kapa) ----------
+        function anahtarKur(ad, degerOku, degistir) {
+            const b = document.querySelector('[data-ayar-anahtar="' + ad + '"]');
+            if (!b) return;
+            const yazDurum = () => b.setAttribute('aria-checked', degerOku() ? 'true' : 'false');
+            b.onclick = () => { degistir(!degerOku()); yazDurum(); };
+            yazDurum();
+        }
+
+        anahtarKur('animasyon',
+            () => Ayarlar.al('animasyon') === '1',
+            v => {
+                Ayarlar.ayarla('animasyon', v ? '1' : '0');
+                // Animasyon kapatılınca 3D sahne de dursun (sahne3d.js aynı
+                // data-animasyon niteliğine bakar; sahne yeniden kurulunca
+                // ayarı görür).
+                if (window.Sahne3D) { try { Sahne3D.yenile(); } catch (e) { } }
+            });
+
+        // ---------- 3D ARKA PLAN ----------
+        // sahne3d.js tercihi 'sakar_sahne3d' anahtarında tutar ('0' = kapalı).
+        // Anahtar bulunamazsa sahne açık kabul edilir (varsayılan davranış).
+        const SAHNE_ANAHTAR = 'sakar_sahne3d';
+        anahtarKur('sahne3d',
+            () => { try { return localStorage.getItem(SAHNE_ANAHTAR) !== '0'; } catch (e) { return true; } },
+            v => {
+                try { localStorage.setItem(SAHNE_ANAHTAR, v ? '1' : '0'); } catch (e) { }
+                if (window.Sahne3D) { try { Sahne3D.yenile(); } catch (e) { } }
+            });
+
+        // Sistemde "hareketi azalt" açıksa kullanıcıya söyle: anahtar açık
+        // görünse bile animasyonlar oynamaz. Sessiz çelişki kafa karıştırır.
+        try {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                const not = document.getElementById('hareketNotu');
+                if (not) not.hidden = false;
+            }
+        } catch (e) { }
+
+        anahtarKur('ses',
+            () => { try { return localStorage.getItem('sakar_ses') !== '0'; } catch (e) { return true; } },
+            v => {
+                try { localStorage.setItem('sakar_ses', v ? '1' : '0'); } catch (e) { }
+                if (v && window.Ses) { try { Ses.hosgeldin(); } catch (e) { } }
+            });
+
+        // ---------- ÖZET KUTULARI ----------
+        (function ozetKur() {
+            const kap = document.getElementById('ozetKutular');
+            const y = Ilerleme.yildizlar();
+            const yildiz = Object.keys(y).reduce((t, k) => t + y[k], 0);
+            const kana = Ilerleme.gorulenIdler().length;
+            const rutbe = Ilerleme.rutbe(Ilerleme.xp());
+            const veriler = [
+                { b: Ilerleme.xp(), s: 'Toplam XP', renk: 'var(--altin-koyu)' },
+                { b: rutbe.ad, s: 'Rütbe', renk: 'var(--mor)' },
+                { b: Ilerleme.seri().sayi, s: 'Günlük seri', renk: 'var(--turuncu)' },
+                { b: yildiz, s: 'Kazanılan yıldız', renk: 'var(--altin-koyu)' },
+                { b: kana, s: 'Çalışılan harf', renk: 'var(--turkuaz-koyu)' }
+            ];
+            veriler.forEach(v => {
+                const k = el('div', 'ok-kutu');
+                const b = el('b', '', String(v.b));
+                b.style.color = v.renk;
+                k.append(b, el('small', '', v.s));
+                kap.append(k);
+            });
+        })();
+
+        // ---------- BULUT DURUMU ----------
+        (function bulutKur() {
+            const durum = document.getElementById('bulutDurum');
+            const rozet = document.getElementById('bulutRozet');
+            const btn = document.getElementById('yedekleBtn');
+            const acik = window.Bulut && Bulut.acik();
+
+            if (!acik) {
+                rozet.textContent = 'Kapalı';
+                durum.textContent = 'Kapalı — ilerleme yalnızca bu tarayıcıda saklanıyor.';
+                btn.disabled = true;
+                return;
+            }
+            rozet.textContent = 'Açık';
+            btn.disabled = false;
+            durum.textContent = 'Açık — ilerleme otomatik yedeklenir.';
+
+            btn.onclick = () => {
+                btn.disabled = true;
+                btn.textContent = 'GÖNDERİLİYOR←';
+                Promise.resolve(Bulut.yedekle(true)).then(() => {
+                    btn.textContent = 'YEDEKLE';
+                    btn.disabled = false;
+                    not('✅ İlerlemen buluta gönderildi.');
+                }).catch(() => {
+                    btn.textContent = 'YEDEKLE';
+                    btn.disabled = false;
+                    not('❌ Gönderilemedi. İnternet bağlantını kontrol et.', true);
+                });
+            };
+        })();
+
+        // ---------- SIFIRLAMA ----------
+        document.getElementById('ayarSifirla').onclick = () => {
+            if (!confirm('Ayarlar (tema, ses, zorluk) varsayılana dönecek. İlerlemen silinmez. Onaylıyor musun?')) return;
+            Ayarlar.sifirla();
+            not('✅ Ayarlar sıfırlandı.');
+            setTimeout(() => location.reload(), 900);
+        };
+
+        document.getElementById('tumSifirla').onclick = () => {
+            if (!confirm('DİKKAT: Kayıt, XP, seri, kanji ve kelime defteri TAMEN silinecek. Bu işlem geri alınamaz. Emin misin?')) return;
+            if (!confirm('Son kez soruyorum: her şey silinsin mi?')) return;
+            Ilerleme.sifirla();
+            try { sessionStorage.clear(); } catch (e) { }
+            window.location.replace('index.html');
+        };
+
+        // ---------- GERİ ----------
+        document.getElementById('geriBtn').onclick = () => {
+            window.location.href = Ilerleme.isim() ? 'dojo.html' : 'index.html';
+        };
+
+        // ---------- HATA RAPORU: bir şey patlarsa sayfa sessizce ölmesin ----------
+        window.addEventListener('error', e => {
+            not('⚠️ Bir hata oluştu: ' + (e.message || 'bilinmeyen'), true);
+        });
+    </script>
+    <!-- SURUM GUNCELLEME BILDIRIMI (guncelleme.js) -->
+    <script src="guncelleme.js?v=1"></script>
+    <script src="sahne3d.js?v=1"></script>
+    <!-- VİDEO ARKA PLAN: videolar/yatay|dikey/arkaplan.webm döngüde oynar.
+         Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
+         KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli (aynı negatif
+         z-index'te sonra gelen katman üstte görünür). -->
+    <script src="video-arkaplan.js?v=4"></script>
+</body>
+
+</html>

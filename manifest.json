@@ -1,0 +1,21 @@
+{
+  "name": "Sakar Paisen | Japonca Öğren",
+  "short_name": "Sakar Paisen",
+  "description": "Hiragana ve Katakana'yı Sakar Paisen ile oyun oynar gibi öğren.",
+  "lang": "tr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fbf8f2",
+  "theme_color": "#7b5cf0",
+  "categories": ["education"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Dojo Haritası", "url": "./dojo.html", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

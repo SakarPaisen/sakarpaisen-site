@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakar Paisen | Antrenman</title>
+    <meta name="theme-color" content="#e63946">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="stylesheet" href="uygulama.css?v=14">
+    <!-- Sayfa kimliği: otomatik testler ve hata raporu doğru sayfayı doğrulasın -->
+    <meta name="sp-sayfa" content="oyun">
+    <style>
+        :root { --arka-plan: var(--zemin); --kutu: var(--zemin-2); --ana-renk: var(--mor); --dogru: var(--turkuaz); --altin: var(--altin); --yazi: var(--yazi); }
+        body { margin: 0; background: var(--zemin); color: var(--yazi); font-family: 'Segoe UI', 'Trebuchet MS', system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; height: 100vh; height: 100dvh; overflow: hidden; }
+
+        .ust-bar { width: 100%; max-width: 800px; padding: 14px 20px; display: flex; align-items: center; gap: 12px; box-sizing: border-box; }
+        .kapat { font-size: 24px; background: var(--kart); border: 2px solid var(--cizgi); border-radius: 50%; width: 42px; height: 42px; color: var(--yazi-soluk); cursor: pointer; transition: 0.15s; display: flex; align-items: center; justify-content: center; }
+        .kapat:hover { color: var(--kirmizi); border-color: var(--kirmizi); }
+        .bar-arka { flex: 1; background: var(--zemin-2); height: 16px; border-radius: 999px; overflow: hidden; }
+        .bar-ic { background: var(--turkuaz); height: 100%; width: 0%; transition: width 0.4s ease-out; border-radius: 999px; }
+        .canlar { font-size: 19px; font-weight: bold; min-width: 74px; text-align: right; letter-spacing: 2px; }
+
+        .uyari { background: #fff4d6; color: #8a6100; padding: 8px 16px; font-size: 14px; text-align: center; width: 100%; box-sizing: border-box; border-bottom: 2px solid #f2dda1; }
+        .uyari[hidden] { display: none; }
+
+        /* justify-content: center + taşan içerik = üst/alt kırpılma. auto margin ile ortalanır, taşarsa kaydırılır. */
+        .sahne { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 620px; text-align: center; padding: 20px 20px 34px; box-sizing: border-box; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+        .sahne > .mesaj:first-child { margin-top: auto; }
+        .sahne > :last-child { margin-bottom: auto; }
+        .mesaj { font-size: 25px; font-weight: 800; margin-bottom: 22px; color: var(--yazi); }
+        .mesaj-renkli { color: var(--mor); }
+        .buyuk { font-size: 78px; font-weight: bold; margin-bottom: 16px; }
+
+        .kart { background: var(--kart); border: 2px solid var(--cizgi); border-radius: 22px; width: 270px; min-height: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; box-shadow: 0 8px 0 var(--cizgi), 0 18px 40px rgba(0,0,0,0.06); padding: 20px 10px 40px; box-sizing: border-box; }
+        .kart img { width: 110px; height: 110px; object-fit: cover; border-radius: 12px; margin-bottom: 10px; }
+        .kart-ja { font-weight: 800; }
+        .kart-ro { font-size: 24px; color: var(--yazi-soluk); margin-top: 10px; }
+        .ip { margin-top: 26px; color: var(--yazi-soluk); font-size: 15px; max-width: 360px; white-space: pre-line; line-height: 1.55; }
+        .ornek-kart { margin-top: 22px; background: #fff8e8; border: 2px dashed var(--altin); border-radius: 16px; padding: 12px 20px; max-width: 360px; text-align: center; transition: 0.15s; }
+        .ornek-kart:hover { border-color: var(--altin-koyu); background: #fff2d4; transform: translateY(-2px); }
+        .ornek-etiket { font-size: 11.5px; color: var(--yazi-soluk); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; font-weight: 800; }
+        .ornek-ja { font-size: 28px; font-weight: 800; }
+        .ornek-yazi { font-size: 16px; color: var(--yazi-soluk); }
+        /* KANJİ KARTI: kun'yomi (hiragana) ve on'yomi (katakana) ayrı satırlarda.
+           Öğrenci hangi okunuşun hangi durumda kullanıldığını ayırt edebilsin. */
+        .kanji-okunus { margin-top: 18px; display: flex; flex-direction: column; gap: 6px; max-width: 360px; }
+        .kanji-okunus-satir { display: flex; justify-content: space-between; gap: 14px; align-items: baseline;
+                              background: var(--kart); border: 2px solid var(--cizgi); border-radius: 12px; padding: 8px 14px; }
+        .kanji-okunus-et { font-size: 12.5px; font-weight: 700; color: var(--yazi-soluk); text-transform: uppercase; letter-spacing: .5px; }
+        .kanji-okunus-deger { font-size: 24px; font-weight: 800; color: var(--mor); }
+        .ses-btn { background: var(--mor); color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 24px; cursor: pointer; position: absolute; bottom: -30px; box-shadow: 0 5px 0 var(--mor-golge); transition: 0.12s; }
+        .ses-btn:active { transform: translateY(4px); box-shadow: none; }
+        .ses-buyuk { background: var(--mor); color: #fff; border: none; border-radius: 24px; width: 130px; height: 130px; font-size: 56px; margin-bottom: 20px; cursor: pointer; box-shadow: 0 6px 0 var(--mor-golge); transition: 0.12s; }
+        .ses-buyuk:active { transform: translateY(6px); box-shadow: none; }
+
+        .secenekler { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; max-width: 560px; }
+        .secenek { background: var(--kart); color: var(--yazi); border: 2px solid var(--cizgi); padding: 22px 10px; border-radius: 16px; font-size: 28px; font-weight: 800; cursor: pointer; transition: 0.15s; box-shadow: 0 4px 0 var(--cizgi); font-family: inherit; position: relative; }
+        .secenek:hover { border-color: var(--mor); transform: translateY(-2px); }
+        /* Sol üstte klavye numarası: "1-4 tuşlarıyla da seçebilirsin" */
+        .sik-no { position: absolute; top: 8px; left: 11px; font-size: 11.5px; font-weight: 800;
+                  color: var(--yazi-soluk); background: var(--zemin-2); border: 1.5px solid var(--cizgi);
+                  border-radius: 7px; padding: 1px 6px; line-height: 1.5; }
+        .secenek.dogru-btn .sik-no, .secenek.yanlis-btn .sik-no { color: rgba(255,255,255,.85);
+                  background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.35); }
+
+        /* ---------- Yazma modu (yaz tipi soru) ---------- */
+        .yaz-kutu {
+          width: 100%; max-width: 320px; margin-top: 22px; padding: 16px 18px;
+          background: var(--kart); color: var(--yazi); border: 2px solid var(--cizgi);
+          border-radius: 16px; box-shadow: 0 4px 0 var(--cizgi);
+          font-family: inherit; font-size: 24px; font-weight: 800; text-align: center;
+          letter-spacing: 2px; outline: none; transition: border-color .15s;
+        }
+        .yaz-kutu::placeholder { font-size: 15px; font-weight: 600; letter-spacing: 0; color: #b3aa9b; }
+        .yaz-kutu:focus { border-color: var(--mor); }
+        .yaz-kutu.dogru-btn, .yaz-kutu.yanlis-btn { color: #fff !important; }
+        .yaz-ipucu { margin-top: 8px; font-size: 13px; font-weight: 700; color: var(--yazi-soluk); }
+        .yaz-gonder {
+          margin-top: 14px; background: var(--mor); color: #fff; border: none;
+          border-radius: 14px; padding: 14px 34px; font-family: inherit; font-size: 16px;
+          font-weight: 800; letter-spacing: .5px; text-transform: uppercase; cursor: pointer;
+          box-shadow: 0 4px 0 var(--mor-golge); transition: transform .08s, box-shadow .08s;
+        }
+        .yaz-gonder:active { transform: translateY(4px); box-shadow: none; }
+        .yaz-dogru {
+          margin-top: 14px; padding: 10px 18px; background: #e6f8f4; border: 2px solid #b9ece2;
+          border-radius: 14px; font-size: 17px; font-weight: 800; color: var(--turkuaz-koyu);
+        }
+
+        /* ---------- Sesli dikte ekranı ---------- */
+        .dikte-ses { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .dikte-ip { font-size: 12.5px; font-weight: 700; color: var(--yazi-soluk); }
+        .dikte-kutu { max-width: 420px; font-size: 19px; letter-spacing: 0; text-align: left;
+                      padding: 15px 18px; }
+        .dikte-kutu::placeholder { font-size: 14px; }
+
+        /* Klavye ipucu şeridi: dersin ilk sorusunda bir kez görünür, sonra söner */
+        .klavye-ipucu { display: flex; align-items: center; gap: 7px; margin-top: 18px;
+                        padding: 8px 14px; background: var(--zemin-2); border: 2px dashed var(--cizgi-koyu);
+                        border-radius: 999px; font-size: 13px; font-weight: 700; color: var(--yazi-soluk);
+                        transition: opacity .6s, transform .6s; }
+        .klavye-ipucu.soluyor { opacity: 0; transform: translateY(6px); }
+        .kk-tus { background: var(--kart); border: 2px solid var(--cizgi-koyu); border-radius: 7px;
+                  padding: 1px 7px; font-weight: 800; color: var(--yazi); box-shadow: 0 2px 0 var(--cizgi-koyu); }
+        .kk-ayrac { color: var(--cizgi-koyu); }
+        .secenek:active { transform: translateY(4px); box-shadow: none; }
+        .dogru-btn { background: var(--turkuaz) !important; color: #fff !important; border-color: var(--turkuaz-koyu) !important; box-shadow: 0 4px 0 var(--turkuaz-koyu) !important; }
+        .yanlis-btn { background: var(--kirmizi) !important; color: #fff !important; border-color: var(--kirmizi-koyu) !important; box-shadow: 0 4px 0 var(--kirmizi-koyu) !important; }
+
+        /* .alt-bar her zaman en altta sabit kalır, bu yüzden DEVAM ET butonu ekrandan çıkmaz */
+        .alt-bar { flex: 0 0 auto; width: 100%; padding: 14px 20px max(14px, env(safe-area-inset-bottom)); border-top: 2px solid var(--cizgi); background: var(--kart); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: 118px; box-sizing: border-box; transition: background .18s, border-color .18s; }
+        .alt-bar.durum-iyi { background: #e6f8f4; border-top-color: #b9ece2; }
+        .alt-bar.durum-hata { background: #fff1f3; border-top-color: #ffd0d7; }
+        .alt-bar.durum-iyi .geri-bildirim { color: var(--turkuaz-koyu); }
+        .alt-bar.durum-hata .geri-bildirim { color: var(--kirmizi); }
+        .geri-bildirim { min-height: 22px; font-weight: 800; }
+        .geri-bildirim.hata { color: var(--kirmizi); }
+        .geri-bildirim.iyi { color: var(--turkuaz-koyu); }
+        .devam-btn { color: white; border: none; padding: 15px 40px; border-radius: 14px; font-size: 19px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; cursor: pointer; display: none; width: 100%; max-width: 400px; font-family: inherit; }
+        .devam-btn:active { transform: translateY(5px); box-shadow: none !important; }
+
+        /* �?ıkka basınca anında geri bildirim: buton kısa bir "tepki" verir */
+        .secenek.sik-animasyon { animation: sikTepki .32s cubic-bezier(.34, 1.56, .64, 1); }
+        @keyframes sikTepki {
+            0%   { transform: scale(1); }
+            40%  { transform: scale(0.94); }
+            100% { transform: scale(1); }
+        }
+        /* DEVAM ET belirdiğinde kısa bir parlama: kullanıcı gözü oraya gitsin */
+        .devam-btn.dikkat { animation: dikkatCek .7s ease-out; }
+        @keyframes dikkatCek {
+            0%   { transform: scale(1); filter: brightness(1); }
+            30%  { transform: scale(1.04); filter: brightness(1.25); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+        .ikincil { background: var(--kart); border: 2px solid var(--cizgi); color: var(--yazi-soluk); padding: 11px 24px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 12px; font-family: inherit; }
+        .ikincil:hover { border-color: var(--mor); color: var(--mor); }
+
+        /* --- Okuma / kelime / cümle ekranı --- */
+        .kelime-tr { font-size: 25px; font-weight: 800; color: var(--mor); margin-top: 14px; }
+        .cumle-kart { background: var(--kart); border: 2px solid var(--cizgi); border-radius: 20px; box-shadow: 0 8px 0 var(--cizgi); padding: 22px 18px 34px; width: 100%; max-width: 460px; position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .cumle-ja { font-size: 34px; font-weight: 800; line-height: 1.7; word-break: keep-all; }
+        .kelime-mi { padding: 2px 5px; border-radius: 8px; transition: 0.15s; }
+        .kelime-mi.tiklabilir { cursor: pointer; border-bottom: 2px dotted var(--cizgi-koyu); }
+        .kelime-mi.tiklabilir:hover { background: #f0ebff; }
+        .cumle-ro { font-size: 20px; color: var(--yazi-soluk); }
+        .cumle-tr { font-size: 20px; color: var(--turkuaz-koyu); font-weight: 800; }
+        .anlam-balon { background: #f3f0ff; border: 2px solid var(--mor); border-radius: 12px; padding: 8px 14px; font-size: 15px; margin-top: 6px; }
+        .anlam-balon b { color: var(--mor); }
+        .ses-btn-cumle { position: static; margin-top: 4px; }
+        .secenekler-yazi { grid-template-columns: 1fr; }
+        .secenek-metin { font-size: 19px; font-weight: bold; padding: 16px 14px; }
+
+        .son-chibi { height: 170px; width: auto; margin-bottom: 8px; animation: spZipla 0.7s ease-out; }
+
+        /* REKLAM ALANI: yalnızca ders bitiş ekranında görünür (app.js ekler).
+           reklam.js ayarı boşken gizli kalır. Bkz. reklam.js */
+        .reklam-alani { width: 100%; max-width: 420px; min-height: 90px; margin: 18px auto 6px;
+                        background: var(--zemin-2); border: 2px dashed var(--cizgi); border-radius: 16px;
+                        display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .reklam-alani[hidden] { display: none; }
+        .reklam-alani .reklam-etiket { font-size: 11px; font-weight: 800; color: var(--yazi-soluk);
+                                       text-transform: uppercase; letter-spacing: 1px; }
+        .ozet { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 6px 0 14px; }
+        .rozet { background: var(--kart); border: 2px solid var(--cizgi); border-radius: 16px; padding: 9px 18px; font-weight: 800; font-size: 18px; box-shadow: 0 3px 0 var(--cizgi); }
+        .rozet.xp { color: var(--altin-koyu); border-color: var(--altin); background: #fff8e8; }
+        .rozet.seri { color: var(--turuncu); }
+        .ses-anahtar { color: var(--yazi) !important; }
+
+        /* Ders bitiş ekranındaki destek bağlantısı */
+        .bitis-destek { display: inline-block; margin-top: 16px; padding: 11px 20px; text-decoration: none;
+                        background: #fff8e8; color: var(--altin-koyu); border: 2px solid var(--altin);
+                        border-radius: 14px; font-weight: 800; font-size: 14px; box-shadow: 0 4px 0 var(--altin); }
+        .bitis-destek:active { transform: translateY(4px); box-shadow: none; }
+        .geri-soyle { display: inline-block; text-decoration: none; margin-top: 10px; font-size: 14px; }
+
+        /* ============================================================
+           DERS ANİMASYONLARI (efsane mod)
+           NEDEN: Sorular arasında hiç geçiş yoktu; ekran aniden değişiyordu.
+           Her adım aynı anda beliriyordu. Bu blok adımlara HAREKET katar:
+           sahne sırayla girer, şıklar tek tek düşer, doğru cevap patlar.
+
+           KURAL: Tüm animasyonlar :root[data-animasyon="0"] ile kapanabilir
+           (ayarlar sayfası). Hareket rahatsız eden kullanıcılar için şart.
+           ============================================================ */
+
+        /* --- 1) Sahne girişi: adım değişince içerik yumuşak belirir --- */
+        .sahne-gir { animation: sahneGir .34s cubic-bezier(.2,.9,.3,1) both; }
+        @keyframes sahneGir {
+          0%   { opacity: 0; transform: translateY(18px) scale(.985); }
+          60%  { opacity: 1; }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* --- 2) Öğretim kartı: hafif dönerek ve büyüyerek gelir --- */
+        .kart-gir { animation: kartGir .46s cubic-bezier(.34,1.35,.64,1) both; transform-origin: center bottom; }
+        @keyframes kartGir {
+          0%   { opacity: 0; transform: translateY(26px) rotate(-2.5deg) scale(.92); }
+          100% { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
+        }
+
+        /* --- 3) Büyük karakter: harf "damgalanır" gibi gelir --- */
+        /* NEDEN AYRI: kartın tamamı gelirken harfin kendisi de vurgulanmalı;
+           öğrencinin gözü harfe gitsin. */
+        .kart-ja.vurgu { animation: harfVurgu .5s cubic-bezier(.2,1.5,.4,1) .12s both; }
+        @keyframes harfVurgu {
+          0%   { opacity: 0; transform: scale(.6); filter: blur(5px); }
+          70%  { opacity: 1; filter: blur(0); }
+          100% { opacity: 1; transform: scale(1); filter: blur(0); }
+        }
+
+        /* --- 4) �?ıklar: soldan sırayla düşer (kademeli) --- */
+        .secenek-gir { animation: secenekGir .32s cubic-bezier(.2,.9,.3,1) both; }
+        @keyframes secenekGir {
+          0%   { opacity: 0; transform: translateY(-14px) scale(.94); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* --- 5) Doğru cevap: yeşil HALKA dalgası yayılır --- */
+        /* NEDEN: Renk değişimi tek başına zayıf bir geri bildirim. Halka
+           "buraya baktı" hissi verir ve gözü doğru cevaba çeker. */
+        .dogru-btn.kutlama { position: relative; }
+        .dogru-btn.kutlama::after {
+          content: ''; position: absolute; inset: -4px; border-radius: 20px;
+          border: 3px solid var(--turkuaz); pointer-events: none;
+          animation: dalgaYay .62s ease-out forwards;
+        }
+        @keyframes dalgaYay {
+          0%   { opacity: .9; transform: scale(.92); }
+          100% { opacity: 0; transform: scale(1.14); }
+        }
+
+        /* --- 6) Yanlış cevap: yatay sallanma ("hayır" işareti) --- */
+        .yanlis-btn.sallan { animation: yanlisSalla .42s cubic-bezier(.36,.07,.19,.97); }
+        @keyframes yanlisSalla {
+          10%, 90% { transform: translateX(-3px); }
+          20%, 80% { transform: translateX(5px); }
+          30%, 50%, 70% { transform: translateX(-8px); }
+          40%, 60% { transform: translateX(8px); }
+          100% { transform: translateX(0); }
+        }
+
+        /* --- 7) Can kaybı: kalp sarsılır ve kırmızı parlar --- */
+        .canlar.sarsinti { animation: canSars .55s cubic-bezier(.36,.07,.19,.97); }
+        @keyframes canSars {
+          0%   { transform: scale(1); }
+          15%  { transform: scale(1.28) rotate(-6deg); color: var(--kirmizi); }
+          35%  { transform: scale(.94) rotate(5deg); }
+          55%  { transform: scale(1.1) rotate(-3deg); }
+          100% { transform: scale(1) rotate(0); }
+        }
+
+        /* --- 8) Kombo: üstte kısa süre yüzen yazı --- */
+        .kombo-yazi {
+          position: fixed; left: 50%; top: 22%; transform: translateX(-50%);
+          z-index: 95; pointer-events: none; font-weight: 800; font-size: 26px;
+          color: var(--altin-koyu); text-shadow: 0 3px 0 rgba(0,0,0,.12);
+          animation: komboYuz 1.05s cubic-bezier(.2,.9,.3,1) forwards;
+        }
+        @keyframes komboYuz {
+          0%   { opacity: 0; transform: translateX(-50%) translateY(14px) scale(.7); }
+          25%  { opacity: 1; transform: translateX(-50%) translateY(0) scale(1.12); }
+          100% { opacity: 0; transform: translateX(-50%) translateY(-42px) scale(1); }
+        }
+
+        /* --- 9) Sahne geçişi: adımlar arası renk dalgası --- */
+        /* NEDEN: Ardışık sorular arasında "nefes alma" anı olmalı; yoksa
+           ekran hep aynı görünür ve ders yorucu olur. */
+        .gecis-dalga {
+          position: fixed; inset: 0; pointer-events: none; z-index: 88;
+          background: linear-gradient(120deg, transparent 30%,
+                      color-mix(in srgb, var(--mor) 22%, transparent) 50%, transparent 70%);
+          animation: gecisDalga .5s ease-out forwards;
+        }
+        @keyframes gecisDalga {
+          0%   { opacity: 0; transform: translateX(-34%); }
+          50%  { opacity: 1; }
+          100% { opacity: 0; transform: translateX(34%); }
+        }
+
+        /* --- 10) İlerleme çubuğu: dolarken üstünde parlama --- */
+        .bar.parla::after {
+          content: ''; position: absolute; inset: 0;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,.65), transparent);
+          animation: barParla .6s ease-out;
+        }
+        @keyframes barParla { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+        /* --- 11) Ders bitişi: yıldızlar tek tek yerine oturur --- */
+        .yildiz-gir { animation: yildizGir .5s cubic-bezier(.2,1.5,.4,1) both; }
+        @keyframes yildizGir {
+          0%   { opacity: 0; transform: scale(0) rotate(-140deg); }
+          70%  { opacity: 1; transform: scale(1.22) rotate(8deg); }
+          100% { opacity: 1; transform: scale(1) rotate(0); }
+        }
+
+        /* --- Yedek: hareket azaltma tercihi (sistem seviyesi) --- */
+        @media (prefers-reduced-motion: reduce) {
+          .sahne-gir, .kart-gir, .kart-ja.vurgu, .secenek-gir,
+          .dogru-btn.kutlama::after, .yanlis-btn.sallan, .canlar.sarsinti,
+          .kombo-yazi, .gecis-dalga, .yildiz-gir, .bar.parla::after {
+            animation: none !important;
+          }
+        }
+
+        /* ---------- Ders bitiş kutlaması ---------- */
+        /* Konfeti: ekranın üstünden düşen renkli parçacıklar */
+        .konfeti-kap {
+          position: fixed; inset: 0; pointer-events: none; z-index: 90; overflow: hidden;
+        }
+        .konfeti {
+          position: absolute; top: -20px; display: block;
+          animation-name: konfetiDus; animation-timing-function: cubic-bezier(.3,.6,.6,1);
+          animation-fill-mode: forwards;
+        }
+        @keyframes konfetiDus {
+          0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(105vh) rotate(540deg); opacity: 0; }
+        }
+
+        /* Ders bitiş parçaları kademeli belir (kutlama hissi) */
+        .son-gir { animation: sonGir .45s cubic-bezier(.2,.9,.3,1) both; }
+        @keyframes sonGir {
+          from { opacity: 0; transform: translateY(16px) scale(.97); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Günlük hedef rozeti */
+        .rozet.hedef { color: var(--turkuaz-koyu); border-color: #b9ece2; background: #e6f8f4; }
+
+        /* Sonraki ders önerisi */
+        .sonraki-oneri {
+          margin-top: 16px; padding: 12px 18px; display: inline-flex; align-items: center; gap: 10px;
+          background: var(--zemin-2); border: 2px dashed var(--cizgi-koyu); border-radius: 14px;
+        }
+        .sonraki-oneri .so-etiket {
+          font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .8px;
+          color: var(--yazi-soluk);
+        }
+        .sonraki-oneri .so-ad { font-size: 15px; font-weight: 800; color: var(--mor); }
+
+        /* Netlify Drop ile yayında Netlify'ın eklediği "Powered by Netlify" şeridi sol altta durur.
+           Bu şerit ders ekranının alt barına / DEVAM ET butonuna binmesin diye onun boyu kadar yer ayırıyoruz.
+           �?erit yoksa (Git ile yayın) bu kuralların hiçbiri uygulanmaz. */
+        #netlify-badge { z-index: 40 !important; bottom: 6px !important; left: 10px !important;
+                         background: var(--kart) !important; border: 2px solid var(--cizgi) !important;
+                         border-radius: 999px !important; padding: 1px !important; }
+        body:has(#netlify-badge) { padding-bottom: 68px; }
+        body:has(#netlify-badge) .alt-bar { min-height: 156px; }
+        @media (max-width: 640px) { #netlify-badge { transform: scale(.86); transform-origin: bottom left; } }
+
+        /* Ders sırasında bir hata oluşursa sağ altta küçük bir uyarı çıkar */
+        .hata-uyari { position: fixed; right: 14px; bottom: 14px; z-index: 60; display: flex; align-items: center;
+                      gap: 8px; padding: 9px 14px; background: #fff4d6; border: 2px solid #f2dda1;
+                      border-radius: 999px; font-size: 13px; font-weight: 800; color: #8a6100;
+                      box-shadow: 0 4px 0 #e8cf95; text-decoration: none; }
+        .hata-uyari:hover { filter: brightness(1.04); }
+
+        /* Cümle/kelime sorularında şıklar sahnenin içinde kaydırılır; alt bardaki buton sabit kalır */
+        @media (max-height: 700px) { .alt-bar { min-height: 100px; padding-top: 10px; padding-bottom: max(10px, env(safe-area-inset-bottom)); } }
+        @media (max-width: 420px) { .secenek { font-size: 24px; padding: 18px 8px; } .mesaj { font-size: 21px; } .kart { width: 100%; max-width: 280px; } }
+    </style>
+</head>
+<body class="sp">
+
+    <div class="ust-bar" id="ustBar">
+        <button class="kapat" onclick="window.location.href='dojo.html'" aria-label="Haritaya dön">×</button>
+        <div class="bar-arka"><div class="bar-ic" id="ilerleme"></div></div>
+        <div class="canlar" id="canlar"></div>
+    </div>
+    <div class="uyari" id="sesUyari" hidden>Bu tarayıcıda Japonca ses bulunamadı, ses butonları çalışmayabilir. Chrome veya Edge ile dene.</div>
+
+    <div class="uyari" id="geriAlani" hidden></div>
+    <div class="sahne" id="sahne"></div>
+
+    <div class="alt-bar">
+        <div class="geri-bildirim" id="geriBildirim"></div>
+        <button class="devam-btn" id="devamBtn">DEVAM ET</button>
+    </div>
+
+    <!-- Hata toplayıcı: ders sırasında oluşan hataları kaydeder (bildirime eklenir) -->
+    <script src="hata-rapor.js?v=3"></script>
+    <!-- Veri katmanı: müfredat, ilerleme, ses, soru üretici -->
+    <!-- REKLAM: ayar boşken tamamen kapalı. Reklam SADECE ders bitişinde gösterilir
+         (app.js çağır). Bkz. reklam.js -->
+    <script src="reklam.js?v=1" defer></script>
+    <script>
+      // Bu sayfanın gerçekten oyun.html olduğunu doğrula.
+      // sw.js eski bir sürümde kalmışsa navigasyon index.html döndürebiliyor;
+      // o durumda kullanıcı sessizce giriş ekranına düşerdi. Artık belli olur.
+      if (document.querySelector('meta[name="sp-sayfa"]').content !== 'oyun') {
+        document.documentElement.setAttribute('data-yanlis-sayfa', '1');
+      }
+    </script>
+    <script src="mufredat.js?v=3"></script>
+    <script src="ilerleme.js?v=11"></script>
+    <script src="ses.js?v=5"></script>
+    <script src="kana.js?v=17"></script>
+    <!-- Okuma pratiği verisi + üreticiler (kelime/cümle). ?v=... önbelleği kırar. -->
+    <script src="reading.js?v=15"></script>
+    <!-- Kanji başlam cümleleri: kanji ile yazılmış cümleler (karışık dersler kullanır).
+         kanji.js'ten ÖNCE yüklenmeli, çünkü karışık ders üreticisi bunu okur. -->
+    <script src="kanji-cumle.js?v=1"></script>
+    <!-- Kanji verisi + soru üretici (Bölüm 9). reading.js ile aynı sözleşme. -->
+    <script src="kanji.js?v=2"></script>
+    <!-- Kelime defteri: öğrenilen kelimeler birikir (kanji bölümü için temel) -->
+    <script src="kelime.js?v=5"></script>
+    <!-- Elle yazılan sorular/dersler: yeni soru eklemek istersen questions.js'e yaz -->
+    <script src="questions.js?v=9"></script>
+    <script src="pwa.js?v=4"></script>
+    <!-- BULUT KAYIT: ayar boşken kapalı, site yerel çalışır. Bkz. bulut.js -->
+    <script src="bulut.js?v=3"></script>
+    <!-- ANALİTİK: token girilene kadar kapalı. Oyun olaylarını (ders başladı/bitti/
+         yarıda kaldı) app.js bu API üzerinden bildir. Bkz. analitik.js -->
+    <script src="analitik.js?v=2" defer></script>
+    <script>window.addEventListener('load', function () { if (window.Analitik) window.Analitik.sayfa('oyun'); });</script>
+    <!-- AYARLAR: zorluk (can/soru/XP) ve animasyon. app.js bunları okur. -->
+    <script src="ayarlar.js?v=1"></script>
+    <!-- GÖNLÜK GÖREVLER + BA�?ARIMLAR: ders bitince app.js bunları kontrol eder. -->
+    <script src="gorevler.js?v=2"></script>
+    <script src="basarimlar.js?v=2"></script>
+    <!-- KOMBO: ders içinde üst üste doğru cevap çarpanı (app.js kullanır) -->
+    <script src="kombo.js?v=1"></script>
+    <!-- YANLI�? DEFTERİ + SINAV: hangi harfleri karıştırdığını takip eder,
+         sınav modu bu bilgiyi kullanarak "zorlayan" şıklar üretir. -->
+    <script src="yanlis.js?v=1"></script>
+    <script src="sinav.js?v=1"></script>
+    <!-- ANA OYUN MOTORU: soruları çizer, puanı ve ilerleme çubuğunu yönetir. Kod: app.js -->
+    <script src="app.js?v=24"></script>
+    <!-- SURUM GUNCELLEME BILDIRIMI (guncelleme.js) -->
+    <script src="guncelleme.js?v=1"></script>
+    <script src="sahne3d.js?v=1"></script>
+    <!-- VİDEO ARKA PLAN: videolar/yatay|dikey/arkaplan.webm döngüde oynar.
+         Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
+         KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli (aynı negatif
+         z-index'te sonra gelen katman üstte görünür). -->
+    <script src="video-arkaplan.js?v=4"></script>
+</body>
+</html>

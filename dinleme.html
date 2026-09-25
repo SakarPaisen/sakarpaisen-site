@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakar Paisen | Dinleme Alıştırması</title>
+    <meta name="theme-color" content="#7b5cf0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="stylesheet" href="uygulama.css?v=14">
+    <meta name="sp-sayfa" content="dinleme">
+    <style>
+        .kapsayici { max-width: 560px; margin: 0 auto; padding: 18px 16px 60px;
+                     display: flex; flex-direction: column; align-items: center;
+                     min-height: calc(100vh - 60px); box-sizing: border-box; }
+        /* İçeriği DİKEY olarak ortala: ekranın üstüne yapışmasın.
+           Ana soru ekranı ortada durunca göz hoparlöre daha kolay odaklanır. */
+        .kapsayici > .dl-ust,
+        .kapsayici > .dl-hoparlor,
+        .kapsayici > .dl-ipucu,
+        .kapsayici > .dl-siklar,
+        .kapsayici > .dl-geri { flex: none; }
+        .kapsayici { justify-content: center; }
+        /* Uzun içerik (sonuç karnesi, boş durum) üstten başlasın */
+        .kapsayici > .dl-son, .kapsayici > .dl-bos { margin-top: auto; margin-bottom: auto; }
+
+        /* ---------- Çoğu bilgi ---------- */
+        .dl-ust { display: flex; align-items: center; gap: 10px; width: 100%; margin-bottom: 20px; }
+        .dl-sayac { font-size: 13px; font-weight: 800; color: var(--yazi-soluk);
+                    background: var(--zemin-2); border-radius: 999px; padding: 6px 14px; }
+        .dl-bar { flex: 1; height: 10px; background: var(--zemin-2); border-radius: 999px; overflow: hidden; }
+        .dl-bar > div { height: 100%; width: 0%; background: var(--mor); border-radius: 999px;
+                        transition: width .3s ease-out; }
+        .dl-skor { font-size: 13px; font-weight: 800; color: var(--turkuaz-koyu); white-space: nowrap; }
+
+        /* ---------- Hoparlör (ana eylem) ---------- */
+        .dl-hoparlor {
+            width: 132px; height: 132px; border-radius: 50%; border: none;
+            background: var(--mor); color: #fff; font-size: 56px;
+            cursor: pointer; box-shadow: 0 7px 0 var(--mor-golge);
+            transition: transform .1s, box-shadow .1s;
+            display: flex; align-items: center; justify-content: center;
+            margin: 10px 0 8px; flex: none;
+        }
+        .dl-hoparlor:active { transform: translateY(7px); box-shadow: none; }
+        .dl-hoparlor.caliyor { animation: dlNabiz .6s ease-out; }
+        @keyframes dlNabiz {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.07); }
+            100% { transform: scale(1); }
+        }
+        .dl-ipucu { font-size: 13px; font-weight: 700; color: var(--yazi-soluk);
+                    margin-bottom: 22px; text-align: center; }
+        .dl-tekrar { background: none; border: none; color: var(--mor); font-family: inherit;
+                     font-size: 13px; font-weight: 800; cursor: pointer; text-decoration: underline; }
+
+        /* ---------- �?ıklar ---------- */
+        /* 2x2 düzen; düğmeler ekranı kaplamasın diye yükseklik sınırlı.
+           Önce çok yüksekti ve altta büyük boş alan kalıyordu. */
+        .dl-siklar { display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+                     width: 100%; max-width: 420px; }
+        .dl-sik {
+            background: var(--kart); color: var(--yazi); border: 2px solid var(--cizgi);
+            border-radius: 18px; padding: 16px 10px; font-size: 36px; font-weight: 800;
+            cursor: pointer; font-family: inherit; box-shadow: 0 4px 0 var(--cizgi);
+            transition: .12s; position: relative; min-height: 84px;
+        }
+        .dl-sik:hover { border-color: var(--mor); transform: translateY(-2px); }
+        .dl-sik:active { transform: translateY(4px); box-shadow: none; }
+        .dl-sik.dogru {
+            background: var(--turkuaz) !important; color: #fff !important;
+            border-color: var(--turkuaz-koyu) !important;
+            box-shadow: 0 4px 0 var(--turkuaz-koyu) !important;
+        }
+        .dl-sik.yanlis {
+            background: var(--kirmizi) !important; color: #fff !important;
+            border-color: var(--kirmizi-koyu) !important;
+            box-shadow: 0 4px 0 var(--kirmizi-koyu) !important;
+        }
+        .dl-sik.pasif { opacity: .45; cursor: default; }
+
+        /* ---------- Geri bildirim ---------- */
+        .dl-geri { min-height: 30px; margin-top: 18px; font-size: 17px; font-weight: 800; text-align: center; }
+        .dl-geri.iyi { color: var(--turkuaz-koyu); }
+        .dl-geri.hata { color: var(--kirmizi); }
+
+        /* ---------- Sonuç karnesi ---------- */
+        .dl-son { text-align: center; width: 100%; animation: spGir .3s ease-out both; }
+        .dl-son .simge { font-size: 66px; margin-bottom: 10px; }
+        .dl-son h2 { margin: 0 0 6px; font-size: 24px; }
+        .dl-son .oran { font-size: 19px; font-weight: 800; color: var(--mor); margin-bottom: 4px; }
+        .dl-son .detay { font-size: 14px; font-weight: 700; color: var(--yazi-soluk); margin-bottom: 20px; }
+        .dl-son .karne { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+        .dl-son .k-kutu { background: var(--zemin-2); border-radius: 14px; padding: 12px 18px; }
+        .dl-son .k-kutu b { display: block; font-size: 24px; line-height: 1.2; }
+        .dl-son .k-kutu small { font-size: 11.5px; font-weight: 700; color: var(--yazi-soluk); }
+        .dl-son .btnlar { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+        /* ---------- Boş durum ---------- */
+        .dl-bos { text-align: center; padding: 40px 16px; }
+        .dl-bos .simge { font-size: 56px; margin-bottom: 12px; }
+        .dl-bos p { color: var(--yazi-soluk); font-weight: 600; line-height: 1.5; margin: 0 0 18px; }
+
+        @media (max-width: 420px) {
+            .dl-hoparlor { width: 120px; height: 120px; font-size: 50px; }
+            .dl-sik { font-size: 34px; padding: 18px 8px; }
+        }
+    </style>
+</head>
+<body class="sp">
+    <nav class="sp-ust">
+        <button class="sp-pill tikla" id="geriBtn" title="Haritaya dön" aria-label="Haritaya dön">←</button>
+        <div class="sp-logo">g���️ <span>Dinleme</span></div>
+        <div class="sp-istatistik"><span class="sp-pill" id="ipucuRozet">Kulak eğitimi</span></div>
+    </nav>
+
+    <div class="kapsayici" id="kok"></div>
+
+    <script src="mufredat.js?v=3"></script>
+    <script src="ilerleme.js?v=11"></script>
+    <script src="ses.js?v=5"></script>
+    <script src="kana.js?v=17"></script>
+    <script src="pwa.js?v=5"></script>
+    <script src="bulut.js?v=3"></script>
+    <script src="analitik.js?v=2" defer></script>
+    <script>window.addEventListener('load', function () { if (window.Analitik) window.Analitik.sayfa('dinleme'); });</script>
+    <script src="ayarlar.js?v=1"></script>
+    <!-- DİNLEME: kulak eğitimi turu. Yanlış yapılan harf 3 soru sonra tekrar gelir. -->
+    <script src="dinleme.js?v=1"></script>
+    <!-- YANLI�? DEFTERİ: dinleme alıştırmasında yanlış cevaplar da karıştırma
+         defterine yazılır (dinleme.js Yanlis.ciftKaydet çağırır).
+         Bu bağlantı eksikti ve yanlış cevaplar kaydedilmiyordu (test yakaladı). -->
+    <script src="yanlis.js?v=1"></script>
+    <script>
+        (function () {
+            const el = (t, c, m) => {
+                const e = document.createElement(t);
+                if (c) e.className = c;
+                if (m != null) e.textContent = m;
+                return e;
+            };
+            const kok = document.getElementById('kok');
+
+            // Kayıt yoksa girişe gönder
+            if (!Ilerleme.isim()) { window.location.replace('index.html'); return; }
+
+            document.getElementById('geriBtn').onclick = () => {
+                window.location.href = 'dojo.html';
+            };
+
+            // ---------- SES ÇAL ----------
+            let sesZaman = null;
+            function sesCal(harf) {
+                const h = document.querySelector('.dl-hoparlor');
+                if (h) {
+                    h.classList.remove('caliyor');
+                    void h.offsetWidth;               // animasyonu yeniden başlat
+                    h.classList.add('caliyor');
+                }
+                clearTimeout(sesZaman);
+                sesZaman = setTimeout(() => { if (h) h.classList.remove('caliyor'); }, 700);
+                try {
+                    if (window.Ses && Ses.harf) Ses.harf(harf, true);   // true: zorla çal
+                } catch (e) { }
+            }
+
+            // ---------- ✨ST BİLGİ ----------
+            function ustCiz() {
+                const d = Dinleme.durum();
+                const ust = el('div', 'dl-ust');
+                ust.append(el('span', 'dl-sayac', d.soruNo + ' / ' + d.toplam));
+                const bar = el('div', 'dl-bar');
+                const ic = el('div');
+                ic.style.width = (d.toplam ? Math.round(d.soruNo / d.toplam * 100) : 0) + '%';
+                bar.append(ic);
+                ust.append(bar);
+                ust.append(el('span', 'dl-skor', '✨' + d.dogru + '  ✖ ' + d.yanlis));
+                return ust;
+            }
+
+            // ---------- SORU EKRANI ----------
+            let kilitli = false;
+
+            function soruCiz() {
+                kilitli = false;
+                const s = Dinleme.sor();
+                kok.replaceChildren();
+
+                if (!s) { sonucCiz(); return; }
+
+                kok.append(ustCiz());
+
+                // Hoparlör: tek ana eylem, büyük ve net
+                const hop = el('button', 'dl-hoparlor', 'g���');
+                hop.title = 'Sesi çal (R tuşu)';
+                hop.onclick = () => sesCal(s.harf);
+                kok.append(hop);
+
+                const ip = el('div', 'dl-ipucu');
+                ip.append(document.createTextNode('Duyduğun harfi seç '));
+                const tkr = el('button', 'dl-tekrar', '(tekrar dinle)');
+                tkr.onclick = () => sesCal(s.harf);
+                ip.append(tkr);
+                kok.append(ip);
+
+                // �?ıklar
+                const kap = el('div', 'dl-siklar');
+                const düğmeler = [];
+                s.siklar.forEach((harf, i) => {
+                    const b = el('button', 'dl-sik', harf);
+                    b.dataset.harf = harf;
+                    b.onclick = () => cevapla(b, harf, s);
+                    kap.append(b);
+                    düğmeler.push(b);
+                });
+                kok.append(kap);
+
+                kok.append(el('div', 'dl-geri', ''));
+
+                // Kısayollar: 1-4 şık, R tekrar dinle
+                document.onkeydown = (e) => {
+                    if (e.key === 'r' || e.key === 'R') { sesCal(s.harf); return; }
+                    const n = parseInt(e.key, 10);
+                    if (n >= 1 && n <= düğmeler.length) düğmeler[n - 1].click();
+                };
+
+                // Sesi otomatik çal (kullanıcı ekrana gelince hemen duysun)
+                setTimeout(() => sesCal(s.harf), 350);
+            }
+
+            // ---------- CEVAP ----------
+            function cevapla(buton, harf, s) {
+                if (kilitli) return;
+                kilitli = true;
+                document.onkeydown = null;
+
+                const r = Dinleme.cevapla(harf);
+                const geri = document.querySelector('.dl-geri');
+
+                if (r.dogruMu) {
+                    buton.classList.add('dogru');
+                    geri.className = 'dl-geri iyi';
+                    geri.textContent = '✅ Doğru! ' + s.harf + ' = ' + s.romaji;
+                    try { if (window.Ses) Ses.dogru(); } catch (e) { }
+                } else {
+                    buton.classList.add('yanlis');
+                    // Doğru cevabı da göster (öğrenme anı budur)
+                    document.querySelectorAll('.dl-sik').forEach(b => {
+                        if (b.dataset.harf === r.dogruHarf) b.classList.add('dogru');
+                        else b.classList.add('pasif');
+                    });
+                    geri.className = 'dl-geri hata';
+                    geri.textContent = '✖ Doğrusu: ' + r.dogruHarf + ' = ' + r.dogruRomaji +
+                        ' (bu harf 3 soru sonra tekrar gelecek)';
+                    try { if (window.Ses) Ses.yanlis(); } catch (e) { }
+                }
+
+                // Kısa bir bekleme: kullanıcı doğru cevabı görsün
+                setTimeout(() => {
+                    if (r.bitti) sonucCiz();
+                    else soruCiz();
+                }, r.dogruMu ? 900 : 1900);
+            }
+
+            // ---------- SONUÇ KARNESİ ----------
+            function sonucCiz() {
+                const o = Dinleme.ozet();
+                // Başarıma ve XP'ye işle (tek yerden)
+                if (o.dogru > 0) {
+                    try { Ilerleme.xpEkle(o.puan); } catch (e) { }
+                }
+                try {
+                    if (window.Basarimlar) {
+                        const yeni = Basarimlar.kontrol();
+                        if (yeni.length) Basarimlar.kutlamaGoster(yeni, document.body);
+                    }
+                } catch (e) { }
+
+                kok.replaceChildren();
+                const son = el('div', 'dl-son');
+                son.append(
+                    el('div', 'simge', o.oran >= 90 ? '✅' : o.oran >= 70 ? 'g���️' : o.oran >= 50 ? 'g���' : 'g�?�'),
+                    el('h2', '', o.oran >= 90 ? 'Kulakların keskin!' :
+                        o.oran >= 70 ? 'İyi gidiyorsun!' :
+                            o.oran >= 50 ? 'Fena değil.' : 'Biraz daha dinleyelim.'),
+                    el('div', 'oran', '%' + o.oran + ' doğru'),
+                    el('div', 'detay', 'Kazandığın XP: +' + o.puan)
+                );
+
+                const karne = el('div', 'karne');
+                [['✅ ' + o.dogru, 'doğru'], ['✖ ' + o.yanlis, 'yanlış'], [o.toplam, 'toplam soru']]
+                    .forEach(x => {
+                        const k = el('div', 'k-kutu');
+                        k.append(el('b', '', String(x[0])), el('small', '', x[1]));
+                        karne.append(k);
+                    });
+                son.append(karne);
+
+                const btnlar = el('div', 'btnlar');
+                const tekrar = el('button', 'sp-btn', 'YENİ TUR');
+                tekrar.onclick = () => baslat();
+                const harita = el('button', 'sp-btn yesil', 'HARİTAYA DÖN');
+                harita.onclick = () => { window.location.href = 'dojo.html'; };
+                btnlar.append(tekrar, harita);
+                son.append(btnlar);
+
+                kok.append(son);
+                document.onkeydown = (e) => { if (e.key === 'Enter') tekrar.click(); };
+            }
+
+            // ---------- BA�?LAT ----------
+            function baslat() {
+                if (!Dinleme.baslat()) {
+                    kok.replaceChildren();
+                    const b = el('div', 'dl-bos');
+                    b.append(
+                        el('div', 'simge', 'g���️'),
+                        el('h3', '', 'Dinlemek için önce harf öğrenmelisin'),
+                        el('p', '', 'En az 4 harf bilmelisin ki şıklar oluşsun. ' +
+                            'Haritaya dönüp ilk dersleri yap, sonra buraya gel.')
+                    );
+                    const btn = el('button', 'sp-btn', 'HARİTAYA DÖN');
+                    btn.onclick = () => { window.location.href = 'dojo.html'; };
+                    b.append(btn);
+                    kok.append(b);
+                    return;
+                }
+                soruCiz();
+            }
+
+            baslat();
+        })();
+    </script>
+    <!-- SURUM GUNCELLEME BILDIRIMI (guncelleme.js) -->
+    <script src="guncelleme.js?v=1"></script>
+    <script src="sahne3d.js?v=1"></script>
+    <!-- VİDEO ARKA PLAN: videolar/yatay|dikey/arkaplan.webm döngüde oynar.
+         Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
+         KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli (aynı negatif
+         z-index'te sonra gelen katman üstte görünür). -->
+    <script src="video-arkaplan.js?v=4"></script>
+</body>
+</html>

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakar Paisen | Yazma Atölyesi</title>
+    <meta name="theme-color" content="#7b5cf0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="stylesheet" href="uygulama.css?v=14">
+    <!-- Sayfa kimliği: testler ve hata raporu doğru sayfayı doğrulasın -->
+    <meta name="sp-sayfa" content="yazma">
+    <style>
+        body {
+            margin: 0;
+        }
+
+        .kapsayici {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 22px 16px 60px;
+        }
+
+        /* ---------- Çoğu şerit: ilerleme + can ---------- */
+        .yz-ust {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .yz-bar {
+            flex: 1;
+            background: var(--zemin-2);
+            border-radius: 999px;
+            height: 16px;
+            overflow: hidden;
+            border: 2px solid var(--cizgi);
+        }
+
+        .yz-bar>div {
+            height: 100%;
+            width: 0%;
+            background: var(--mor);
+            border-radius: 999px;
+            transition: width .35s;
+        }
+
+        .yz-sayac {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--yazi-soluk);
+            white-space: nowrap;
+        }
+
+        /* ---------- Soru kartı ---------- */
+        .yz-kart {
+            background: var(--kart);
+            border: 2px solid var(--cizgi);
+            border-radius: 22px;
+            padding: 24px 20px;
+            box-shadow: 0 6px 0 var(--cizgi);
+            text-align: center;
+        }
+
+        .yz-soru {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--yazi-soluk);
+            margin-bottom: 14px;
+        }
+
+        .yz-harf {
+            font-size: 96px;
+            line-height: 1.05;
+            font-weight: 700;
+            margin: 6px 0 4px;
+        }
+
+        .yz-tur {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 5px 11px;
+            border-radius: 999px;
+            background: var(--zemin-2);
+            color: var(--yazi-soluk);
+            font-size: 11.5px;
+            font-weight: 800;
+        }
+
+        /* İpucu kutusu: harfin nasıl hatırlanacağını söyler */
+        .yz-ipucu {
+            margin-top: 14px;
+            padding: 11px 13px;
+            background: #fff8e8;
+            border: 2px solid var(--altin);
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--altin-koyu);
+            text-align: left;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+
+        .yz-ipucu[hidden] {
+            display: none;
+        }
+
+        /* ---------- Cevap girişi ---------- */
+        .yz-giris-kap {
+            margin-top: 20px;
+        }
+
+        .yz-giris {
+            width: 100%;
+            box-sizing: border-box;
+            background: var(--kart);
+            color: var(--yazi);
+            border: 2px solid var(--cizgi);
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 24px;
+            font-weight: 800;
+            text-align: center;
+            font-family: inherit;
+            outline: none;
+            box-shadow: 0 4px 0 var(--cizgi);
+            transition: border-color .15s;
+        }
+
+        .yz-giris:focus {
+            border-color: var(--mor);
+        }
+
+        .yz-giris.dogru {
+            border-color: var(--turkuaz);
+            box-shadow: 0 4px 0 var(--turkuaz-koyu);
+        }
+
+        .yz-giris.hata {
+            border-color: var(--kirmizi);
+            box-shadow: 0 4px 0 var(--kirmizi-koyu);
+        }
+
+        /* Yumuşak klavye: romaji için özel tuşlar (telefonda büyük kolaylık) */
+        .yz-tuslar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            justify-content: center;
+            margin-top: 12px;
+        }
+
+        .yz-tus {
+            background: var(--zemin-2);
+            border: 2px solid var(--cizgi);
+            border-radius: 12px;
+            padding: 9px 13px;
+            font-size: 15px;
+            font-weight: 800;
+            font-family: inherit;
+            color: var(--yazi);
+            cursor: pointer;
+            transition: transform .08s, border-color .15s;
+        }
+
+        .yz-tus:hover {
+            border-color: var(--mor);
+            color: var(--mor);
+        }
+
+        .yz-tus:active {
+            transform: translateY(3px);
+        }
+
+        .yz-geri {
+            min-height: 26px;
+            margin-top: 16px;
+            font-size: 16px;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .yz-geri.iyi {
+            color: var(--turkuaz-koyu);
+        }
+
+        .yz-geri.hata {
+            color: var(--kirmizi);
+        }
+
+        /* ---------- Alt düğmeler ---------- */
+        .yz-alt {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .yz-alt .sp-btn {
+            flex: 1;
+        }
+
+        .sp-btn[hidden] {
+            display: none;
+        }
+
+        /* ---------- Tur bitti ekranı ---------- */
+        .yz-sonuc {
+            text-align: center;
+        }
+
+        .yz-sonuc .buyuk {
+            font-size: 62px;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .yz-sonuc h2 {
+            margin: 0 0 8px;
+            font-size: 24px;
+        }
+
+        .yz-sonuc p {
+            margin: 0 0 18px;
+            color: var(--yazi-soluk);
+            font-weight: 700;
+        }
+
+        .yz-ozet {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .yz-ozet div {
+            background: var(--zemin-2);
+            border: 2px solid var(--cizgi);
+            border-radius: 14px;
+            padding: 12px 8px;
+        }
+
+        .yz-ozet b {
+            display: block;
+            font-size: 22px;
+        }
+
+        .yz-ozet small {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--yazi-soluk);
+        }
+
+        /* Zayıf harfler: turdan sonra tekrar çalışılacaklar */
+        .yz-zayif {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .yz-zayif .chip {
+            background: var(--kart);
+            border: 2px solid var(--cizgi);
+            border-radius: 12px;
+            padding: 7px 11px;
+            text-align: center;
+            min-width: 52px;
+        }
+
+        .yz-zayif .chip b {
+            display: block;
+            font-size: 22px;
+        }
+
+        .yz-zayif .chip small {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--kirmizi);
+        }
+
+        @media (max-width: 520px) {
+            .yz-harf {
+                font-size: 76px;
+            }
+
+            .yz-giris {
+                font-size: 21px;
+                padding: 14px;
+            }
+
+            .yz-ozet {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 7px;
+            }
+        }
+    </style>
+</head>
+
+<body class="sp">
+    <nav class="sp-ust">
+        <button class="sp-pill tikla" id="geriBtn" title="Haritaya dön" aria-label="Haritaya dön">←</button>
+        <div class="sp-logo">✍️ <span>Yazma Atölyesi</span></div>
+        <div class="sp-istatistik"><span class="sp-pill" id="seriRozet">g��? 0</span></div>
+    </nav>
+
+    <div class="kapsayici" id="kok"></div>
+
+    <script src="mufredat.js?v=3"></script>
+    <script src="ilerleme.js?v=11"></script>
+    <script src="ses.js?v=5"></script>
+    <script src="kana.js?v=18"></script>
+    <script src="pwa.js?v=5"></script>
+    <script src="bulut.js?v=3"></script>
+    <script src="analitik.js?v=2" defer></script>
+    <script>window.addEventListener('load', function () { if (window.Analitik) window.Analitik.sayfa('yazma'); });</script>
+    <script src="ayarlar.js?v=1"></script>
+    <!-- YANLI�? DEFTERİ: yazma hatası da karıştırma defterine yazılsın -->
+    <script src="yanlis.js?v=1"></script>
+    <!-- YAZMA MOTORU: harfi gör, romajisini yaz. Hatırlama odaklı çalışma. -->
+    <script src="yazma.js?v=1"></script>
+    <!-- SURUM GUNCELLEME BILDIRIMI (guncelleme.js) -->
+    <script src="guncelleme.js?v=1"></script>
+    <script src="sahne3d.js?v=1"></script>
+    <!-- VİDEO ARKA PLAN: videolar/yatay|dikey/arkaplan.webm döngüde oynar.
+         Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
+         KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli (aynı negatif
+         z-index'te sonra gelen katman üstte görünür). -->
+    <script src="video-arkaplan.js?v=4"></script>
+</body>
+
+</html>

@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakar Paisen | Japonca Öğren</title>
+    <meta name="theme-color" content="#7b5cf0">
+    <meta name="description" content="Sakar Paisen ile hiragana, katakana ve kanjiyi oyunlaştırılmış derslerle öğren.">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="stylesheet" href="uygulama.css?v=14">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--zemin); color: var(--yazi); font-family: 'Segoe UI', 'Trebuchet MS', system-ui, sans-serif; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 20px; text-align: center; position: relative; isolation: isolate; overflow-x: hidden; }
+        /* Açılış ekranı: koyu zemin + beyaz yazı. Video yüklenince video görünür. */
+        body.hero-asamasi { min-height: 100dvh; background: #15203b; color: #fff; }
+        /* Açılış perdesi: yalnızca VIDEO yüklenene kadar görünen yumuşak karartma.
+           Video oynarken perde TAMAMEN kalkar; metin okunurluğu için arkada
+           sadece hafif bir alt-yazı gölgesi kalır (aşağıda .hero metinlerinde). */
+        body.hero-asamasi::before {
+          content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+          background: linear-gradient(180deg, rgba(8,12,26,.55), rgba(8,12,26,.45) 45%, rgba(8,12,26,.85));
+          opacity: 1; transition: opacity .6s ease;
+        }
+        /* Video oynayınca perde tamamen kalkar: video net görünsün. */
+        body.video-aktif.hero-asamasi::before { opacity: 0; }
+        body.hero-asamasi > header,
+        body.hero-asamasi > main,
+        body.hero-asamasi > section,
+        body.hero-asamasi > div:not(#videoArkaplan):not(.balon),
+        body.hero-asamasi > noscript,
+        body.hero-asamasi > footer { z-index: 1; }
+        body.hero-asamasi #videoArkaplan { z-index: 0; }
+        @media (orientation: portrait) {
+          body.hero-asamasi { background: #0b1424; }
+        }
+        body.hero-asamasi #spSerit, body.hero-asamasi .hero-hizli,
+        body.hero-asamasi .alt-bilgi, body.hero-asamasi .powered { display: none; }
+        body.secim-asamasi { justify-content: flex-start; padding-top: 36px; }
+        body.secim-asamasi .ozellikler, body.secim-asamasi .surec,
+        body.secim-asamasi .ornek-serit, body.secim-asamasi .ornek-baslik,
+        body.secim-asamasi .guven-notu, body.secim-asamasi .mini-guven { display: none; }
+        body.secim-asamasi header { width: 100%; max-width: 760px; }
+        body.secim-asamasi .ob-baslik { margin-top: 12px; }
+        body.secim-asamasi .ob-kart { animation: kartGir .55s cubic-bezier(.2,.85,.25,1) both; animation-delay: calc(var(--sira) * 55ms); }
+        @keyframes kartGir { from { opacity: 0; transform: translateY(22px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .secim-geri { display: none; background: none; border: 0; color: var(--mor); font: inherit; font-weight: 800; cursor: pointer; padding: 10px 0; }
+        body.secim-asamasi .secim-geri { display: block; }
+        @media (prefers-reduced-motion: reduce) { body.secim-asamasi .ob-kart { animation: none; } }
+        body.hero-gecis .hero { animation: sahnedenCik .22s ease-in both; }
+        @keyframes sahnedenCik { to { opacity: 0; transform: scale(1.05); } }
+        /* Açılış → seçim geçişinde arka plan da birlikte yumuşak değişsin. */
+        body.hero-gecis::before { opacity: .15; transition: opacity .22s ease; }
+        body.hero-gecis::after { opacity: .15; transition: opacity .22s ease; }
+        body.hero-asamasi .baslangic-etiket { background: rgba(13,19,39,.68); color: #fff; border-color: rgba(255,255,255,.55); }
+        body.hero-asamasi .hero-btn { background: #fff; color: #202543; box-shadow: 0 7px 0 #cfc9eb, 0 16px 36px rgba(0,0,0,.38); }
+        body.hero-asamasi .hero-btn:active { box-shadow: 0 0 0 #cfc9eb; }
+        body.secim-asamasi .hero-hizli { display: none; }
+        body.secim-asamasi .balon { order: 2; margin: 12px auto 18px; }
+        body.secim-asamasi .chibi-kap { order: 1; height: 120px; margin: 0 auto 12px; }
+        body.secim-asamasi .chibi { height: 112px; }
+        body.secim-asamasi .panel { order: 3; margin: 0 auto 24px; }
+        body.secim-asamasi .ob-baslik { order: 4; }
+        body.secim-asamasi .ob-alt { order: 5; }
+        body.secim-asamasi .ob-serit { order: 6; }
+        body.secim-asamasi .alt-bilgi { order: 7; }
+        body.secim-asamasi .powered { order: 8; }
+        body.secim-asamasi header { order: 0; text-align: left; }
+        body.secim-asamasi #spSerit { order: -1; }
+        .logo { font-size: clamp(34px, 7vw, 46px); font-weight: 800; margin-bottom: 20px; letter-spacing: -1px; position: relative; z-index: 1; }
+
+        /* ============================================================
+           HERO AŞAMASI (ilk ekran)
+
+           NEDEN İKİ AŞAMA: Eskiden her şey aynı anda ekrandaydı. Kullanıcı
+           "garip geldi gözüme" dedi; haklıydı ve video kayboluyordu.
+
+           YENİ AKIŞ:
+             1) HERO : video + logo + tek BAŞLA butonu + (kayıtlıysa) çıkış.
+             2) AKIŞ : butona basınca giriş/karşılama akışı açılır.
+
+           DÜZELTİLEN SORUNLAR (kullanıcı geri bildirimi):
+             • "animasyon olmadı"  -> :nth-child sayaçları JS'in eklediği çıkış
+               düğmesini de sayıyordu; nth-child yerine sınıf tabanlı sıra
+               kullanılıyor. Ayrıca heroGir animasyonu artık her zaman oynar.
+             • "buton yerleri bozuk" -> .hero ve çocukları ortalanmış kutu
+               değildi; flex + gap ve net genişlik sınırı verildi.
+           ============================================================ */
+        .hero {
+          display: flex; flex-direction: column; align-items: center; justify-content: center;
+          z-index: 1; position: relative;
+          width: 100%; max-width: 620px; margin: 0 auto;
+          gap: 0;   /* aralıklar öğe bazında veriliyor */
+        }
+
+        /* ---------- WEB (geniş ekran) HERO DÜZENİ ----------
+           İstek: başlık ve butonlar videonun ORTASINI kapatmasın; kenarlara
+           dağılsın. Telefonda (dikey) bu yapılmaz: dar ekranda köşelere
+           dağıtmak okunurluğu bozar, o yüzden varsayılan ortalanmış düzen
+           yalnızca geniş + yatay ekranlarda değişir. */
+        @media (min-width: 900px) and (orientation: landscape) {
+          body.hero-asamasi { align-items: stretch; padding: 0; }
+          body.hero-asamasi .hero {
+            max-width: none; margin: 0; flex: 1 1 auto;
+            align-items: center; justify-content: space-between;
+            padding: 22px clamp(28px, 5vw, 68px) 30px;
+          }
+          /* Üst şerit: etiket solda, Japonca ipucu sağda */
+          body.hero-asamasi .hero > .baslangic-etiket { width: auto; align-self: flex-start; margin: 0; }
+          body.hero-asamasi .hero > .hero-jp {
+            position: absolute; top: 28px; right: clamp(28px, 5vw, 68px);
+            width: auto; margin: 0;
+          }
+          /* Başlık üstte, videonun ortası boş kalsın */
+          body.hero-asamasi .hero > .hero-logo { margin-top: 7vh; }
+          /* Butonlar: alt şeritte, sol tarafa yaslı (videonun ortasını açık bırakır) */
+          body.hero-asamasi .hero > .hero-btn { margin: 0; align-self: flex-start; }
+          body.hero-asamasi .hero > .hero-ikincil { margin: 14px 0 0; align-self: flex-start; }
+          body.hero-asamasi .hero > .hero-not { margin: 16px 0 0; width: auto; align-self: flex-start; }
+          body.hero-asamasi .hero > .hero-cikis { margin: 12px 0 0 !important; align-self: flex-start; }
+        }
+        /* Çok geniş ekranda butonlar ekranın sol-alt köşesine iyice yaklaşsın */
+        @media (min-width: 1100px) and (orientation: landscape) {
+          body.hero-asamasi .hero > .hero-btn,
+          body.hero-asamasi .hero > .hero-ikincil,
+          body.hero-asamasi .hero > .hero-not,
+          body.hero-asamasi .hero > .hero-cikis { margin-left: clamp(16px, 5vw, 96px); }
+        }
+        /* Hero açıkken diğer bloklar gizli */
+        body.hero-asamasi .ozellikler,
+        body.hero-asamasi .surec,
+        body.hero-asamasi .ornek-serit,
+        body.hero-asamasi .ornek-baslik,
+        body.hero-asamasi .ob-serit,
+        body.hero-asamasi .ob-baslik,
+        body.hero-asamasi .ob-alt,
+        /* ÖĞRENME BİÇİMLERİ GİRİŞ YAPILMADAN GÖRÜNMEZ:
+           Kayıt yokken bu kartlar "hangi alandan başlayayım" diye soruyordu
+           ama kullanıcı henüz hesap açmamıştı; bölüm erken ve gereksizdi.
+           Artık yalnızca giriş yapılmış kullanıcıya (body.kayit-var) görünür. */
+        body:not(.kayit-var) .ob-serit,
+        body:not(.kayit-var) .ob-baslik,
+        body:not(.kayit-var) .ob-alt,
+        body.hero-asamasi .guven-notu,
+        body.hero-asamasi .mini-guven,
+        body.hero-asamasi .balon,
+        body.hero-asamasi .chibi-kap,
+        body.hero-asamasi .hero-hizli,
+        body.hero-asamasi .alt-bilgi { display: none; }
+        body.hero-asamasi #spSerit { display: none; }
+        body.hero-asamasi .panel { display: none; }
+
+        /* Hero kapanırken içerik ve arka plan birlikte yumuşak geçiş yapar. */
+        body.hero-gecis .hero { animation: heroCikis .22s ease-in forwards; }
+        body.hero-gecis::after { opacity: .15; transition: opacity .22s ease; }
+        @keyframes heroCikis {
+          to { opacity: 0; transform: scale(1.035) translateY(-10px); filter: blur(5px); }
+        }
+
+        /* --- Hero öğeleri: hepsi tam genişlikte, ortalanmış blok ---
+           ÖNEMLİ: `display:block` + `text-align:center` kullanılıyor; inline
+           elemanların flex içinde satır kırma sorunu böylece kalkıyor. */
+        .hero > * { display: block; width: 100%; text-align: center; margin-left: 0; margin-right: 0; }
+        /* Not ve ikincil bağlantı: tam genişlik yerine ortada dar kutular. */
+        .hero-not, .hero-ikincil { width: auto !important; margin-left: auto !important; margin-right: auto !important; }
+
+        /* --- HERO METİNLERİ: videonun üstünde okunur kalsın ---
+           Sorun: video eklenince yazılar çok soluk kalıyordu ve okunmuyordu.
+           Çözüm: her metin öğesinin arkasına yumuşak bir gölge ver; video net
+           kalsın, yazı okunsun. Etiket ve not ise net bir arka plan alır. */
+        .hero-logo, .hero-alt, .hero-jp, .hero-not {
+          text-shadow: 0 2px 10px rgba(0,0,0,.85), 0 2px 22px rgba(0,0,0,.7), 0 0 2px rgba(0,0,0,.9);
+        }
+        body.hero-asamasi .baslangic-etiket {
+          background: rgba(13,19,39,.92); color: #fff;
+          border-color: rgba(255,255,255,.4);
+          box-shadow: 0 4px 18px rgba(0,0,0,.45);
+          backdrop-filter: blur(4px);
+        }
+        .hero-not {
+          background: rgba(13,19,39,.82); border-radius: 999px;
+          padding: 8px 18px; display: inline-block;
+          backdrop-filter: blur(4px);
+        }
+
+        .hero-logo { font-size: clamp(42px, 9vw, 76px); font-weight: 800; letter-spacing: -2px;
+                     line-height: 1.08; margin: 0; padding: 0 8px;
+                     text-shadow: 0 4px 26px rgba(0,0,0,.4); }
+        .hero-logo span { color: #fff; }
+        .hero-alt { margin: 14px 0 0; font-size: clamp(14px, 2.2vw, 17px); font-weight: 700;
+                    color: #fff; opacity: .95; padding: 0 12px;
+                    text-shadow: 0 2px 12px rgba(0,0,0,.5); }
+        .hero-jp { margin: 16px 0 0; font-size: clamp(11px, 1.6vw, 13px); font-weight: 800;
+                   letter-spacing: 3px; color: #fff; opacity: .95;
+                   text-shadow: 0 2px 10px rgba(0,0,0,.45); }
+
+        /* --- BAŞLA butonu --- */
+        /* DÜZELTME: Eskiden `display:inline-flex` idi ve .hero'nun çocukları
+           tam genişliğe zorlanınca buton tuhaf bir yere kayıyordu. Şimdi
+           kendi sarmalayıcısı yok; blok hizalı inline-flex olarak ortalanıyor. */
+        .hero-btn {
+          display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+          width: auto; min-width: 240px; margin: 36px auto 0;
+          background: var(--mor); color: #fff; border: none; border-radius: 20px;
+          padding: 19px 46px; font-family: inherit;
+          font-size: clamp(16px, 2.5vw, 19px); font-weight: 800;
+          letter-spacing: 1.2px; text-transform: uppercase; cursor: pointer;
+          box-shadow: 0 7px 0 var(--mor-golge), 0 16px 36px rgba(0,0,0,.32);
+          transition: transform .1s, box-shadow .1s, filter .15s;
+          /* Buton metni ve oku hiç sıkışmasın */
+          white-space: nowrap; line-height: 1;
+        }
+        /* Nabız animasyonu buton HOVER'da durur: kullanıcı tıklarken zıplamasın */
+        .hero-btn:hover { filter: brightness(1.08); }
+        .hero-btn:active { transform: translateY(7px); box-shadow: 0 0 0 var(--mor-golge), 0 6px 18px rgba(0,0,0,.28); }
+
+        .hero-not { margin: 20px 0 0; font-size: 13px; font-weight: 700; color: #fff;
+                    opacity: .92; text-shadow: 0 2px 10px rgba(0,0,0,.6); }
+        .hero-not b { color: #fff; }
+
+        /* --- BAŞLA ALTI İKİNCİ YOL ---
+           Yeni kullanıcı BAŞLA'ya basar; kayıtlı kullanıcı ise doğrudan
+           kaldığı yere dönmek ister. İkinci yol bu yüzden var: hemen
+           altında, daha sönük bir bağlantı olarak durur. */
+        .hero-ikincil {
+          margin: 18px auto 0; background: none; border: 0; padding: 6px 10px;
+          font-family: inherit; font-size: 13.5px; font-weight: 800;
+          color: #fff; opacity: .9; cursor: pointer; text-decoration: underline;
+          text-underline-offset: 4px; text-shadow: 0 2px 10px rgba(0,0,0,.55);
+        }
+        .hero-ikincil:hover { opacity: 1; }
+        /* Kayıt yoksa "kaldığın yerden devam" anlamsız: gizlenir. */
+        body:not(.kayit-var) .hero-ikincil { display: none; }
+
+        /* Video henüz hazır değilken buton "hazırlanıyor" der; video
+           oynayınca giris.js metni normale döndürür. */
+        body:not(.video-aktif) .hero-btn .hb-metin { opacity: .999; }
+
+        /* Hero'daki çıkış düğmesi: küçük, sönük, ama bulunabilir */
+        .hero-cikis { margin-top: 14px !important; font-size: 12.5px !important;
+                      color: #fff !important; opacity: .9; }
+
+        /* ============================================================
+           HERO GİRİŞ ANİMASYONU
+           DÜZELTME: Önceden sıralama :nth-child ile veriliyordu. giris.js
+           çıkış düğmesini DOM'a ekleyince sayaç kayıyordu ve animasyon
+           gecikmesi yanlış öğelere düşüyordu. Artık sıra SINIFLA veriliyor;
+           yani JS ne eklerse eklesin animasyon bozulmaz.
+
+           Ayrıca animasyon `both` yerine `backwards` kullanıyor: bitince stil
+           SIFIRLANIR, böylece sonradan gelen düzenleme animasyonu ezmez.
+           ============================================================ */
+        .hero[hidden] { display: none; }
+        .hero .hg { animation: heroGir .68s cubic-bezier(.2,.9,.3,1) backwards; }
+        .hero .hg-1 { animation-delay: .04s; }
+        .hero .hg-2 { animation-delay: .14s; }
+        .hero .hg-3 { animation-delay: .24s; }
+        .hero .hg-4 { animation-delay: .34s; }
+        .hero .hg-5 { animation-delay: .46s; }
+        @keyframes heroGir {
+          0%   { opacity: 0; transform: translateY(24px) scale(.97); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ============================================================
+           HERO ÇALIŞMA BİÇİMLERİ ŞERİDİ
+           Hero'nun ALTINDA ince bir şerit: hero'da yalnızca başla butonu var,
+           ama kullanıcı "başka ne var" diye merak ediyor. Cevabı hero'nun
+           hemen altında, tek satırda: beş kısayol. Ana kartlar aşağıda kalır.
+
+           ÖNEMLİ: Hero aşamasında da GÖRÜNÜR (tıklamayı engellemez),
+           böylece ilk ekrandan hızlı erişim olur.
+           ============================================================ */
+        .hero-hizli {
+          display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+          width: 100%; max-width: 620px; margin: 30px auto 0; position: relative; z-index: 1;
+        }
+        .hero-hizli a {
+          display: inline-flex; align-items: center; gap: 7px;
+          background: color-mix(in srgb, var(--kart) 88%, transparent);
+          backdrop-filter: blur(6px);
+          border: 2px solid var(--cizgi); border-radius: 999px;
+          padding: 10px 16px; text-decoration: none; color: var(--yazi);
+          font-size: 12.5px; font-weight: 800; white-space: nowrap;
+          box-shadow: 0 3px 0 var(--cizgi);
+          transition: transform .12s, border-color .15s, box-shadow .12s;
+          /* Açılış görselinin üstünde okunur kalsın */
+          background-color: rgba(255,255,255,.9);
+        }
+        .hero-hizli a:hover { transform: translateY(-3px); border-color: var(--mor); box-shadow: 0 6px 0 var(--cizgi); }
+
+        /* İÇERİK KATMANI: 3D sahne ve video arkada kalır. */
+        header, .balon, .chibi-kap, .panel, .ozellikler, .surec,
+        .ornek-serit, .ornek-baslik, .ob-serit, .ob-baslik, .ob-alt,
+        .guven-notu, .mini-guven, .reklam-alani, .alt-bilgi {
+            position: relative; z-index: 1;
+        }
+        /* Sahne belirgin olsun diye içerik kutuları hafif saydam: arkadaki
+           3D karakterler kenarlardan görünür, metin okunurluğu bozulmaz. */
+        .ob-kart, .ozellik { background-color: color-mix(in srgb, var(--kart) 93%, transparent); backdrop-filter: blur(3px); }
+        .logo span { color: var(--mor); }
+
+        /* ---------- VİDEO ARKA PLAN + İÇERİK ZEMİNLERİ ---------- */
+        /* Katman sırası: 3D sahne (-2) < video (-1) < açılış perdesi (0).
+           Bu yüzden video oynarken perde onun ÜSTÜNDE kalır (yazı okunur). */
+        #videoArkaplan { z-index: -1 !important; }
+        /* Video oynayan sayfada içerik kutuları hafif saydam olsun ki
+           arka plan vide .su görünsün; metin okunurluğu blur ile korunur. */
+        body:has(#videoArkaplan) > header,
+        body:has(#videoArkaplan) > main,
+        body:has(#videoArkaplan) > section,
+        body:has(#videoArkaplan) > div:not(#videoArkaplan),
+        body:has(#videoArkaplan) > a,
+        body:has(#videoArkaplan) > footer { position: relative; z-index: 1; }
+        body:has(#videoArkaplan) .ozellik,
+        body:has(#videoArkaplan) .ob-kart,
+        body:has(#videoArkaplan) .ornek-harf,
+        body:has(#videoArkaplan) .panel,
+        body:has(#videoArkaplan) .balon { background-color: color-mix(in srgb, var(--kart) 86%, transparent); backdrop-filter: blur(4px); }
+
+        .balon { background: var(--kart); color: var(--yazi); border: 2px solid var(--cizgi); padding: 16px 22px; border-radius: 18px; font-weight: 700; font-size: 17px; max-width: 390px; min-height: 58px; position: relative; margin-bottom: 18px; box-shadow: 0 4px 0 var(--cizgi); }
+        .balon::after { content: ''; position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); border-width: 12px 12px 0; border-style: solid; border-color: var(--kart) transparent transparent transparent; }
+
+        .baslangic-etiket { display: inline-flex; align-items: center; gap: 7px; margin: 0 0 12px; padding: 7px 12px; border: 1px solid color-mix(in srgb, var(--mor) 30%, var(--cizgi)); border-radius: 999px; color: var(--mor); background: color-mix(in srgb, var(--mor) 8%, var(--kart)); font-size: 12px; font-weight: 800; }
+        .baslangic-etiket::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--turkuaz); box-shadow: 0 0 0 4px color-mix(in srgb, var(--turkuaz) 15%, transparent); }
+        .chibi-kap { height: 190px; display: flex; align-items: flex-end; justify-content: center; margin-bottom: 26px; }
+        .chibi { height: 180px; width: auto; transform-origin: bottom center; animation: nefes 3s ease-in-out infinite; cursor: pointer; }
+        .chibi-emoji { font-size: 120px; line-height: 1; animation: nefes 3s ease-in-out infinite; cursor: pointer; }
+        .chibi.zipla, .chibi-emoji.zipla { animation: zipla 0.55s ease-out; }
+        @keyframes nefes { 0%, 100% { transform: translateY(0) scaleY(1); } 50% { transform: translateY(-8px) scaleY(1.02); } }
+        @keyframes zipla { 0% { transform: translateY(0) scale(1.05, 0.9); } 35% { transform: translateY(-38px) scale(0.95, 1.08); } 70% { transform: translateY(0) scale(1.06, 0.92); } 100% { transform: translateY(0) scale(1); } }
+        @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+
+        .panel { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 12px; align-items: stretch; position: relative; z-index: 1; }
+        .panel[hidden] { display: none; }
+        body.giris-akisi .ozellikler, body.giris-akisi .surec, body.giris-akisi .guven-notu, body.giris-akisi .mini-guven { display: none; }
+        body.giris-akisi .alt-bilgi { margin-top: 18px; }
+        .panel:focus-within { filter: drop-shadow(0 10px 22px color-mix(in srgb, var(--mor) 10%, transparent)); }
+        button, input, a { -webkit-tap-highlight-color: transparent; }
+        button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid color-mix(in srgb, var(--mor) 55%, white); outline-offset: 3px; }
+
+        .ozellikler { width: 100%; max-width: 760px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 28px auto 0; text-align: left; }
+        .ozellik { background: color-mix(in srgb, var(--kart) 88%, var(--mor) 12%); border: 2px solid var(--cizgi); border-radius: 18px; padding: 16px; box-shadow: 0 4px 0 var(--cizgi); transition: transform .18s, border-color .18s, box-shadow .18s; }
+        .ozellik:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--mor) 55%, var(--cizgi)); box-shadow: 0 8px 0 var(--cizgi); }
+        @media (prefers-reduced-motion: reduce) { .ozellik:hover { transform: none; } }
+        .ozellik-simge { display: block; font-size: 26px; margin-bottom: 8px; }
+        .ozellik strong { display: block; font-size: 14px; margin-bottom: 4px; }
+        .ozellik small { display: block; color: var(--yazi-soluk); font-size: 12.5px; line-height: 1.45; font-weight: 600; }
+        .guven-notu { width: 100%; max-width: 680px; margin: 16px auto 0; color: var(--yazi-soluk); font-size: 12px; line-height: 1.5; }
+        .mini-guven { display: inline-flex; align-items: center; gap: 7px; margin-top: 10px; padding: 7px 12px; border-radius: 999px; background: var(--zemin-2); color: var(--yazi-soluk); font-size: 11.5px; font-weight: 700; }
+        .mini-guven b { color: var(--turkuaz); font-size: 14px; }
+
+        /* Hazır bilgi kartı: kullanıcı giriş yapmadan önce içerikten örnek görsün.
+           Duolingo'da da ilk ekranda ne öğrenileceği somut olarak gösterilir. */
+        .ornek-serit { width: 100%; max-width: 760px; display: grid; grid-template-columns: repeat(auto-fit, minmax(88px, 1fr)); gap: 8px; margin: 20px auto 0; }
+        .ornek-harf { background: var(--kart); border: 2px solid var(--cizgi); border-radius: 14px; padding: 10px 6px; box-shadow: 0 3px 0 var(--cizgi); }
+        .ornek-harf b { display: block; font-size: 24px; line-height: 1.15; }
+        .ornek-harf small { display: block; font-size: 11px; font-weight: 700; color: var(--yazi-soluk); margin-top: 3px; }
+        .ornek-baslik { width: 100%; max-width: 760px; margin: 24px auto -6px; text-align: left; font-size: 12px; font-weight: 800; color: var(--yazi-soluk); letter-spacing: .4px; text-transform: uppercase; }
+        body.giris-akisi .ornek-serit, body.giris-akisi .ornek-baslik, body.giris-akisi .mini-guven { display: none; }
+
+        /* ---------- ÖĞRENME BİÇİMLERİ (giriş ekranında, HER ZAMAN görünür) ---------- */
+        /* NEDEN BURADA: Kullanıcı önce bu ekranı görüyor. Alanlar yalnızca dojo
+           panelinde olunca "başka ne var?" sorusu yanıtsız kalıyordu.
+           ÖNEMLİ: Bu blok giriş akışı başlayınca GİZLENMEZ (eski hata: kullanıcı
+           kayıtlı olunca body.giris-akisi ekleniyor ve alanlar kayboluyordu). */
+        .ob-baslik { width: 100%; max-width: 760px; margin: 30px auto 4px; text-align: left;
+                     font-size: 19px; font-weight: 800; }
+        .ob-alt { width: 100%; max-width: 760px; margin: 0 auto 14px; text-align: left;
+                  font-size: 13px; font-weight: 700; color: var(--yazi-soluk); line-height: 1.5; }
+        .ob-serit { width: 100%; max-width: 760px; display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+
+        /* Kart: öğrenme biçimi */
+        .ob-kart { display: block; position: relative; background: var(--kart);
+                   border: 2px solid var(--cizgi); border-radius: 18px; padding: 16px;
+                   text-decoration: none; color: inherit; box-shadow: 0 4px 0 var(--cizgi);
+                   transition: transform .14s, border-color .15s, box-shadow .14s; text-align: left; }
+        .ob-kart:hover { transform: translateY(-4px); border-color: var(--mor); box-shadow: 0 8px 0 var(--cizgi); }
+        /* Simge artık renkli bir kutu içinde ve başlıkla aynı satırda:
+           kartın solunda 44px kutu, sağında ad + açıklama. Böylece göz
+           soldan sağa tek akışta okuyor (eskiden simge tek başına üstteydi). */
+        .ob-ust { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .ob-kart .ob-simge { font-size: 22px; line-height: 1; flex: none;
+                             width: 44px; height: 44px; border-radius: 14px;
+                             display: inline-flex; align-items: center; justify-content: center;
+                             background: color-mix(in srgb, var(--mor) 10%, var(--zemin-2));
+                             border: 2px solid color-mix(in srgb, var(--mor) 20%, var(--cizgi)); }
+        .ob-kart .ob-ad { font-size: 15.5px; font-weight: 800; display: block; line-height: 1.25; }
+        .ob-kart .ob-acik { font-size: 12.5px; font-weight: 700; color: var(--yazi-soluk);
+                            line-height: 1.45; margin-top: 5px; display: block; }
+        .ob-kart.onerilen .ob-simge { background: color-mix(in srgb, var(--mor) 18%, var(--kart));
+                                      border-color: var(--mor); font-size: 26px; }
+        .ob-kart .ob-not { display: inline-block; margin-top: 10px; padding: 4px 10px;
+                           border-radius: 999px; background: var(--zemin-2);
+                           color: var(--yazi-soluk); font-size: 10.5px; font-weight: 800; }
+
+        /* ÖNERİLEN: dojo haritası — vurgulu ve rozetli */
+        .ob-kart.onerilen { border-color: var(--mor); grid-column: 1 / -1;
+                            background: linear-gradient(135deg, color-mix(in srgb, var(--mor) 13%, var(--kart)), var(--kart));
+                            box-shadow: 0 4px 0 var(--mor-golge); }
+        .ob-kart.onerilen:hover { box-shadow: 0 8px 0 var(--mor-golge); }
+        .ob-kart.onerilen .ob-simge { font-size: 36px; }
+        .ob-kart.onerilen .ob-ad { font-size: 20px; }
+        .ob-kart.onerilen .ob-not { background: var(--mor); color: #fff; }
+        .ob-rozet { position: absolute; top: -11px; right: 14px; padding: 4px 11px;
+                    border-radius: 999px; background: var(--mor); color: #fff;
+                    font-size: 10px; font-weight: 800; letter-spacing: .5px;
+                    box-shadow: 0 2px 0 var(--mor-golge); }
+
+        @media (max-width: 620px) {
+            .ob-serit { grid-template-columns: 1fr; gap: 10px; max-width: 420px; }
+            .ob-baslik, .ob-alt { max-width: 420px; }
+            .ob-kart { padding: 13px 14px; }
+            .ob-kart .ob-simge { font-size: 23px; margin-bottom: 6px; }
+        }
+        @media (max-width: 620px) {
+            .ornek-serit { grid-template-columns: repeat(4, 1fr); gap: 6px; max-width: 420px; }
+            .ornek-harf { padding: 8px 4px; }
+            .ornek-harf b { font-size: 20px; }
+            .ornek-harf small { font-size: 10px; }
+            .ornek-baslik { max-width: 420px; }
+        }
+        .surec { width: 100%; max-width: 760px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 16px auto 0; }
+        .surec-adim { display: flex; align-items: center; justify-content: center; gap: 7px; color: var(--yazi-soluk); font-size: 11.5px; font-weight: 800; }
+        .surec-adim b { display: inline-grid; place-items: center; width: 23px; height: 23px; border-radius: 50%; background: var(--mor); color: #fff; font-size: 12px; }
+        .surec-adim:not(:last-child)::after { content: '→'; margin-left: 5px; color: var(--cizgi-koyu); font-size: 17px; }
+        @media (max-width: 620px) { .surec { max-width: 420px; } .surec-adim { font-size: 10.5px; } .surec-adim:not(:last-child)::after { content: '·'; } }
+        @media (max-width: 620px) {
+            .ozellikler { grid-template-columns: 1fr; max-width: 420px; margin-top: 22px; gap: 9px; }
+            .ozellik { display: grid; grid-template-columns: 34px 1fr; column-gap: 10px; align-items: center; padding: 12px 14px; }
+            .ozellik-simge { grid-row: span 2; margin: 0; }
+        }
+        .giris { background: var(--kart); color: var(--yazi); border: 2px solid var(--cizgi); border-radius: 14px; padding: 15px; font-size: 19px; font-weight: 700; text-align: center; outline: none; font-family: inherit; box-shadow: 0 4px 0 var(--cizgi); transition: border-color .15s; }
+        .giris::placeholder { color: #b3aa9b; font-weight: 600; }
+        .giris:focus { border-color: var(--mor); }
+        .buyuk-btn { background: var(--mor); color: white; border: none; padding: 16px 30px; font-size: 18px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; border-radius: 16px; cursor: pointer; box-shadow: 0 5px 0 var(--mor-golge); transition: 0.1s; font-family: inherit; width: 100%; display: inline-flex; align-items: center; justify-content: center; text-align: center; line-height: 1.2; }
+        .buyuk-btn:hover { filter: brightness(1.05); }
+        .buyuk-btn:active { transform: translateY(5px); box-shadow: none; }
+        .buyuk-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .secim { background: var(--kart); color: var(--yazi); border: 2px solid var(--cizgi); border-radius: 16px; padding: 15px 18px; font-size: 17px; font-weight: 800; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 14px; transition: 0.15s; box-shadow: 0 4px 0 var(--cizgi); font-family: inherit; }
+        .secim:hover { border-color: var(--mor); transform: translateY(-2px); }
+        .secim:active { transform: translateY(4px); box-shadow: none; }
+        .secim .sembol { font-size: 24px; min-width: 56px; text-align: center; color: var(--mor); background: #f3f0ff; border-radius: 12px; padding: 8px 0; }
+        .secim small { display: block; font-weight: 600; color: var(--yazi-soluk); font-size: 13.5px; margin-top: 4px; }
+        .metin-btn { background: none; border: none; color: var(--yazi-soluk); cursor: pointer; font-size: 14px; text-decoration: underline; margin-top: 6px; font-family: inherit; }
+        .metin-btn:hover { color: var(--kirmizi); }
+        .hata { color: var(--kirmizi); font-size: 14px; font-weight: 700; min-height: 18px; }
+
+        /* REKLAM ALANI: reklam.js içindeki ADSENSE_ID boşken görünmez (hidden).
+           Doldurulunca kendiliğinden açılır. Bkz. reklam.js */
+        .reklam-alani { width: 100%; max-width: 420px; min-height: 96px; margin-top: 22px;
+                        background: var(--zemin-2); border: 2px dashed var(--cizgi); border-radius: 16px;
+                        display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .reklam-alani[hidden] { display: none; }
+        .reklam-alani .reklam-etiket { font-size: 11px; font-weight: 800; color: var(--yazi-soluk);
+                                       text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Google ile giriş butonu (Google'ın kendi "G" logosu CSS ile çizilir, dış dosya gerekmez) */
+        .g-btn { background: var(--kart); color: var(--yazi); border: 2px solid var(--cizgi); border-radius: 16px;
+                 padding: 15px 18px; font-size: 17px; font-weight: 800; font-family: inherit; cursor: pointer;
+                 display: flex; align-items: center; justify-content: center; gap: 12px;
+                 box-shadow: 0 4px 0 var(--cizgi); transition: 0.15s; width: 100%; }
+        .g-btn:hover { border-color: var(--mor); transform: translateY(-2px); }
+        .g-btn:active { transform: translateY(4px); box-shadow: none; }
+        .g-btn:disabled { cursor: default; opacity: .9; }
+        .g-btn .giris-alt { font-weight: 600; font-size: 12.5px; color: var(--yazi-soluk); display: block; text-align: left; }
+        .g-logo { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 21px; font-weight: 800; line-height: 1;
+                  color: #4285f4; background: #fff; border: 2px solid var(--cizgi); border-radius: 50%;
+                  width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+        .cizgi-yukleniyor { width: 20px; height: 20px; border-radius: 50%; flex: none;
+                            border: 3px solid var(--cizgi); border-top-color: var(--mor); animation: donme .8s linear infinite; }
+        @keyframes donme { to { transform: rotate(360deg); } }
+        .giris-not { font-size: 12.5px; font-weight: 600; color: var(--yazi-soluk); line-height: 1.5; }
+
+        .alt-bilgi { margin-top: 30px; display: flex; gap: 10px; align-items: center; justify-content: center;
+                     font-size: 13.5px; font-weight: 700; color: var(--cizgi-koyu); flex-wrap: wrap; }
+        .alt-bilgi a { color: var(--yazi-soluk); text-decoration: none; transition: color .15s; }
+        .alt-bilgi a:hover { color: var(--mor); }
+
+        /* Powered by Netlify şeridi */
+        .powered { position: fixed; left: 12px; bottom: 8px; display: flex; align-items: center; gap: 6px;
+                   padding: 7px 12px; background: var(--kart); border: 2px solid var(--cizgi); border-radius: 999px;
+                   box-shadow: 0 3px 0 var(--cizgi); font-size: 12px; font-weight: 800; color: var(--yazi-soluk);
+                   text-decoration: none; z-index: 30; }
+        .powered:hover { border-color: var(--mor); color: var(--mor); }
+        .powered b { color: var(--yazi); font-weight: 800; }
+        /* Netlify kendi şeridini (Drop yayınında #netlify-badge) de aynı köşeye koyar:
+           o varsa kendi etiketimizi gizleriz (çift etiket olmasın), Netlify'ınki zaten görünür kalır. */
+        body:has(#netlify-badge) .powered { display: none; }
+        @media (max-width: 640px) { .powered { display: none; } }
+
+        /* ---------- Kısa ekran / yatay telefon ---------- */
+        /* 190px'lik maskot + 3 kart + alt bilgi, küçük ekranda sayfayı uzatıyordu.
+           Kısa ekranda maskot ve kartlar küçülür, giriş formu ekranda kalır. */
+        @media (max-height: 720px) and (min-width: 621px) {
+            .chibi-kap { height: 132px; margin-bottom: 16px; }
+            .chibi { height: 124px; }
+            .logo { margin-bottom: 12px; }
+            .ozellikler { margin-top: 18px; }
+        }
+        @media (max-height: 560px) {
+            .chibi-kap { height: 96px; margin-bottom: 10px; }
+            .chibi { height: 90px; }
+            .ozellikler, .ornek-baslik, .ornek-serit, .guven-notu, .mini-guven, .surec { display: none; }
+        }
+
+    </style>
+</head>
+<body class="hero-asamasi">
+    <!-- HERO AŞAMASI FLASH ÖNLEMİ:
+         hero-asamasi sınıfı doğrudan HTML'de durur; giris.js yüklenene kadar
+         tanıtım blokları görünüp kaybolmaz. Butona basılınca giris.js sınıfı kaldırır.
+         JavaScript kapalıysa da hero görünür kalır ve buton çalışmaz — bu yüzden
+         noscript uyarısı aşağıda. -->
+    <header aria-label="Sakar Paisen giriş">
+        <!-- HERO: video öne çıksın diye sade ekran.
+             Sıra sınıfları (hg-1..hg-5) SABİT: giris.js çıkış düğmesi eklese
+             bile animasyon sırası bozulmaz (eski :nth-child hatası buydu). -->
+        <div class="hero" id="hero">
+            <div class="baslangic-etiket hg hg-1">ÜCRETSİZ · KENDİ HIZINDA ÖĞREN</div>
+            <h1 class="hero-logo hg hg-2">⛩️ Sakar <span>Paisen</span></h1>
+            <p class="hero-alt hg hg-3">Japoncayı küçük adımlarla, eğlenerek öğren.</p>
+            <p class="hero-jp hg hg-4" aria-hidden="true">ひらがな・カタカナ・漢字</p>
+            <button class="hero-btn hg hg-5" id="heroBtn">
+                <span aria-hidden="true">▶</span> <span class="hb-metin">Başla</span>
+            </button>
+            <!-- Kayıtlı kullanıcı için ikinci yol: doğrudan kaldığı yere dön.
+                 Kayıt yoksa CSS (body:not(.kayit-var)) bunu gizler; giris.js
+                 kayıt varsa body'ye .kayit-var ekler. -->
+            <button class="hero-ikincil hg hg-5" id="heroDevam" type="button">Kaldığın yerden devam et →</button>
+            <!-- heroNot ve çıkış düğmesini giris.js buraya ekler.
+                 Animasyon sınıfı yok: eklenti olduğu için sahne zaten kurulmuş olur. -->
+            <p class="hero-not" id="heroNot"></p>
+        </div>
+
+        <!-- HIZLI ERİŞİM: hero'da "başka ne var?" sorusun kısa cevabı.
+             Ana kartlar aşağıda; burada yalnızca en sık kullanılanlar. -->
+        <button class="secim-geri" id="secimGeri" type="button">← Açılış ekranına dön</button>
+        <nav class="hero-hizli" aria-label="Hızlı erişim">
+            <a href="dojo.html"><span aria-hidden="true">🗺️</span> Dojo haritası</a>
+            <a href="kanji.html"><span aria-hidden="true">🈶</span> Kanji</a>
+            <a href="yazma.html"><span aria-hidden="true">✍️</span> Yazma</a>
+            <a href="video.html"><span aria-hidden="true">🎬</span> Videolar</a>
+            <a href="sozluk.html"><span aria-hidden="true">🔎</span> Sözlük</a>
+        </nav>
+    </header>
+    <div class="balon" id="balon" role="status" aria-live="polite"></div>
+    <div class="chibi-kap" id="chibiKap"></div>
+    <main class="panel" id="panel" hidden aria-live="polite"></main>
+    <noscript>
+        <p class="guven-notu">Bu uygulamanın çalışması için JavaScript gerekli. Tarayıcı ayarlarından açıp sayfayı yenile.</p>
+    </noscript>
+
+    <section class="ozellikler" aria-label="Uygulama özellikleri">
+        <article class="ozellik">
+            <span class="ozellik-simge" aria-hidden="true">🗺️</span>
+            <strong>Adım adım dojo</strong>
+            <small>Hiragana'dan kanjiye, seviyene uygun ders yolunu takip et.</small>
+        </article>
+        <article class="ozellik">
+            <span class="ozellik-simge" aria-hidden="true">🧠</span>
+            <strong>Akıllı tekrar</strong>
+            <small>Zorlandığın harfleri ve kelimeleri doğru zamanda yeniden çalış.</small>
+        </article>
+        <article class="ozellik">
+            <span class="ozellik-simge" aria-hidden="true">🔥</span>
+            <strong>Her gün biraz daha</strong>
+            <small>Serini koru, XP kazan ve Japonca öğrenme alışkanlığı oluştur.</small>
+        </article>
+    </section>
+    <div class="surec" aria-label="Öğrenme süreci">
+        <div class="surec-adim"><b>1</b> Başla</div>
+        <div class="surec-adim"><b>2</b> Öğren</div>
+        <div class="surec-adim"><b>3</b> Tekrar et</div>
+    </div>
+
+    <!-- İlk derste öğrenilecek harflerden küçük bir önizleme: soyut vaat yerine
+         somut içerik gösterir ("ne öğreneceğim?" sorusunu ekran açılmadan yanıtlar). -->
+    <p class="ornek-baslik">İlk dersinde bunları öğreneceksin</p>
+    <div class="ornek-serit" aria-label="İlk ders harf örneği">
+        <div class="ornek-harf"><b lang="ja">あ</b><small>a</small></div>
+        <div class="ornek-harf"><b lang="ja">い</b><small>i</small></div>
+        <div class="ornek-harf"><b lang="ja">う</b><small>u</small></div>
+        <div class="ornek-harf"><b lang="ja">え</b><small>e</small></div>
+        <div class="ornek-harf"><b lang="ja">お</b><small>o</small></div>
+    </div>
+
+    <p class="guven-notu">İlerlemen bu cihazda saklanır. Google ile giriş yapabilir veya adını yazarak hemen başlayabilirsin.</p>
+    <div class="mini-guven"><b>🔒</b> Hesap açmadan da başlayabilirsin · Günde 5 dakika yeter</div>
+
+    <!-- İÇERİK: hero aşamasında bunların tamamı CSS ile gizlenir.
+         Butona basınca (body.hero-asamasi kalkar) görünürler. -->
+
+    <!-- ÖĞRENME BİÇİMLERİ: kullanıcı dojo'ya girmeden de neler yapabileceğini görsün.
+         ÖNEMLİ: Bu blok giriş akışında GİZLENMEZ — kayıtlı kullanıcı da görebilsin.
+         Dojo "önerilen" olarak işaretli; diğerleri alternatif çalışma biçimleri. -->
+    <h2 class="ob-baslik" id="obBaslik">Nereden başlamak istersin?</h2>
+    <p class="ob-alt" id="obAlt">Hepsi aynı ilerlemeni besler. Canın hangisini isterse onu seç.</p>
+    <section class="ob-serit" aria-label="Öğrenme biçimleri">
+
+        <!-- ÖNERİLEN: dojo haritası (dersler sırayla) -->
+        <a class="ob-kart onerilen" href="dojo.html" style="--sira:0">
+            <span class="ob-rozet">ÖNERİLEN</span>
+            <span class="ob-ust"><span class="ob-simge" aria-hidden="true">🗺️</span><span class="ob-ad">Dojo haritası</span></span>
+            <span class="ob-acik">Hiragana'dan kanjiye, sırayla ve seviyene uygun dersler. Yeni başlıyorsan buradan başla.</span>
+            <span class="ob-not">Ders ders ilerle</span>
+        </a>
+
+        <!-- Kanji öğrenme -->
+        <a class="ob-kart" href="kanji.html" style="--sira:1">
+            <span class="ob-ust"><span class="ob-simge" aria-hidden="true">🈶</span><span class="ob-ad">Kanji öğren</span></span>
+            <span class="ob-acik">Kanji kütüphanesi: gruplara göre süz, ara, anlam ve okunuşları incele, kartlarla çalış.</span>
+            <span class="ob-not">Kütüphane · kart çalışması</span>
+        </a>
+
+        <!-- Yazma -->
+        <a class="ob-kart" href="yazma.html" style="--sira:2">
+            <span class="ob-ust"><span class="ob-simge" aria-hidden="true">✍️</span><span class="ob-ad">Yazarak çalış</span></span>
+            <span class="ob-acik">Harfi gör, okunuşunu kendini yaz. Can yok, sınırsız deneme var. En kalıcı öğrenme biçimi.</span>
+            <span class="ob-not">Klâvyeden yaz</span>
+        </a>
+
+        <!-- Kelime kurma -->
+        <a class="ob-kart" href="birlestirme.html" style="--sira:3">
+            <span class="ob-ust"><span class="ob-simge" aria-hidden="true">🧩</span><span class="ob-ad">Kelime kur</span></span>
+            <span class="ob-acik">Öğrendiğin harfleri birleştirip gerçek kelimeyi kendin oluştur: ね + こ = ねこ</span>
+            <span class="ob-not">Harften kelimeye</span>
+        </a>
+
+        <!-- Cümle -->
+        <a class="ob-kart" href="cumle.html" style="--sira:4">
+            <span class="ob-ust"><span class="ob-simge" aria-hidden="true">🧱</span><span class="ob-ad">Cümle kur</span></span>
+            <span class="ob-acik">Türkçesi verilir, Japonca sırayı sen kurarsın. Yüklem sonda olur — bunu oturtmak şart.</span>
+            <span class="ob-not">Kelime dizme</span>
+        </a>
+
+        <!-- Dinleme -->
+        <a class="ob-kart" href="dinleme.html" style="--sira:5">
+            <span class="ob-ust"><span class="ob-simge" aria-hidden="true">🎧</span><span class="ob-ad">Dinleyerek çalış</span></span>
+            <span class="ob-acik">Sesi duy, harfi seç. Kulağını Japonca seslere alıştırır; okumasına da yardım eder.</span>
+            <span class="ob-not">12 soruluk tur</span>
+        </a>
+
+        <!-- Video dersler: kanaldaki anlatımlar (video.html) -->
+        <a class="ob-kart" href="video.html" style="--sira:6">
+            <span class="ob-ust"><span class="ob-simge" aria-hidden="true">🎬</span><span class="ob-ad">İzleyerek öğren</span></span>
+            <span class="ob-acik">Hiragana ve Katakana anlatımları video olarak. Okumak yerine dinlemeyi seçenler için.</span>
+            <span class="ob-not">Video dersler</span>
+        </a>
+
+        <!-- Sözlük -->
+        <a class="ob-kart" href="sozluk.html" style="--sira:7">
+            <span class="ob-ust"><span class="ob-simge" aria-hidden="true">🔎</span><span class="ob-ad">Sözlükten bak</span></span>
+            <span class="ob-acik">Harf, kelime ve kanji ara. Aklına takılanı ders arasında hemen bul.</span>
+            <span class="ob-not">Arama</span>
+        </a>
+
+        <!-- Tüm alanlar -->
+        <a class="ob-kart" href="alanlar.html" style="--sira:8">
+            <span class="ob-ust"><span class="ob-simge" aria-hidden="true">🧰</span><span class="ob-ad">Tüm çalışma alanları</span></span>
+            <span class="ob-acik">İstatistikler, kelime defteri, ayarlar ve geri kalan her şey tek sayfada.</span>
+            <span class="ob-not">Hepsi bir arada</span>
+        </a>
+    </section>
+
+    <!-- REKLAM: reklam.js ayarları boşken bu kutu gizli kalır, sayfa bozulmaz. -->
+    <div class="reklam-alani" data-reklam="1" hidden>
+        <span class="reklam-etiket">Reklam</span>
+    </div>
+
+    <footer class="alt-bilgi">
+        <a href="https://kreosus.com/sakarpaisen" target="_blank" rel="noopener">☕ Sensei'ye bir çay ısmarla</a>
+        <span>·</span>
+        <a href="ayarlar.html" title="Tema, ses, zorluk ayarları">⚙️ Ayarlar</a>
+        <span>·</span>
+        <a href="dojo.html#geri" id="geriLink">💬 Geri bildirim</a>
+    </footer>
+
+    <a class="powered" href="https://www.netlify.com" target="_blank" rel="noopener">⚡ Powered by <b>Netlify</b></a>
+
+    <script src="mufredat.js?v=3"></script>
+    <script src="ilerleme.js?v=11"></script>
+    <script src="ses.js?v=5"></script>
+    <script src="pwa.js?v=5"></script>
+    <!-- BULUT KAYIT: Supabase ayarı boşken tamamen kapalı, site yerel çalışır.
+         Açmak için bulut.js içindeki SUPABASE_ADRES / SUPABASE_ANAHTAR'ı doldur. -->
+    <script src="bulut.js?v=3"></script>
+    <!-- ANALİTİK: token girilene kadar tamamen kapalı (dış istek yapmaz).
+         Açmak için analitik.js içindeki CLOUDFLARE_TOKEN satırını doldur. -->
+    <script src="analitik.js?v=2" defer></script>
+    <script>window.addEventListener('load', function () { if (window.Analitik) window.Analitik.sayfa('giris'); });</script>
+    <!-- GİRİŞ EKRANI MOTORU: Google ile giriş akışı + test modu. Kod: giris.js -->
+    <script src="giris.js?v=10" defer></script>
+    <!-- REKLAM: ayarlar boşken tamamen kapalı (dış istek yapmaz). Bkz. reklam.js -->
+    <script src="reklam.js?v=1" defer></script>
+    <!-- AYARLAR: tema/ses/zorluk. Tema seçilmişse daha giriş ekranında uygulanır. -->
+    <script src="ayarlar.js?v=1"></script>
+    <!-- DURUM ŞERİDİ: kayıtlı kullanıcı girişte durumunu görsün (serit.js).
+         ÖNEMLİ: sadece kayıt varsa kurulur; yeni kullanıcıda boş şerit çıkmasın.
+         Hediye rozeti şeritte KAPATILIR: giriş ekranında zaten büyük
+         "GÜNLÜK HEDİYENİ AL" butonu var, ikisi birlikte tekrar duruyordu
+         (ekran görüntüsü doğrulamasında görüldü). -->
+    <script>
+        window.addEventListener('load', function () {
+            try {
+                if (window.Serit && window.Ilerleme && Ilerleme.isim()) {
+                    Serit.kur(null, { hediyeGizle: true });
+                }
+            } catch (e) { }
+        });
+    </script>
+    <!-- GÖREVLER/BAŞARIMLAR: giriş ekranında günlük durumu gösterebilmek için -->
+    <script src="gorevler.js?v=2"></script>
+    <script src="basarimlar.js?v=2"></script>
+    <script src="hediye.js?v=2"></script>
+    <script src="serit.js?v=1"></script>
+    <!-- SÜRÜM GÜNCELLEME BİLDİRİMİ: service worker yenilendiğinde kullanıcıya
+         "yenile" bildirimi gösterir. Bu olayı dinleyen kod eksikti ve eski
+         önbellek sessizce çalışıyordu (yeni eklenen sayfalar görünmüyordu). -->
+    <script src="guncelleme.js?v=1"></script>
+    <!-- VİDEO ARKA PLAN: videolar/yatay|dikey/arkaplan.webm dosyalarını döngüde oynatır.
+         Ekran yönüne göre yatay/dikey videoyu kendisi seçer; dosya yoksa
+         sessizce vazgeçer ve alttaki katman görünür kalır. Kod: video-arkaplan.js -->
+    <script src="video-arkaplan.js?v=4"></script>
+</body>
+</html>
