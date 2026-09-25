@@ -6,6 +6,8 @@
     <title>Sakar Paisen | Japonca Öğren</title>
     <meta name="theme-color" content="#7b5cf0">
     <meta name="description" content="Sakar Paisen ile hiragana, katakana ve kanjiyi oyunlaştırılmış derslerle öğren.">
+    <!-- Google AdSense otomatik reklamları -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2039369863449847" crossorigin="anonymous"></script>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
     <link rel="icon" type="image/png" href="icons/icon-192.png">
@@ -34,6 +36,20 @@
         body.hero-asamasi #videoArkaplan { z-index: 0; }
         @media (orientation: portrait) {
           body.hero-asamasi { background: #0b1424; }
+          /* Telefonda üstte metin, altta video: iki alan birbirini örtmez. */
+          body.hero-asamasi .hero { align-items: flex-start; text-align: left; padding: 8px 20px 0; }
+          body.hero-asamasi .hero > * { text-align: left; width: 100%; }
+          body.hero-asamasi .hero > .baslangic-etiket,
+          body.hero-asamasi .hero > .hero-logo,
+          body.hero-asamasi .hero > .hero-alt,
+          body.hero-asamasi .hero > .hero-jp,
+          body.hero-asamasi .hero > .hero-btn,
+          body.hero-asamasi .hero > .hero-ikincil,
+          body.hero-asamasi .hero > .hero-not,
+          body.hero-asamasi .hero > .hero-cikis { margin-left: 0; margin-right: 0; align-self: flex-start; }
+          body.hero-asamasi .hero > .hero-btn { width: 100%; }
+          body.hero-asamasi #videoArkaplan { top: 48%; height: 52%; }
+          body.hero-asamasi #videoArkaplan video { object-position: center 35%; }
         }
         body.hero-asamasi #spSerit, body.hero-asamasi .hero-hizli,
         body.hero-asamasi .alt-bilgi, body.hero-asamasi .powered { display: none; }
@@ -101,31 +117,50 @@
            yalnızca geniş + yatay ekranlarda değişir. */
         @media (min-width: 900px) and (orientation: landscape) {
           body.hero-asamasi { align-items: stretch; padding: 0; }
+          body.hero-asamasi::after {
+            content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background: linear-gradient(90deg, rgba(7,10,24,.58) 0%, rgba(7,10,24,.28) 42%, transparent 68%);
+          }
           body.hero-asamasi .hero {
             max-width: none; margin: 0; flex: 1 1 auto;
-            align-items: center; justify-content: space-between;
-            padding: 22px clamp(28px, 5vw, 68px) 30px;
+            align-items: flex-start; justify-content: flex-end;
+            padding: clamp(24px, 4vw, 56px) 0 clamp(28px, 5vh, 58px) clamp(36px, 7vw, 104px);
           }
-          /* Üst şerit: etiket solda, Japonca ipucu sağda */
-          body.hero-asamasi .hero > .baslangic-etiket { width: auto; align-self: flex-start; margin: 0; }
-          body.hero-asamasi .hero > .hero-jp {
-            position: absolute; top: 28px; right: clamp(28px, 5vw, 68px);
-            width: auto; margin: 0;
+          /* Masaüstünde bütün içerik tek sol sütunda; sağ yarı video/karaktere kalır. */
+          body.hero-asamasi .hero > * {
+            text-align: left !important; width: auto !important;
+            max-width: min(570px, 45vw); margin-left: 0 !important; margin-right: 0 !important;
           }
-          /* Başlık üstte, videonun ortası boş kalsın */
-          body.hero-asamasi .hero > .hero-logo { margin-top: 7vh; }
-          /* Butonlar: alt şeritte, sol tarafa yaslı (videonun ortasını açık bırakır) */
-          body.hero-asamasi .hero > .hero-btn { margin: 0; align-self: flex-start; }
-          body.hero-asamasi .hero > .hero-ikincil { margin: 14px 0 0; align-self: flex-start; }
-          body.hero-asamasi .hero > .hero-not { margin: 16px 0 0; width: auto; align-self: flex-start; }
-          body.hero-asamasi .hero > .hero-cikis { margin: 12px 0 0 !important; align-self: flex-start; }
+          body.hero-asamasi .hero > .baslangic-etiket { align-self: flex-start; margin-bottom: 12px !important; }
+          body.hero-asamasi .hero > .hero-logo { margin: 0 0 10px !important; }
+          body.hero-asamasi .hero > .hero-alt { margin: 0 0 4px !important; }
+          body.hero-asamasi .hero > .hero-jp { margin: 0 0 4px !important; letter-spacing: 2px; }
+          body.hero-asamasi .hero > .hero-btn { margin: 20px 0 0 !important; align-self: flex-start; }
+          body.hero-asamasi .hero > .hero-ikincil { margin: 12px 0 0 !important; align-self: flex-start; }
+          body.hero-asamasi .hero > .hero-not { margin: 14px 0 0 !important; align-self: flex-start; }
+          body.hero-asamasi .hero > .hero-cikis { margin: 10px 0 0 !important; align-self: flex-start; }
         }
-        /* Çok geniş ekranda butonlar ekranın sol-alt köşesine iyice yaklaşsın */
-        @media (min-width: 1100px) and (orientation: landscape) {
-          body.hero-asamasi .hero > .hero-btn,
+        /* Telefonda üst yarı metin, alt yarı karakter. Video aynı katmanda
+           kaldığı için nesne konumu ve yumuşak bölme çizgisi ile ayrım netleşir. */
+        @media (max-width: 899px) and (orientation: portrait) {
+          body.hero-asamasi { justify-content: flex-start; padding: max(18px, env(safe-area-inset-top)) 18px 0; }
+          body.hero-asamasi::before {
+            background: linear-gradient(180deg, rgba(7,10,24,.72) 0%, rgba(7,10,24,.52) 54%, rgba(7,10,24,.18) 70%, rgba(7,10,24,.08) 100%);
+          }
+          body.hero-asamasi .hero {
+            min-height: 58dvh; align-items: stretch; justify-content: flex-start;
+            text-align: left; padding: 0 4px 20px;
+          }
+          body.hero-asamasi .hero > * { text-align: left !important; margin-left: 0; margin-right: 0; }
+          body.hero-asamasi .hero > .baslangic-etiket { width: fit-content; margin-bottom: 12px !important; }
+          body.hero-asamasi .hero > .hero-logo { margin: 0 0 8px !important; }
+          body.hero-asamasi .hero > .hero-alt { margin: 0 0 4px !important; }
+          body.hero-asamasi .hero > .hero-jp { margin: 0 0 6px !important; }
+          body.hero-asamasi .hero > .hero-btn { margin: 20px 0 0 !important; }
           body.hero-asamasi .hero > .hero-ikincil,
           body.hero-asamasi .hero > .hero-not,
-          body.hero-asamasi .hero > .hero-cikis { margin-left: clamp(16px, 5vw, 96px); }
+          body.hero-asamasi .hero > .hero-cikis { margin: 10px 0 0 !important; }
+          body.hero-asamasi #videoArkaplan video { object-position: 50% 100% !important; }
         }
         /* Hero açıkken diğer bloklar gizli */
         body.hero-asamasi .ozellikler,
