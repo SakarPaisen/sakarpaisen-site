@@ -6,9 +6,13 @@ node_modules/
 .env.*
 !.env.example
 
-# Large media: keep locally and upload optimized copies separately
+# Large lesson media: keep locally
 *.mp4
 *.webm
+
+# Optimized opening background videos are required by the deployed site
+!videolar/dikey/arkaplan.mp4
+!videolar/yatay/arkaplan.mp4
 
 # OS/editor files
 Thumbs.db
