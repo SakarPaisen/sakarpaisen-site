@@ -141,6 +141,21 @@ body { overflow-x: hidden; }
 .dugme-ad.bitmis { color: var(--turkuaz-koyu); }
 .dugme-ad.aktif { color: var(--mor); font-weight: 800; }
 
+/* ---------- KİLİTLİ DAİRE ----------
+   Aktif daireden sonraki dersler: gri, basılamaz görünür.
+   NEDEN: Kilit olmadan kullanıcı rastgele seviyeye atlıyordu. */
+.dugme.kilitli {
+  background: var(--kilitli-renk);
+  box-shadow: 0 5px 0 rgba(0,0,0,.10);
+  cursor: not-allowed;
+  filter: grayscale(1);
+  opacity: .72;
+}
+.dugme.kilitli .dugme-ikon { font-size: 28px; }
+.dugme-ad.kilitli { color: var(--yazi-soluk); opacity: .7; font-weight: 700; }
+/* Kilitli daireye hover'da "yükselme" olmasın: basılabilir izlenimi vermesin. */
+.dugme-kap:has(.dugme.kilitli):hover .dugme { transform: none; }
+
 /* Aktif dersin adi ile balon cakismasin diye yol satirina nefes payi */
 .yol-satir:has(.dugme.aktif) { padding-top: 26px; }
 

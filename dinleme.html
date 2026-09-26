@@ -1,9 +1,17 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sakar Paisen | Dinleme Alıştırması</title>
+    <meta name="description" content="Japonca hiragana ve katakana harflerini dinleyerek ayırt et; sesli dinleme alıştırmalarıyla kulak eğitimi yap.">
+    <meta property="og:title" content="Sakar Paisen | Dinleme Alıştırması">
+    <meta property="og:description" content="Japonca harfleri dinleyerek ayırt et ve kulak eğitimi yap.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sakarpaisen.com/dinleme.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Sakar Paisen | Dinleme Alıştırması">
+    <meta name="twitter:description" content="Japonca harfleri dinleyerek çalış.">
     <meta name="theme-color" content="#7b5cf0">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -55,7 +63,7 @@
         .dl-tekrar { background: none; border: none; color: var(--mor); font-family: inherit;
                      font-size: 13px; font-weight: 800; cursor: pointer; text-decoration: underline; }
 
-        /* ---------- �?ıklar ---------- */
+        /* ---------- Şıklar ---------- */
         /* 2x2 düzen; düğmeler ekranı kaplamasın diye yükseklik sınırlı.
            Önce çok yüksekti ve altta büyük boş alan kalıyordu. */
         .dl-siklar { display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
@@ -111,7 +119,7 @@
 <body class="sp">
     <nav class="sp-ust">
         <button class="sp-pill tikla" id="geriBtn" title="Haritaya dön" aria-label="Haritaya dön">←</button>
-        <div class="sp-logo">g���️ <span>Dinleme</span></div>
+        <div class="sp-logo">🎧 <span>Dinleme</span></div>
         <div class="sp-istatistik"><span class="sp-pill" id="ipucuRozet">Kulak eğitimi</span></div>
     </nav>
 
@@ -128,7 +136,7 @@
     <script src="ayarlar.js?v=1"></script>
     <!-- DİNLEME: kulak eğitimi turu. Yanlış yapılan harf 3 soru sonra tekrar gelir. -->
     <script src="dinleme.js?v=1"></script>
-    <!-- YANLI�? DEFTERİ: dinleme alıştırmasında yanlış cevaplar da karıştırma
+    <!-- YANLIŞ DEFTERİ: dinleme alıştırmasında yanlış cevaplar da karıştırma
          defterine yazılır (dinleme.js Yanlis.ciftKaydet çağırır).
          Bu bağlantı eksikti ve yanlış cevaplar kaydedilmiyordu (test yakaladı). -->
     <script src="yanlis.js?v=1"></script>
@@ -192,7 +200,7 @@
                 kok.append(ustCiz());
 
                 // Hoparlör: tek ana eylem, büyük ve net
-                const hop = el('button', 'dl-hoparlor', 'g���');
+                const hop = el('button', 'dl-hoparlor', '🔊');
                 hop.title = 'Sesi çal (R tuşu)';
                 hop.onclick = () => sesCal(s.harf);
                 kok.append(hop);
@@ -204,7 +212,7 @@
                 ip.append(tkr);
                 kok.append(ip);
 
-                // �?ıklar
+                // Şıklar
                 const kap = el('div', 'dl-siklar');
                 const düğmeler = [];
                 s.siklar.forEach((harf, i) => {
@@ -280,7 +288,7 @@
                 kok.replaceChildren();
                 const son = el('div', 'dl-son');
                 son.append(
-                    el('div', 'simge', o.oran >= 90 ? '✅' : o.oran >= 70 ? 'g���️' : o.oran >= 50 ? 'g���' : 'g�?�'),
+                    el('div', 'simge', o.oran >= 90 ? '✅' : o.oran >= 70 ? '🙂' : o.oran >= 50 ? '😐' : '😵'),
                     el('h2', '', o.oran >= 90 ? 'Kulakların keskin!' :
                         o.oran >= 70 ? 'İyi gidiyorsun!' :
                             o.oran >= 50 ? 'Fena değil.' : 'Biraz daha dinleyelim.'),
@@ -309,13 +317,13 @@
                 document.onkeydown = (e) => { if (e.key === 'Enter') tekrar.click(); };
             }
 
-            // ---------- BA�?LAT ----------
+            // ---------- BAŞLAT ----------
             function baslat() {
                 if (!Dinleme.baslat()) {
                     kok.replaceChildren();
                     const b = el('div', 'dl-bos');
                     b.append(
-                        el('div', 'simge', 'g���️'),
+                        el('div', 'simge', '🙂'),
                         el('h3', '', 'Dinlemek için önce harf öğrenmelisin'),
                         el('p', '', 'En az 4 harf bilmelisin ki şıklar oluşsun. ' +
                             'Haritaya dönüp ilk dersleri yap, sonra buraya gel.')
@@ -339,6 +347,5 @@
          Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
          KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli (aynı negatif
          z-index'te sonra gelen katman üstte görünür). -->
-    <script src="video-arkaplan.js?v=4"></script>
 </body>
 </html>

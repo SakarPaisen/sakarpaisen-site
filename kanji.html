@@ -5,6 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sakar Paisen | Kanji Çalışma</title>
+    <meta name="description" content="Japonca kanjilerini ara, anlamlarını ve okumalarını incele; çalışma kartlarıyla tekrar yap.">
+    <meta property="og:title" content="Sakar Paisen | Kanji Çalışma">
+    <meta property="og:description" content="Kanjileri ara, incele ve çalışma kartlarıyla tekrar et.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sakarpaisen.com/kanji.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Sakar Paisen | Kanji Çalışma">
+    <meta name="twitter:description" content="Kanjileri ara, incele ve tekrar et.">
     <meta name="theme-color" content="#7b5cf0">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -91,7 +99,7 @@
         }
 
         /* ---------- Kanji kart ızgarası ---------- */
-        /* KENDİ BA�?INA DURAN ALAN: ders akışı yok, istediğin kanjiye tıklarsın.
+        /* KENDİ BAŞINA DURAN ALAN: ders akışı yok, istediğin kanjiye tıklarsın.
            Duolingo'nun "alfabe sayfası" mantığı: tüm içerik tek bakışta görünür. */
         .kj-izgara {
             display: grid;
@@ -384,10 +392,10 @@
 <body class="sp">
     <nav class="sp-ust">
         <button class="sp-pill tikla" id="geriBtn" title="Haritaya dön" aria-label="Haritaya dön">←</button>
-        <div class="sp-logo">g��� <span>Kanji Çalışma</span></div>
+        <div class="sp-logo">🈶 <span>Kanji Çalışma</span></div>
         <div class="sp-istatistik">
             <span class="sp-pill" id="ogrenilenRozet">0 / 0</span>
-            <button class="sp-pill tikla mor" id="falBtn" title="Bilmediğin kanjilerle kart çalış">g��� Kart
+            <button class="sp-pill tikla mor" id="falBtn"[^>]*>🃏 Kart
                 çalış</button>
         </div>
     </nav>
@@ -416,12 +424,16 @@
          DİKKAT: Burada location.replace ile yönlendirme YAPILMAZ — Ilerleme
          bu noktada genelde henüz yüklenmemiş olur ve kayıtlı kullanıcı da
          boşuna giriş ekranına atılırdı (yaşandı ve ölçümle doğrulandı). -->
+    <script src="mufredat.js?v=3"></script>
+    <script src="ilerleme.js?v=11"></script>
+    <!-- OTURUM İŞARETİ: ilerleme.js YÜKLENDİKTEN SONRA hesaplanır.
+         Daha önce burada hesaplanıyordu; Ilerleme henüz tanımsız olduğu için
+         işaret hep false kalıyor, kanji.js/kanji-calisma.js hiç yüklenmiyor ve
+         sayfa "0 / 0" kart gösteriyordu. -->
     <script>
         window.SP_OTURUM = false;
         try { window.SP_OTURUM = !!(window.Ilerleme && Ilerleme.isim()); } catch (e) { }
     </script>
-    <script src="mufredat.js?v=3"></script>
-    <script src="ilerleme.js?v=11"></script>
     <!-- AĞIR KÜTÜPHANELER YALNIZCA OTURUM VARSA inilir (SP_OTURUM, yukarıda
          script'lerden önce işaretlendi). Kayıt yoksa kanji-calisma.js zaten
          index.html'e yönlendirir; boşuna yüzlerce KB indirmenin anlamı yok. -->
@@ -443,19 +455,14 @@
     <script src="analitik.js?v=2" defer></script>
     <script>window.addEventListener('load', function () { if (window.Analitik) window.Analitik.sayfa('kanji'); });</script>
     <script src="ayarlar.js?v=1"></script>
-    <!-- KANJI ÇALI�?MA MOTORU: kendi başına duran kanji kütüphanesi + kart çalışması -->
+    <!-- KANJI ÇALIŞMA MOTORU: kendi başına duran kanji kütüphanesi + kart çalışması -->
     <script>
         if (window.SP_OTURUM) document.write('<script src="kanji-calisma.js?v=1"><\/script>');
     </script>
     <!-- SURUM GUNCELLEME BILDIRIMI (guncelleme.js) -->
     <script src="guncelleme.js?v=1"></script>
     <script src="sahne3d.js?v=1"></script>
-    <!-- VİDEO ARKA PLAN: videolar/yatay|dikey/arkaplan.webm döngüde oynar.
-         Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
-         KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli; video kök
-         elemanı body'nin ilk çocuğu olarak eklenir ve böylece 3D kökünün
-         ÖNÜNE geçer (aynı negatif z-index'te sonra gelen üstte kalır). -->
-    <script src="video-arkaplan.js?v=4"></script>
+    <!-- ARKA PLAN VİDEO YALNIZCA giriş ekranında (index.html) çalışır. -->
 </body>
 
 </html>

@@ -483,7 +483,7 @@ const KANA_MESAJLAR = ['İlk harfimiz!', 'Sıradaki harf!', 'Bir tane daha!', 'A
 const KANA_SATIR_IPUCU = {
   a: 'A sesleri: ağzın açık, ses berrak.',
   i: 'İ sesleri: ince ve kısa.',
-  u: 'U sesleri: dudak düz, 'u' derken gülümser gibi.',
+  u: "U sesleri: dudak düz, 'u' derken gülümser gibi.",
   e: 'E sesleri: Türkçedeki e gibi açık.',
   o: 'O sesleri: yuvarlak dudak.',
   ka: 'K sesleri: Türkçedeki k gibi net.',
@@ -492,13 +492,13 @@ const KANA_SATIR_IPUCU = {
   ke: 'K sesleri: açık e ile.',
   ko: 'K sesleri: yuvarlak o ile.',
   sa: 'S sesleri: ıslık gibi ince s.',
-  shi: 'Ş sesi: 's' değil, 'ş' gibi okunur — en çok karıştırılan harf!',
+  shi: "Ş sesi: 's' değil, 'ş' gibi okunur — en çok karıştırılan harf!",
   su: 'S sesleri: dudak düz.',
   se: 'S sesleri: açık e.',
   so: 'S sesleri: yuvarlak o.',
   ta: 'T sesleri: net ve kısa t.',
-  chi: 'Ç sesi: 't' değil, 'ç' gibi okunur.',
-  tsu: 'TS sesi: t ve s'i tek nefeste söyle (tsunami).',
+  chi: "Ç sesi: 't' değil, 'ç' gibi okunur.",
+  tsu: "TS sesi: t ve s'i tek nefeste söyle (tsunami).",
   te: 'T sesleri: açık e.',
   to: 'T sesleri: yuvarlak o.',
   na: 'N sesleri: burnundan hafif.',
@@ -508,7 +508,7 @@ const KANA_SATIR_IPUCU = {
   no: 'N sesleri: yuvarlak o.',
   ha: 'H sesleri: nefes gibi yumuşak h.',
   hi: 'H sesleri: ince i.',
-  fu: 'F sesi: 'f' değil 'h' ile 'f' arası — üfler gibi.',
+  fu: "F sesi: 'f' değil 'h' ile 'f' arası — üfler gibi.",
   he: 'H sesleri: açık e.',
   ho: 'H sesleri: yuvarlak o.',
   ma: 'M sesleri: dudaklar kapalı.',
@@ -519,14 +519,14 @@ const KANA_SATIR_IPUCU = {
   ya: 'Y sesleri: Türkçedeki y gibi.',
   yu: 'Y sesleri: dudak düz.',
   yo: 'Y sesleri: yuvarlak o.',
-  ra: 'R sesi: Japon r\'si Türkçedeki r\'den YUMUŞAK — dil tek kere vurur.',
+  ra: "R sesi: Japon r'si Türkçedeki r'den YUMUŞAK — dil tek kere vurur.",
   ri: 'R sesi: yumuşak ve tek vuruşlu.',
   ru: 'R sesi: dudak düz.',
   re: 'R sesi: açık e.',
   ro: 'R sesi: yuvarlak o.',
-  wa: 'W sesi: dudaklar yuvarlak, 'v' değil.',
+  wa: "W sesi: dudaklar yuvarlak, 'v' değil.",
   wo: 'WO: yalnızca nesne eki olarak kullanılır (を).',
-  n: 'Tek başına hece! Kendi sesi var: 'n'.'
+  n: "Tek başına hece! Kendi sesi var: 'n'."
 };
 
 function dersUret(item) {

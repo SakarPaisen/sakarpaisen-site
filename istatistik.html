@@ -1,9 +1,17 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sakar Paisen | İstatistikler</title>
+    <meta name="description" content="Japonca öğrenme ilerlemeni, günlük XP'ni, serini ve zayıf harflerini istatistiklerle takip et.">
+    <meta property="og:title" content="Sakar Paisen | İstatistikler">
+    <meta property="og:description" content="XP'ni, serini ve Japonca ilerlemeni takip et.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sakarpaisen.com/istatistik.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Sakar Paisen | İstatistikler">
+    <meta name="twitter:description" content="Japonca öğrenme ilerlemeni takip et.">
     <meta name="theme-color" content="#7b5cf0">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -58,7 +66,7 @@
 <body class="sp">
     <nav class="sp-ust">
         <button class="sp-pill tikla" id="geriBtn" title="Haritaya dön" aria-label="Haritaya dön">←</button>
-        <div class="sp-logo">g��� <span>İstatistikler</span></div>
+        <div class="sp-logo">📊 <span>İstatistikler</span></div>
         <div class="sp-istatistik"><span class="sp-pill altin" id="xpRozet">0 XP</span></div>
     </nav>
 
@@ -74,21 +82,21 @@
     <script src="analitik.js?v=2" defer></script>
     <script>window.addEventListener('load', function () { if (window.Analitik) window.Analitik.sayfa('istatistik'); });</script>
     <script src="ayarlar.js?v=1"></script>
-    <!-- BA�?ARIMLAR: istatistik sayfasının alt bölümünde tam liste gösterilir -->
+    <!-- BAŞARIMLAR: istatistik sayfasının alt bölümünde tam liste gösterilir -->
     <script src="basarimlar.js?v=2"></script>
     <script src="gorevler.js?v=2"></script>
     <script src="kombo.js?v=1"></script>
-    <!-- DURUM �?ERİDİ: seri/XP/rütbe/görev/hediye tek satırda (serit.js) -->
+    <!-- DURUM ŞERİDİ: seri/XP/rütbe/görev/hediye tek satırda (serit.js) -->
     <script src="hediye.js?v=2"></script>
     <script src="serit.js?v=1"></script>
-    <!-- YANLI�? DEFTERİ: "hangi harfi hangisiyle karıştırdın" bölümü için -->
+    <!-- YANLIŞ DEFTERİ: "hangi harfi hangisiyle karıştırdın" bölümü için -->
     <script src="yanlis.js?v=1"></script>
     <script src="istatistik.js?v=5"></script>
     <script>
         document.getElementById('geriBtn').onclick = () => {
             window.location.href = Ilerleme.isim() ? 'dojo.html' : 'index.html';
         };
-        // �?erit üst menünün HEMEN altına gelir (sabit menüyü itmez)
+        // Şerit üst menünün HEMEN altına gelir (sabit menüyü itmez)
         Serit.kur('.sp-ust', { yuzen: false });
         Istatistik.ciz(document.getElementById('kok'));
         document.getElementById('xpRozet').textContent = Ilerleme.xp() + ' XP';
@@ -100,6 +108,5 @@
          Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
          KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli (aynı negatif
          z-index'te sonra gelen katman üstte görünür). -->
-    <script src="video-arkaplan.js?v=4"></script>
 </body>
 </html>

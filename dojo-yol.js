@@ -72,8 +72,15 @@
       renkSirasi[ders.id] = daireRengi;
     });
 
+    // ÖNEMLİ: Sadece gerçekten görünür (kaydırılmış) bir buton ortalansın.
+    // Eskiden koşulsuz çağrılıyordu ve sayfa açılışında haritayı zorla aşağı
+    // kaydırıyordu; kullanıcı bir anda haritanın ortasında buluyordu kendini.
     const aktif = kap.querySelector('.dugme.aktif');
-    if (aktif) setTimeout(function () { aktif.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 250);
+    if (aktif) {
+      const k = aktif.getBoundingClientRect();
+      const gorunur = k.bottom > 0 && k.top < (window.innerHeight || 0);
+      if (!gorunur) setTimeout(function () { aktif.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 250);
+    }
   }
 
   // BÖLÜM BAŞLIĞI + İLERLEME HALKASI
@@ -120,6 +127,10 @@
   function dugme(ders, index, renkli, ayar, bolumRengi) {
     const aktif = ders.id === ayar.seviye;
     const bitmis = ders.id < ayar.seviye;
+    // KİLİTLİ: aktif daireden SONRAKİ dersler. Kullanıcı sırayı atlamasın.
+    // ÖNEMLİ: Eskiden bu durum HİÇ hesaplanmıyordu; tüm daireler açık görünüyordu
+    // ve kullanıcı rastgele bir seviyeye atlayabiliyordu (kilit anlamsızdı).
+    const kilitli = ders.id > ayar.seviye;
     const yildiz = (ayar.yildizlar || {})[ders.id] || 0;
 
     const kap = document.createElement('div');
@@ -128,17 +139,22 @@
 
     const bas = document.createElement('button');
     bas.type = 'button';
-    bas.className = 'dugme' + (aktif ? ' aktif' : '') + (bitmis ? ' bitmis' : '') + (renkli ? ' ozel' : '');
+    bas.className = 'dugme' + (aktif ? ' aktif' : '') + (bitmis ? ' bitmis' : '') +
+      (kilitli ? ' kilitli' : '') + (renkli ? ' ozel' : '');
     bas.style.setProperty('--dugme-renk', bolumRengi);
-    bas.setAttribute('aria-label', ders.baslik);
-    bas.innerHTML = '<span class="dugme-ikon">' + (bitmis ? '✓' : dersIkon(ders)) + '</span>';
+    // Kilitli dairede ekran okuyucu "kilitli" desin.
+    bas.setAttribute('aria-label', ders.baslik + (kilitli ? ' (kilitli)' : ''));
+    if (kilitli) bas.setAttribute('aria-disabled', 'true');
+    bas.innerHTML = '<span class="dugme-ikon">' +
+      (kilitli ? '🔒' : (bitmis ? '✓' : dersIkon(ders))) + '</span>';
     bas.addEventListener('click', function (e) {
       e.stopPropagation();
       ayar.secildi(ders, kap);
     });
 
     const ad = document.createElement('div');
-    ad.className = 'dugme-ad' + (bitmis ? ' bitmis' : '') + (aktif ? ' aktif' : '');
+    ad.className = 'dugme-ad' + (bitmis ? ' bitmis' : '') + (aktif ? ' aktif' : '') +
+      (kilitli ? ' kilitli' : '');
     ad.textContent = ders.baslik;
 
     kap.append(bas, ad);

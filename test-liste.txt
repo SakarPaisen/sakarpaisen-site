@@ -1,0 +1,163 @@
+
+> sakar-paisen@1.0.0 test:liste
+> playwright test --list
+
+Listing tests:
+  [masaustu] › _gecici-kana.spec.mjs:4:1 › kana.js durumu
+  [masaustu] › _gecici-kapsam.spec.mjs:4:1 › app.js motorunun bekledigi global isimler
+  [masaustu] › _gecici-oyun.spec.mjs:4:1 › ders gercekten oynanabiliyor
+  [masaustu] › _gecici-qa.spec.mjs:4:1 › hangi HTML sayfalari NAVIGASYONDA dogru geliyor
+  [masaustu] › ayarlar.spec.mjs:8:3 › Ayarlar sayfası › kayıt varsa açılır, bölümler görünür
+  [masaustu] › ayarlar.spec.mjs:18:3 › Ayarlar sayfası › tema seçilince html[data-tema] yazılır ve kaydedilir
+  [masaustu] › ayarlar.spec.mjs:41:3 › Ayarlar sayfası › zorluk seçimi kaydedilir ve Canlı açıklama güncellenir
+  [masaustu] › ayarlar.spec.mjs:59:3 › Ayarlar sayfası › animasyon anahtarı kapalıyken data-animasyon="0" olur
+  [masaustu] › ayarlar.spec.mjs:71:3 › Ayarlar sayfası › sadece ayarları sıfırla ilerlemeyi SİLMEZ
+  [masaustu] › ayarlar.spec.mjs:92:3 › Ayarlar sayfası › kayıt yoksa giriş ekranına yönlendir
+  [masaustu] › ayarlar.spec.mjs:100:3 › Ayarlar sayfası › konsol hatası ve 404 yok
+  [masaustu] › ayarlar.spec.mjs:112:3 › İstatistik sayfası › kayıt varsa açılır ve özet kartları çizilir
+  [masaustu] › ayarlar.spec.mjs:121:3 › İstatistik sayfası › XP geçmişi olmadan da çöker değil (boş durum mesajı)
+  [masaustu] › ayarlar.spec.mjs:135:3 › İstatistik sayfası › XP kazanınca geçmiş kaydı oluşur ve grafik çizilir
+  [masaustu] › ayarlar.spec.mjs:164:3 › İstatistik sayfası › 7/30 gün sekmesi çalışır
+  [masaustu] › ayarlar.spec.mjs:179:3 › İstatistik sayfası › harf kaydı varsa harf kartları listelenir
+  [masaustu] › ayarlar.spec.mjs:199:3 › İstatistik sayfası › konsol hatası ve 404 yok
+  [masaustu] › ayarlar.spec.mjs:221:3 › Zorluk ayarı ders motorunu etkiler › Kolay seçilince 6 can, Zorlu seçilince 3 can gösterilir
+  [masaustu] › ayarlar.spec.mjs:238:3 › Zorluk ayarı ders motorunu etkiler › sınav (boss) canı zorluk ayarından ETKİLENMEZ
+  [masaustu] › ayarlar.spec.mjs:249:3 › Zorluk ayarı ders motorunu etkiler › ayar yoksa eski davranış: 4 can
+  [masaustu] › ayarlar.spec.mjs:261:5 › Tema tüm sayfalarda geçerli › /dojo.html koyu temayı uygular
+  [masaustu] › ayarlar.spec.mjs:261:5 › Tema tüm sayfalarda geçerli › /kelime.html koyu temayı uygular
+  [masaustu] › ayarlar.spec.mjs:261:5 › Tema tüm sayfalarda geçerli › /oyun.html?ders=1 koyu temayı uygular
+  [masaustu] › ders.spec.mjs:13:3 › Ders akışı › ders açılır, ilk adım öğretim kartıdır
+  [masaustu] › ders.spec.mjs:25:3 › Ders akışı › şık seçilince DEVAM ET ekranın İÇİNDE görünür
+  [masaustu] › ders.spec.mjs:37:3 › Ders akışı › şık seçilince anında geri bildirim gelir
+  [masaustu] › ders.spec.mjs:48:3 › Ders akışı › yanlış cevap canı düşür
+  [masaustu] › ders.spec.mjs:81:3 › Ders akışı › doğru cevap canı düşürmez
+  [masaustu] › ders.spec.mjs:89:3 › Ders akışı › ilerleme çubuğu ders boyunca ilerler
+  [masaustu] › ders.spec.mjs:109:3 › Ders akışı › ders boyunca flı soru tipleri çıkar (tek tip değil)
+  [masaustu] › ders.spec.mjs:139:3 › Ders akışı › canlar bitince "Tekrar dene" ekranı çıkar
+  [masaustu] › dinleme.spec.mjs:28:3 › Ders sonu "ne öğrendim" özeti › geçen harfler toplanır ve özet listesi döner
+  [masaustu] › dinleme.spec.mjs:47:3 › Ders sonu "ne öğrendim" özeti › ZORLANILAN harfler özet listesinin BAŞINA geçer
+  [masaustu] › dinleme.spec.mjs:66:3 › Ders sonu "ne öğrendim" özeti › her ders başında özet listesi sıfırlanır (öncekinin kalıntısı gelmez)
+  [masaustu] › dinleme.spec.mjs:86:3 › Ders sonu "ne öğrendim" özeti › KANA dışı id'ler özete girmez (kelime/kanji id sızması)
+  [masaustu] › dinleme.spec.mjs:105:3 › Ders sonu "ne öğrendim" özeti › ders sayfasında özet kutusu için CSS sınıfı tanımlı
+  [masaustu] › dinleme.spec.mjs:130:3 › Dinleme alıştırması › tur başlar, sorular üretilir ve doğru cevap şıklarda olur
+  [masaustu] › dinleme.spec.mjs:161:3 › Dinleme alıştırması › yanlış cevap 3 soru SONRA tekrar sorulur (spacing etkisi)
+  [masaustu] › dinleme.spec.mjs:198:3 › Dinleme alıştırması › doğru cevap sayacı doğru işler, karne hesaplanır
+  [masaustu] › dinleme.spec.mjs:223:3 › Dinleme alıştırması › yanlış cevap karıştırma defterine kaydedilir (yanlis.js entegrasyonu)
+  [masaustu] › dinleme.spec.mjs:243:3 › Dinleme alıştırması › 4 harften az biliniyorsa tur başlamaz (şıklar oluşamaz)
+  [masaustu] › dinleme.spec.mjs:259:3 › Dinleme alıştırması › dojo panelinde dinleme kısayolu var
+  [masaustu] › dinleme.spec.mjs:269:3 › Dinleme alıştırması › konsol hatası ve 404 yok
+  [masaustu] › dojo.spec.mjs:10:3 › Dojo haritası › harita açılır ve ders daireleri çizilir
+  [masaustu] › dojo.spec.mjs:18:3 › Dojo haritası › istatistikler görünür: seri, rütbe, XP
+  [masaustu] › dojo.spec.mjs:26:3 › Dojo haritası › XP değeri doğru gösterilir
+  [masaustu] › dojo.spec.mjs:33:3 › Dojo haritası › günlük hedef çubuğu görünür
+  [masaustu] › dojo.spec.mjs:44:5 › Dojo haritası › Tanıtım turu › ilk açılışta kendiliğinden çıkar
+  [masaustu] › dojo.spec.mjs:57:5 › Dojo haritası › Tanıtım turu › 4 kart gezilir, sonuncuda buton "ANLADIM" olur
+  [masaustu] › dojo.spec.mjs:73:5 › Dojo haritası › Tanıtım turu › kapatınca bir daha çıkmaz, ❓ ile tekrar açılır
+  [masaustu] › dojo.spec.mjs:101:3 › Dojo haritası › geri bildirim kutusu ve destek linki var
+  [masaustu] › giris.spec.mjs:15:3 › Giriş ekranı › temiz profilde adını yazma ekranı veya Google butonu çıkar
+  [masaustu] › giris.spec.mjs:29:3 › Giriş ekranı › ad girilince kayıt oluşur ve dojo butonu çıkar
+  [masaustu] › giris.spec.mjs:53:3 › Giriş ekranı › boş ad kabul edilmez
+  [masaustu] › giris.spec.mjs:65:3 › Giriş ekranı › kayıt varsa dojo.html açılır
+  [masaustu] › giris.spec.mjs:76:3 › Giriş ekranı › kayıt yoksa dojo girişe yönlendir
+  [masaustu] › giris.spec.mjs:83:3 › Giriş ekranı › kimlik girilmişse Google butonu görünür
+  [masaustu] › gorev.spec.mjs:9:3 › Günlük görevler › her gün 3 görev üretilir ve sayfa yenilenince DEĞİŞMEZ
+  [masaustu] › gorev.spec.mjs:24:3 › Günlük görevler › görevler panelde görünür ve ilerleme çubuğu var
+  [masaustu] › gorev.spec.mjs:34:3 › Günlük görevler › ders bitince ders görevinin ilerlemesi artar
+  [masaustu] › gorev.spec.mjs:61:3 › Günlük görevler › hedefe ulaşınca görev tamamlanır ve ödül bildirilir
+  [masaustu] › gorev.spec.mjs:79:3 › Günlük görevler › tamamlanan görev XP ödülü verir (odulHesapla > 0)
+  [masaustu] › gorev.spec.mjs:94:3 › Günlük görevler › gün değişince görevler sıfırlanır
+  [masaustu] › gorev.spec.mjs:119:3 › Başarımlar › liste yüklenir ve kilitli/açık durumu doğru
+  [masaustu] › gorev.spec.mjs:138:3 › Başarımlar › kontrol() yeni açılanları döndürür, ikinci kez döndürmez
+  [masaustu] › gorev.spec.mjs:154:3 › Başarımlar › dojo panelinde başarım kutusu ve ilerleme çubuğu var
+  [masaustu] › gorev.spec.mjs:167:3 › Başarımlar › başarım bandı ekranda belirir ve kaybolur
+  [masaustu] › gorev.spec.mjs:197:3 › Başarımlar › istatistik sayfasında TÜM başarımlar listelenir
+  [masaustu] › gorev.spec.mjs:211:3 › Başarımlar › konsol hatası ve 404 yok
+  [masaustu] › klavye.spec.mjs:11:3 › Klavye kısayolları › her şıkta numara rozeti görünür
+  [masaustu] › klavye.spec.mjs:21:3 › Klavye kısayolları › 1-4 tuşlarıyla şık seçilir
+  [masaustu] › klavye.spec.mjs:33:3 › Klavye kısayolları › Enter ile devam edilir
+  [masaustu] › klavye.spec.mjs:53:3 › Klavye kısayolları › Enter, buton odaklıyken iki kez tetiklenmez
+  [masaustu] › klavye.spec.mjs:74:3 › Dokunmatik cihaz davranışı › mobilde klavye ipucun görünmez ama numaralar kalır
+  [masaustu] › kombo.spec.mjs:9:3 › Kombo sistemi › üst üste doğruda çarpan kademeli artar, tavanda durur
+  [masaustu] › kombo.spec.mjs:31:3 › Kombo sistemi › yanlış cevap komboyu sıfırlar
+  [masaustu] › kombo.spec.mjs:50:3 › Kombo sistemi › kombo bonusu birikir ve temizle() sıfırlar
+  [masaustu] › kombo.spec.mjs:68:3 › Kombo sistemi › ders bitişinde kombo rozeti ve bonus XP görünür
+  [masaustu] › kombo.spec.mjs:82:3 › Kombo sistemi › kombo göstergesi ekranda belirir (2+ doğru)
+  [masaustu] › kombo.spec.mjs:96:3 › Günlük hediye › günde bir kez açılabilir, ikinci kez açılamaz
+  [masaustu] › kombo.spec.mjs:116:3 › Günlük hediye › seri büyüdükçe ödül artar
+  [masaustu] › kombo.spec.mjs:139:3 › Günlük hediye › hediye XP si gerçekten Ilerleme.xp() değerini artırır
+  [masaustu] › kombo.spec.mjs:156:3 › Günlük hediye › dojo panelinde sandık butonu görünür ve tıklanabilir
+  [masaustu] › kombo.spec.mjs:174:3 › Sensei öğüdü › bağlama göre doğru cümle seçer (tekrar varsa tekrarı söyler)
+  [masaustu] › kombo.spec.mjs:195:3 › Sensei öğüdü › günlük hedefe yaklaşınca kalan XP söyler
+  [masaustu] › kombo.spec.mjs:212:3 › Sensei öğüdü › uzun aradan sonra karşılama cümlesi gelir
+  [masaustu] › kombo.spec.mjs:229:3 › Sensei öğüdü › hiç özel durum yoksa genel teşvik verir (boş dönmez)
+  [masaustu] › kombo.spec.mjs:246:3 › Sensei öğüdü › dojo sayfasında öğüt balonu görünür
+  [masaustu] › kombo.spec.mjs:258:3 › Sensei öğüdü › ziyaret tarihi kaydedilir (bir sonraki giriş için)
+  [masaustu] › kombo.spec.mjs:269:3 › Sensei öğüdü › konsol hatası ve 404 yok
+  [masaustu] › modul.spec.mjs:6:3 › Yeni modüller (analitik + bulut) › giriş sayfasında analitik/reklam/bulut yüklenir
+  [masaustu] › modul.spec.mjs:19:3 › Yeni modüller (analitik + bulut) › modüller durumlarını doğru bildir (acik() tutarlı)
+  [masaustu] › modul.spec.mjs:39:3 › Yeni modüller (analitik + bulut) › reklam localhost ta KAPALI (AdSense sahte tıklama saymasın)
+  [masaustu] › modul.spec.mjs:48:3 › Yeni modüller (analitik + bulut) › kapalıyken analitik/reklam dış istek yapmaz (gizlilik)
+  [masaustu] › modul.spec.mjs:68:3 › Yeni modüller (analitik + bulut) › reklam alanı yerelde görünmez (site bozulmasın)
+  [masaustu] › modul.spec.mjs:79:3 › Yeni modüller (analitik + bulut) › oyun sayfasında da yüklenir
+  [masaustu] › plan.spec.mjs:28:3 › Çalışma planı › plan en fazla 3 adım verir ve her adımın eylemi vardır
+  [masaustu] › plan.spec.mjs:46:3 › Çalışma planı › adımlar önem sırasına göre dizilir (en acil önce)
+  [masaustu] › plan.spec.mjs:60:3 › Çalışma planı › karıştırılan harf varsa planda karıştırma adımı çıkar
+  [masaustu] › plan.spec.mjs:69:3 › Çalışma planı › aynı URL iki kez gösterilmez (tekrar olmasın)
+  [masaustu] › plan.spec.mjs:78:3 › Çalışma planı › toplam süre doğru hesaplanır
+  [masaustu] › plan.spec.mjs:91:3 › Çalışma planı › hiçbir şey kalmadıysa tebrik adımı çıkar (boş plan olmaz)
+  [masaustu] › plan.spec.mjs:108:3 › Çalışma planı › dojo panelinde plan kutusu çizilir
+  [masaustu] › plan.spec.mjs:123:3 › Çalışma planı › plan adımına tıklanınca doğru ders açılır
+  [masaustu] › plan.spec.mjs:138:3 › Sözlük › içerik toplanır: harf, kelime ve kanji bulunur
+  [masaustu] › plan.spec.mjs:151:3 › Sözlük › romaji ile harf bulunur
+  [masaustu] › plan.spec.mjs:162:3 › Sözlük › JAPONCA karakterle arama çalışır
+  [masaustu] › plan.spec.mjs:172:3 › Sözlük › aynı sesin iki alfabesi de bulunur (あ ve ア)
+  [masaustu] › plan.spec.mjs:182:3 › Sözlük › Türkçe karakterli arama toleranslı çalışır (ç/ş/ğ/ı)
+  [masaustu] › plan.spec.mjs:203:3 › Sözlük › tür filtresi yalnızca o türü getirir
+  [masaustu] › plan.spec.mjs:218:3 › Sözlük › tam eşleşme listenin EN ÜSTÜNDE olur
+  [masaustu] › plan.spec.mjs:231:3 › Sözlük › olmayan arama boş döner (hata vermez)
+  [masaustu] › plan.spec.mjs:246:3 › Sözlük › arayüz: yazınca sonuç listesi çizilir ve tür etiketleri görünür
+  [masaustu] › plan.spec.mjs:269:3 › Sözlük › tür filtresi düğmeleri çalışır
+  [masaustu] › plan.spec.mjs:286:3 › Sözlük › konsol hatası ve 404 yok
+  [masaustu] › serit.spec.mjs:27:5 › Durum şeridi — her sayfada oyun durumu › /istatistik.html sayfasında şerit görünür ve dolu
+  [masaustu] › serit.spec.mjs:27:5 › Durum şeridi — her sayfada oyun durumu › /ayarlar.html sayfasında şerit görünür ve dolu
+  [masaustu] › serit.spec.mjs:27:5 › Durum şeridi — her sayfada oyun durumu › /kelime.html sayfasında şerit görünür ve dolu
+  [masaustu] › serit.spec.mjs:45:3 › Durum şeridi — her sayfada oyun durumu › seri bugün yapılmadıysa şeritte uyarı vurgusu çıkar
+  [masaustu] › serit.spec.mjs:69:3 › Durum şeridi — her sayfada oyun durumu › görev sayacına tıklayınca dojo açılır
+  [masaustu] › serit.spec.mjs:81:3 › Durum şeridi — her sayfada oyun durumu › YENİ kullanıcıda (kayıt yokken) şerit çıkmaz
+  [masaustu] › serit.spec.mjs:94:3 › Giriş ekranı — günlük hediye › girişte büyük hediye butonu çıkar ve sandığı açar
+  [masaustu] › serit.spec.mjs:112:3 › Giriş ekranı — günlük hediye › hediye alındıktan sonra buton bir daha çıkmaz (aynı gün)
+  [masaustu] › serit.spec.mjs:131:3 › Giriş ekranı — günlük hediye › giriş ekranında görev özeti görünür
+  [masaustu] › serit.spec.mjs:144:3 › Giriş ekranı — günlük hediye › girişte şeritteki hediye rozeti TEKRARLANMAZ
+  [masaustu] › serit.spec.mjs:161:3 › Kelime defteri — görev paneli › görev paneli görünür ve satırlar çizilir
+  [masaustu] › serit.spec.mjs:171:3 › Kelime defteri — görev paneli › görevler defterdekiyle aynı (tutarlı)
+  [masaustu] › serit.spec.mjs:187:5 › Yerleşim sağlığı › /index.html: konsol hatası ve 404 yok
+  [masaustu] › serit.spec.mjs:187:5 › Yerleşim sağlığı › /istatistik.html: konsol hatası ve 404 yok
+  [masaustu] › serit.spec.mjs:187:5 › Yerleşim sağlığı › /ayarlar.html: konsol hatası ve 404 yok
+  [masaustu] › serit.spec.mjs:187:5 › Yerleşim sağlığı › /kelime.html: konsol hatası ve 404 yok
+  [masaustu] › sinav.spec.mjs:47:3 › Yanlış defteri (karıştırılan harfler) › karıştırma kaydedilir ve tekrar okunur
+  [masaustu] › sinav.spec.mjs:65:3 › Yanlış defteri (karıştırılan harfler) › SIRALI kayıt: (a,b) ile (b,a) AYNI çift sayılır
+  [masaustu] › sinav.spec.mjs:83:3 › Yanlış defteri (karıştırılan harfler) › en çok karıştırılanlar doğru sıralanır
+  [masaustu] › sinav.spec.mjs:95:3 › Yanlış defteri (karıştırılan harfler) › zorSiklar: çok karıştırılan partneri döndür
+  [masaustu] › sinav.spec.mjs:111:3 › Yanlış defteri (karıştırılan harfler) › aynı harf kendisiyle çift oluşturmaz
+  [masaustu] › sinav.spec.mjs:125:3 › Yanlış defteri (karıştırılan harfler) › istatistik sayfasında karıştırılan harfler bölümü çizilir
+  [masaustu] › sinav.spec.mjs:136:3 › Yanlış defteri (karıştırılan harfler) › karıştırma yoksa bölüm hiç çıkmaz
+  [masaustu] › sinav.spec.mjs:146:3 › Sınav modu › ?ders=sinav gerçekten sınav açar (ders 1 DEĞİL)
+  [masaustu] › sinav.spec.mjs:162:3 › Sınav modu › sınavda 3 can olur (normal derste 4)
+  [masaustu] › sinav.spec.mjs:173:3 › Sınav modu › uret(): her soruda doğru cevap şıklarda VAR
+  [masaustu] › sinav.spec.mjs:200:3 › Sınav modu › uret() şema doğru: motorun beklediği alanlar
+  [masaustu] › sinav.spec.mjs:226:3 › Sınav modu › karıştırılan harfler sınavda AĞIRLIKLI sorulur
+  [masaustu] › sinav.spec.mjs:270:3 › Sınav modu › dojo panelinde sınav kısayolu var ve çalışıyor
+  [masaustu] › sinav.spec.mjs:283:3 › Sınav modu › sınavda yıldız KAYDEDİLMEZ (müfredat dairesi değil)
+  [masaustu] › sinav.spec.mjs:295:3 › Sınav modu › konsol hatası ve 404 yok
+  [masaustu] › yayin.spec.mjs:17:5 › Yayın sağlığı › Giriş: konsol hatası ve 404 yok
+  [masaustu] › yayin.spec.mjs:17:5 › Yayın sağlığı › Dojo: konsol hatası ve 404 yok
+  [masaustu] › yayin.spec.mjs:17:5 › Yayın sağlığı › Ders (harf): konsol hatası ve 404 yok
+  [masaustu] › yayin.spec.mjs:17:5 › Yayın sağlığı › Ders (test): konsol hatası ve 404 yok
+  [masaustu] › yayin.spec.mjs:41:3 › Yayın sağlığı › tanıtım turu kapalıyken dojo temiz açılır
+  [masaustu] › yayin.spec.mjs:58:3 › Yayın sağlığı › service worker kaydı hata vermez
+  [mobil] › klavye.spec.mjs:11:3 › Klavye kısayolları › her şıkta numara rozeti görünür
+  [mobil] › klavye.spec.mjs:21:3 › Klavye kısayolları › 1-4 tuşlarıyla şık seçilir
+  [mobil] › klavye.spec.mjs:33:3 › Klavye kısayolları › Enter ile devam edilir
+  [mobil] › klavye.spec.mjs:53:3 › Klavye kısayolları › Enter, buton odaklıyken iki kez tetiklenmez
+  [mobil] › klavye.spec.mjs:74:3 › Dokunmatik cihaz davranışı › mobilde klavye ipucun görünmez ama numaralar kalır
+Total: 157 tests in 17 files

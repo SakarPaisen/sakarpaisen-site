@@ -60,13 +60,34 @@ const sunucu = createServer(async (req, res) => {
     return;
   }
 
+  // ÖNEMLİ: GELİŞTİRME SUNUCUSUNDA SERVICE WORKER TAMAMEN KAPALI.
+  //
+  // NEDEN: Bu sunucu yerel geliştirme/test için kullanılıyor. Testler ve QA
+  // tarayıcı oturumları aynı kalıcı profili (ör. ~/.codegpt/ab-sessions/...)
+  // paylaştığı için sw.js'in önbelleği ORTAMLAR ARASINDA TAŞINIYOR.
+  // Gerçek olay: diskte
+  //   Service Worker/CacheStorage/.../<kayit>  ->  http://localhost:8000/oyun.html
+  // kaydı bulundu; profil başka bir portta (8321) çalışırken tarayıcı bu
+  // önbelleği o port için de kullandı ve oyun.html isteğine sıfırlanmış
+  // giriş sayfası döndü. Sonuç: app.js çalışıyor, ama beklediği #sahne
+  // bulunmadığı için sessizce duruyordu ve ders hiç açılmıyordu.
+  // 'no-store' başlığı bunu ENGELLEMEZ: service worker önbelleği ayrı bir
+  // katmandır ve fetch'i başlıklardan önce karşılar.
+  //
+  // ÇÖZÜM: sw.js'i hiç servis etme (404). Kayıtlı bir SW olsa bile güncelleme
+  // isteği başarısız olur; SW'nin fetch yolu tarayıcıya değil önbelleğe baktığı
+  // için sayfa BOZULMAZ, sadece önbellek devreden çıkar. Canlı sitede
+  // (gerçek alan adı) service worker etkilenmez, orada sw.js normal servis edilir.
+  const swIstegi = rel === 'sw.js';
+
   try {
+    if (swIstegi) throw new Error('service worker gelistirmede kapali');
     const bilgi = await stat(tam);
     if (!bilgi.isFile()) throw new Error('dosya degil');
     const govde = await readFile(tam);
     const tur = MIME[extname(tam).toLowerCase()] || 'application/octet-stream';
-    // ÖNEMLİ: Önbellekleme kapalı. Service worker + tarayıcı önbelleği test
-    // sırasında eski dosyayı döndürüp yanıltıcı sonuç verebiliyor.
+    // Önbellekleme kapalı. 'no-store' service worker önbelleğini kapsamaz;
+    // asıl koruma yukarıdaki 'sw.js hiç servis edilmez' kuralıdır.
     res.writeHead(200, {
       'Content-Type': tur,
       'Content-Length': govde.length,
@@ -77,7 +98,9 @@ const sunucu = createServer(async (req, res) => {
     // ÖNEMLİ: "her isteğe index.html ver" fallback'i YOK.
     // Böyle bir fallback, oyun.html istendiğinde giriş ekranının servis
     // edilmesine ve dersin hiç açılmamasına yol açıyordu.
-    const govde = Buffer.from('Bulunamadi: ' + rel, 'utf8');
+    const govde = Buffer.from(swIstegi
+      ? 'sw.js gelistirme sunucusunda bilerek devre disi (bkz. sunucu.mjs)'
+      : 'Bulunamadi: ' + rel, 'utf8');
     res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8', 'Content-Length': govde.length });
     res.end(govde);
   }

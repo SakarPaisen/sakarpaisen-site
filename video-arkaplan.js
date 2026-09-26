@@ -58,10 +58,34 @@
   }
 
   function dikeyMi() {
-    // Yükseklik > genişlik ise dikey; ama geniş ekranda oturmak için
-    // 820px altı genişlikte de dikey kabul ediyoruz (telefon yatay da olabilir,
-    // bu durumda yatay video daha doğru olur — o yüzden ikisini de kontrol et).
-    return window.innerHeight > window.innerWidth;
+    // AMAÇ: "telefon/tablet" ile "dar masaüstü penceresi"ni ayırmak.
+    //
+    // SORUN: Eskiden yalnızca yükseklik > genişlik diye bakılıyordu. Bu yüzden
+    // masaüstünde pencereyi dikey daraltan (ör. 900x1000) kullanıcıya DİKEY
+    // (9:16) video gönderiliyordu; videonun kenarları kesiliyor, kadraj bozuk
+    // görünüyordu. Masaüstü kullanıcısı yatay video görmeli.
+    //
+    // ÇÖZÜM: Yön kararı artık ÜÇ koşulun birleşimi:
+    //   1) Yükseklik > genişlik         -> dikey oran
+    //   2) Genişlik telefon/tablet ölçüsünde (<= 820px)
+    //   3) Cihaz gerçekten dokunmatik  -> masaüstünü kesin dışlar
+    //
+    // 3. koşul neden: 900x1000'lik daraltılmış masaüstü penceresi 1. ve 2.'yi
+    // sağlayabilir; dokunmatik kontrolü olmadan yanlış eşleşiyordu.
+    // Dokunmatik olmayan cihazda (masaüstü) daima YATAY video seçilir.
+    const oranDikey = window.innerHeight > window.innerWidth;
+    const darEkran = Math.min(window.innerWidth, window.innerHeight) <= 820;
+    let dokunmatik = false;
+    try {
+      dokunmatik = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+      // 'coarse' = parmak, 'fine' = fare/imleç. Dokunmatik ekranlı dizüstü
+      // sırasında 'fine' döner; o yüzden bu kontrol tek başına yetmez, yalnızca
+      // pozitif dokunmatik bulgusunu güçlendirmek için kullanılır.
+      if (!dokunmatik && window.matchMedia) {
+        dokunmatik = window.matchMedia('(pointer: coarse)').matches;
+      }
+    } catch (e) { }
+    return oranDikey && darEkran && dokunmatik;
   }
 
   // Hangi opsiyonel dosyalar var? Sayfaya data-* ile bildirilir:

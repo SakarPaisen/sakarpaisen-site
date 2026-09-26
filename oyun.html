@@ -1,9 +1,17 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sakar Paisen | Antrenman</title>
+    <meta name="description" content="Sakar Paisen antrenmanında Japonca harflerini sorular, dinleme ve yazma alıştırmalarıyla pekiştir.">
+    <meta property="og:title" content="Sakar Paisen | Antrenman">
+    <meta property="og:description" content="Japonca harflerini sorular ve alıştırmalarla pekiştir.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sakarpaisen.com/oyun.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Sakar Paisen | Antrenman">
+    <meta name="twitter:description" content="Japonca antrenmanına başla.">
     <meta name="theme-color" content="#e63946">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -121,7 +129,7 @@
         .devam-btn { color: white; border: none; padding: 15px 40px; border-radius: 14px; font-size: 19px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; cursor: pointer; display: none; width: 100%; max-width: 400px; font-family: inherit; }
         .devam-btn:active { transform: translateY(5px); box-shadow: none !important; }
 
-        /* �?ıkka basınca anında geri bildirim: buton kısa bir "tepki" verir */
+        /* Şıkka basınca anında geri bildirim: buton kısa bir "tepki" verir */
         .secenek.sik-animasyon { animation: sikTepki .32s cubic-bezier(.34, 1.56, .64, 1); }
         @keyframes sikTepki {
             0%   { transform: scale(1); }
@@ -211,7 +219,7 @@
           100% { opacity: 1; transform: scale(1); filter: blur(0); }
         }
 
-        /* --- 4) �?ıklar: soldan sırayla düşer (kademeli) --- */
+        /* --- 4) Şıklar: soldan sırayla düşer (kademeli) --- */
         .secenek-gir { animation: secenekGir .32s cubic-bezier(.2,.9,.3,1) both; }
         @keyframes secenekGir {
           0%   { opacity: 0; transform: translateY(-14px) scale(.94); }
@@ -341,15 +349,6 @@
         }
         .sonraki-oneri .so-ad { font-size: 15px; font-weight: 800; color: var(--mor); }
 
-        /* Netlify Drop ile yayında Netlify'ın eklediği "Powered by Netlify" şeridi sol altta durur.
-           Bu şerit ders ekranının alt barına / DEVAM ET butonuna binmesin diye onun boyu kadar yer ayırıyoruz.
-           �?erit yoksa (Git ile yayın) bu kuralların hiçbiri uygulanmaz. */
-        #netlify-badge { z-index: 40 !important; bottom: 6px !important; left: 10px !important;
-                         background: var(--kart) !important; border: 2px solid var(--cizgi) !important;
-                         border-radius: 999px !important; padding: 1px !important; }
-        body:has(#netlify-badge) { padding-bottom: 68px; }
-        body:has(#netlify-badge) .alt-bar { min-height: 156px; }
-        @media (max-width: 640px) { #netlify-badge { transform: scale(.86); transform-origin: bottom left; } }
 
         /* Ders sırasında bir hata oluşursa sağ altta küçük bir uyarı çıkar */
         .hata-uyari { position: fixed; right: 14px; bottom: 14px; z-index: 60; display: flex; align-items: center;
@@ -418,12 +417,12 @@
     <script>window.addEventListener('load', function () { if (window.Analitik) window.Analitik.sayfa('oyun'); });</script>
     <!-- AYARLAR: zorluk (can/soru/XP) ve animasyon. app.js bunları okur. -->
     <script src="ayarlar.js?v=1"></script>
-    <!-- GÖNLÜK GÖREVLER + BA�?ARIMLAR: ders bitince app.js bunları kontrol eder. -->
+    <!-- GÖNLÜK GÖREVLER + BAŞARIMLAR: ders bitince app.js bunları kontrol eder. -->
     <script src="gorevler.js?v=2"></script>
     <script src="basarimlar.js?v=2"></script>
     <!-- KOMBO: ders içinde üst üste doğru cevap çarpanı (app.js kullanır) -->
     <script src="kombo.js?v=1"></script>
-    <!-- YANLI�? DEFTERİ + SINAV: hangi harfleri karıştırdığını takip eder,
+    <!-- YANLIŞ DEFTERİ + SINAV: hangi harfleri karıştırdığını takip eder,
          sınav modu bu bilgiyi kullanarak "zorlayan" şıklar üretir. -->
     <script src="yanlis.js?v=1"></script>
     <script src="sinav.js?v=1"></script>
@@ -436,6 +435,5 @@
          Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
          KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli (aynı negatif
          z-index'te sonra gelen katman üstte görünür). -->
-    <script src="video-arkaplan.js?v=4"></script>
 </body>
 </html>

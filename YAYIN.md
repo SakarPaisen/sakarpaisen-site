@@ -1,8 +1,7 @@
-# Yayına alma (Netlify) — adım adım
+# Yayına alma (GitHub + Vercel)
 
-Site saf statik dosyalardan oluşur, derleme gerekmez. Netlify'a sürükle-bırak ile
-yayınlanır. **HTTPS otomatik gelir** — bu sayede PWA (telefona uygulama olarak
-yükleme) ilk kez gerçekten çalışır.
+Site saf statik dosyalardan oluşur, derleme gerekmez. GitHub bağlı Vercel projesi üzerinden
+yayınlanır. Build gerekmez; Vercel `sakarpaisen.com` alan adını ve HTTPS'i otomatik yönetir.
 
 ## 1) Geri bildirim kutusunu bağla (bir kez yapılır)
 

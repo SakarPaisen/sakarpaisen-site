@@ -25,10 +25,27 @@
         if (metin != null) e.textContent = metin;
         return e;
     }
-    // Romaji karşılaştırma: büyük/küçük harf ve fazla boşluk sorun olmasın.
-    // "Shi" ile "shi" aynı sayılır; "shi " de kabul edilir.
+    // Romaji karşılaştırma: büyük/küçük harf, boşluk ve yaygın yazım
+    // varyantları sorun olmasın. Örn. し için shi/si ikisi de doğrudur.
     function normalize(s) {
-        return String(s || '').toLowerCase().trim().replace(/\s+/g, '');
+        return String(s || '').toLowerCase().trim()
+            .replace(/\s+/g, '')
+            .replace(/[ō]/g, 'ou').replace(/[ū]/g, 'uu')
+            .replace(/[ā]/g, 'aa').replace(/[ē]/g, 'ee');
+    }
+    const ROMAJI_VARYANTLARI = {
+        shi: ['si'], chi: ['ti'], tsu: ['tu'], fu: ['hu'],
+        ji: ['zi'], wo: ['o'],
+        sha: ['sya'], shu: ['syu'], sho: ['syo'],
+        cha: ['tya', 'cya'], chu: ['tyu', 'cyu'], cho: ['tyo', 'cyo'],
+        ja: ['zya', 'jya'], ju: ['zyu', 'jyu'], jo: ['zyo', 'jyo'],
+        n: ['nn', "n'"]
+    };
+    function romajiDogruMu(yazilan, dogru) {
+        const cevap = normalize(yazilan);
+        const temel = normalize(dogru);
+        return [temel].concat(ROMAJI_VARYANTLARI[temel] || [])
+            .map(normalize).indexOf(cevap) !== -1;
     }
 
     // Öğrencinin yazdığı romaji, başka bir harfe aitse o harfi "karıştırılan"
@@ -223,7 +240,7 @@
         const id = sorular[sira];
         const e = KANA[id];
         const yazilan = girisEl.value;
-        const dogruMu = normalize(yazilan) === normalize(e.r);
+        const dogruMu = romajiDogruMu(yazilan, e.r);
 
         if (!normalize(yazilan)) {
             geriEl.className = 'yz-geri hata';

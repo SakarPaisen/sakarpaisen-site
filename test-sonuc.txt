@@ -1,0 +1,322 @@
+
+> sakar-paisen@1.0.0 test
+> playwright test
+
+
+Running 157 tests using 1 worker
+
+DURUM: {
+ "kanaBetigi": [
+  "kana.js?v=17"
+ ],
+ "appBetigi": [
+  "app.js?v=24"
+ ],
+ "kanaGlobalVar": "undefined",
+ "dersUretVar": "function",
+ "kanaYuklendiMi": true
+}
+OLAYLAR: [
+ "KONSOL[info]: [giriş] Google girişi açık. İstemci kimliği: 919231297764-b42ipapn40a8v16201gtqt1eoljm6s4l.apps.googleusercontent.com",
+ "KONSOL[info]: [giriş] Yetkili JavaScript kaynağı olarak şu adresleri eklemiş olmalısın:\n         https://sakarpaisen.com\n         https://www.sakarpaisen.com\n         http://localhost:8000   (yerelde denemek için)",
+ "YANIT 200 kana.js?v=17",
+ "KONSOL[info]: [reading.js] Sözlük ve cümleler tutarlı: 308 kelime, 118 cümle.",
+ "YANIT 200 app.js?v=24",
+ "KONSOL[info]: [kanji-cumle.js] 52 kanjili cümle tutarlı.",
+ "KONSOL[info]: [kanji.js] Kanji verisi tutarlı: 90 kanji, 15 grup.",
+ "KONSOL[warning]: [sahne3d] Shader derlenemedi: ERROR: 0:37: 'modelViewMatrix' : undeclared identifier\nERROR: 0:38: 'projectionMatrix' : undeclared identifier\nERROR: 0:47: 'gl_PointCoord' : undeclared identifier\n"
+]
+  ok   1 [masaustu] › tests\_gecici-kana.spec.mjs:4:1 › kana.js durumu (1.8s)
+KAPSAM: {
+ "KANA": {
+  "windowda": "undefined",
+  "kodKapsaminda": "object"
+ },
+ "KANA_TABLO": {
+  "windowda": "undefined",
+  "kodKapsaminda": "object"
+ },
+ "KANA_GRUPLAR": {
+  "windowda": "undefined",
+  "kodKapsaminda": "object"
+ },
+ "dersUret": {
+  "windowda": "function",
+  "kodKapsaminda": "function"
+ },
+ "kanaTekrarUret": {
+  "windowda": "function",
+  "kodKapsaminda": "function"
+ },
+ "kanaPekistirUret": {
+  "windowda": "function",
+  "kodKapsaminda": "function"
+ },
+ "MUFREDAT": {
+  "windowda": "undefined",
+  "kodKapsaminda": "object"
+ },
+ "Ilerleme": {
+  "windowda": "object",
+  "kodKapsaminda": "object"
+ },
+ "Ses": {
+  "windowda": "object",
+  "kodKapsaminda": "object"
+ },
+ "Kombo": {
+  "windowda": "object",
+  "kodKapsaminda": "object"
+ },
+ "Ayarlar": {
+  "windowda": "object",
+  "kodKapsaminda": "object"
+ },
+ "Gorevler": {
+  "windowda": "object",
+  "kodKapsaminda": "object"
+ },
+ "Basarimlar": {
+  "windowda": "object",
+  "kodKapsaminda": "object"
+ },
+ "Yanlis": {
+  "windowda": "object",
+  "kodKapsaminda": "object"
+ },
+ "Sinav": {
+  "windowda": "object",
+  "kodKapsaminda": "object"
+ },
+ "READING": {
+  "windowda": "object",
+  "kodKapsaminda": "object"
+ },
+ "KANJI": {
+  "windowda": "object",
+  "kodKapsaminda": "object"
+ },
+ "KelimeDefteri": {
+  "windowda": "object",
+  "kodKapsaminda": "object"
+ },
+ "Hediye": {
+  "windowda": "undefined",
+  "kodKapsaminda": "YOK"
+ },
+ "SORULAR": {
+  "windowda": "object",
+  "kodKapsaminda": "object"
+ },
+ "Analitik": {
+  "windowda": "object",
+  "kodKapsaminda": "object"
+ },
+ "Reklam": {
+  "windowda": "object",
+  "kodKapsaminda": "object"
+ },
+ "registerDers": {
+  "windowda": "function",
+  "kodKapsaminda": "function"
+ }
+}
+HATALAR: []
+  ok   2 [masaustu] › tests\_gecici-kapsam.spec.mjs:4:1 › app.js motorunun bekledigi global isimler (1.7s)
+ILK EKRAN: {"sp":"oyun","baslik":"Sakar Paisen | Antrenman","tip":"ogret","adimMetni":"İlk harfimiz!","canlar":"❤️❤️❤️❤️","hataListesi":"hata yok","hataUyariVar":false,"sahneIcerik":"<div class=\"mesaj mesaj-renkli\">İlk harfimiz!</div><div class=\"kart\"><img src=\"alfabe/hiragana/a.webp\" alt=\"a\"><div class=\"kart-ja\" style=\"font-size: 64px;\">あ</div><div class=\"kart-ro\">a</div><button class=\"ses-btn\">🔊</button></div><div class=\"ornek-kart\" title=\"Dinlemek için tıkla\" style=\"cursor: "}
+CEVAP SONRASI: {"bildirim":"✓ Aynen öyle!","devamGorunur":true,"ilerleme":"11.7647%"}
+SONRAKI ADIM: {"tip":"ogret","ilerleme":"17.6471%"}
+  ok   3 [masaustu] › tests\_gecici-oyun.spec.mjs:4:1 › ders gercekten oynanabiliyor (4.5s)
+NAV /oyun.html?ders=1 -> sp-sayfa=oyun | Sakar Paisen | Antrenman
+NAV /dojo.html -> sp-sayfa=YOK | Sakar Paisen | Dojo Haritası
+NAV /kelime.html -> sp-sayfa=kelime | Sakar Paisen | Kelime Defterim
+NAV /ayarlar.html -> sp-sayfa=ayarlar | Sakar Paisen | Ayarlar
+NAV /index.html -> sp-sayfa=YOK | Sakar Paisen | Japonca Öğren
+  x    4 [masaustu] › tests\_gecici-qa.spec.mjs:4:1 › hangi HTML sayfalari NAVIGASYONDA dogru geliyor (4.8s)
+  ok   5 [masaustu] › tests\ayarlar.spec.mjs:8:3 › Ayarlar sayfası › kayıt varsa açılır, bölümler görünür (2.1s)
+  x    6 [masaustu] › tests\ayarlar.spec.mjs:18:3 › Ayarlar sayfası › tema seçilince html[data-tema] yazılır ve kaydedilir (2.2s)
+  ok   7 [masaustu] › tests\ayarlar.spec.mjs:41:3 › Ayarlar sayfası › zorluk seçimi kaydedilir ve Canlı açıklama güncellenir (2.2s)
+  ok   8 [masaustu] › tests\ayarlar.spec.mjs:59:3 › Ayarlar sayfası › animasyon anahtarı kapalıyken data-animasyon="0" olur (2.0s)
+  ok   9 [masaustu] › tests\ayarlar.spec.mjs:71:3 › Ayarlar sayfası › sadece ayarları sıfırla ilerlemeyi SİLMEZ (3.0s)
+  ok  10 [masaustu] › tests\ayarlar.spec.mjs:92:3 › Ayarlar sayfası › kayıt yoksa giriş ekranına yönlendir (2.0s)
+  ok  11 [masaustu] › tests\ayarlar.spec.mjs:100:3 › Ayarlar sayfası › konsol hatası ve 404 yok (3.0s)
+  ok  12 [masaustu] › tests\ayarlar.spec.mjs:112:3 › İstatistik sayfası › kayıt varsa açılır ve özet kartları çizilir (2.1s)
+  ok  13 [masaustu] › tests\ayarlar.spec.mjs:121:3 › İstatistik sayfası › XP geçmişi olmadan da çöker değil (boş durum mesajı) (2.1s)
+  ok  14 [masaustu] › tests\ayarlar.spec.mjs:135:3 › İstatistik sayfası › XP kazanınca geçmiş kaydı oluşur ve grafik çizilir (2.3s)
+  ok  15 [masaustu] › tests\ayarlar.spec.mjs:164:3 › İstatistik sayfası › 7/30 gün sekmesi çalışır (2.9s)
+  ok  16 [masaustu] › tests\ayarlar.spec.mjs:179:3 › İstatistik sayfası › harf kaydı varsa harf kartları listelenir (2.3s)
+  ok  17 [masaustu] › tests\ayarlar.spec.mjs:199:3 › İstatistik sayfası › konsol hatası ve 404 yok (3.0s)
+  ok  18 [masaustu] › tests\ayarlar.spec.mjs:221:3 › Zorluk ayarı ders motorunu etkiler › Kolay seçilince 6 can, Zorlu seçilince 3 can gösterilir (4.3s)
+  ok  19 [masaustu] › tests\ayarlar.spec.mjs:238:3 › Zorluk ayarı ders motorunu etkiler › sınav (boss) canı zorluk ayarından ETKİLENMEZ (2.7s)
+  ok  20 [masaustu] › tests\ayarlar.spec.mjs:249:3 › Zorluk ayarı ders motorunu etkiler › ayar yoksa eski davranış: 4 can (2.3s)
+  ok  21 [masaustu] › tests\ayarlar.spec.mjs:261:5 › Tema tüm sayfalarda geçerli › /dojo.html koyu temayı uygular (2.4s)
+  ok  22 [masaustu] › tests\ayarlar.spec.mjs:261:5 › Tema tüm sayfalarda geçerli › /kelime.html koyu temayı uygular (2.3s)
+  ok  23 [masaustu] › tests\ayarlar.spec.mjs:261:5 › Tema tüm sayfalarda geçerli › /oyun.html?ders=1 koyu temayı uygular (2.3s)
+  ok  24 [masaustu] › tests\ders.spec.mjs:13:3 › Ders akışı › ders açılır, ilk adım öğretim kartıdır (1.7s)
+  ok  25 [masaustu] › tests\ders.spec.mjs:25:3 › Ders akışı › şık seçilince DEVAM ET ekranın İÇİNDE görünür (1.9s)
+  ok  26 [masaustu] › tests\ders.spec.mjs:37:3 › Ders akışı › şık seçilince anında geri bildirim gelir (1.7s)
+  ok  27 [masaustu] › tests\ders.spec.mjs:48:3 › Ders akışı › yanlış cevap canı düşür (4.5s)
+  ok  28 [masaustu] › tests\ders.spec.mjs:81:3 › Ders akışı › doğru cevap canı düşürmez (1.8s)
+  ok  29 [masaustu] › tests\ders.spec.mjs:89:3 › Ders akışı › ilerleme çubuğu ders boyunca ilerler (3.8s)
+  ok  30 [masaustu] › tests\ders.spec.mjs:109:3 › Ders akışı › ders boyunca flı soru tipleri çıkar (tek tip değil) (15.4s)
+  ok  31 [masaustu] › tests\ders.spec.mjs:139:3 › Ders akışı › canlar bitince "Tekrar dene" ekranı çıkar (9.7s)
+  ok  32 [masaustu] › tests\dinleme.spec.mjs:28:3 › Ders sonu "ne öğrendim" özeti › geçen harfler toplanır ve özet listesi döner (2.7s)
+  ok  33 [masaustu] › tests\dinleme.spec.mjs:47:3 › Ders sonu "ne öğrendim" özeti › ZORLANILAN harfler özet listesinin BAŞINA geçer (2.7s)
+  ok  34 [masaustu] › tests\dinleme.spec.mjs:66:3 › Ders sonu "ne öğrendim" özeti › her ders başında özet listesi sıfırlanır (öncekinin kalıntısı gelmez) (2.7s)
+  ok  35 [masaustu] › tests\dinleme.spec.mjs:86:3 › Ders sonu "ne öğrendim" özeti › KANA dışı id'ler özete girmez (kelime/kanji id sızması) (2.7s)
+  ok  36 [masaustu] › tests\dinleme.spec.mjs:105:3 › Ders sonu "ne öğrendim" özeti › ders sayfasında özet kutusu için CSS sınıfı tanımlı (2.7s)
+  ok  37 [masaustu] › tests\dinleme.spec.mjs:130:3 › Dinleme alıştırması › tur başlar, sorular üretilir ve doğru cevap şıklarda olur (2.6s)
+  ok  38 [masaustu] › tests\dinleme.spec.mjs:161:3 › Dinleme alıştırması › yanlış cevap 3 soru SONRA tekrar sorulur (spacing etkisi) (2.6s)
+  ok  39 [masaustu] › tests\dinleme.spec.mjs:198:3 › Dinleme alıştırması › doğru cevap sayacı doğru işler, karne hesaplanır (2.7s)
+  ok  40 [masaustu] › tests\dinleme.spec.mjs:223:3 › Dinleme alıştırması › yanlış cevap karıştırma defterine kaydedilir (yanlis.js entegrasyonu) (2.6s)
+  ok  41 [masaustu] › tests\dinleme.spec.mjs:243:3 › Dinleme alıştırması › 4 harften az biliniyorsa tur başlamaz (şıklar oluşamaz) (2.6s)
+  ok  42 [masaustu] › tests\dinleme.spec.mjs:259:3 › Dinleme alıştırması › dojo panelinde dinleme kısayolu var (3.1s)
+  ok  43 [masaustu] › tests\dinleme.spec.mjs:269:3 › Dinleme alıştırması › konsol hatası ve 404 yok (4.2s)
+  ok  44 [masaustu] › tests\dojo.spec.mjs:10:3 › Dojo haritası › harita açılır ve ders daireleri çizilir (584ms)
+  ok  45 [masaustu] › tests\dojo.spec.mjs:18:3 › Dojo haritası › istatistikler görünür: seri, rütbe, XP (574ms)
+  ok  46 [masaustu] › tests\dojo.spec.mjs:26:3 › Dojo haritası › XP değeri doğru gösterilir (679ms)
+  ok  47 [masaustu] › tests\dojo.spec.mjs:33:3 › Dojo haritası › günlük hedef çubuğu görünür (618ms)
+  ok  48 [masaustu] › tests\dojo.spec.mjs:44:5 › Dojo haritası › Tanıtım turu › ilk açılışta kendiliğinden çıkar (2.3s)
+  ok  49 [masaustu] › tests\dojo.spec.mjs:57:5 › Dojo haritası › Tanıtım turu › 4 kart gezilir, sonuncuda buton "ANLADIM" olur (2.5s)
+  ok  50 [masaustu] › tests\dojo.spec.mjs:73:5 › Dojo haritası › Tanıtım turu › kapatınca bir daha çıkmaz, ❓ ile tekrar açılır (4.0s)
+  ok  51 [masaustu] › tests\dojo.spec.mjs:101:3 › Dojo haritası › geri bildirim kutusu ve destek linki var (584ms)
+  ok  52 [masaustu] › tests\giris.spec.mjs:15:3 › Giriş ekranı › temiz profilde adını yazma ekranı veya Google butonu çıkar (2.0s)
+  -   53 [masaustu] › tests\giris.spec.mjs:29:3 › Giriş ekranı › ad girilince kayıt oluşur ve dojo butonu çıkar
+  -   54 [masaustu] › tests\giris.spec.mjs:53:3 › Giriş ekranı › boş ad kabul edilmez
+  ok  55 [masaustu] › tests\giris.spec.mjs:65:3 › Giriş ekranı › kayıt varsa dojo.html açılır (602ms)
+  ok  56 [masaustu] › tests\giris.spec.mjs:76:3 › Giriş ekranı › kayıt yoksa dojo girişe yönlendir (2.1s)
+  ok  57 [masaustu] › tests\giris.spec.mjs:83:3 › Giriş ekranı › kimlik girilmişse Google butonu görünür (2.8s)
+  ok  58 [masaustu] › tests\gorev.spec.mjs:9:3 › Günlük görevler › her gün 3 görev üretilir ve sayfa yenilenince DEĞİŞMEZ (4.7s)
+  ok  59 [masaustu] › tests\gorev.spec.mjs:24:3 › Günlük görevler › görevler panelde görünür ve ilerleme çubuğu var (2.8s)
+  ok  60 [masaustu] › tests\gorev.spec.mjs:34:3 › Günlük görevler › ders bitince ders görevinin ilerlemesi artar (3.6s)
+  ok  61 [masaustu] › tests\gorev.spec.mjs:61:3 › Günlük görevler › hedefe ulaşınca görev tamamlanır ve ödül bildirilir (2.6s)
+  ok  62 [masaustu] › tests\gorev.spec.mjs:79:3 › Günlük görevler › tamamlanan görev XP ödülü verir (odulHesapla > 0) (2.6s)
+  ok  63 [masaustu] › tests\gorev.spec.mjs:94:3 › Günlük görevler › gün değişince görevler sıfırlanır (2.6s)
+  ok  64 [masaustu] › tests\gorev.spec.mjs:119:3 › Başarımlar › liste yüklenir ve kilitli/açık durumu doğru (2.5s)
+  ok  65 [masaustu] › tests\gorev.spec.mjs:138:3 › Başarımlar › kontrol() yeni açılanları döndürür, ikinci kez döndürmez (2.6s)
+  ok  66 [masaustu] › tests\gorev.spec.mjs:154:3 › Başarımlar › dojo panelinde başarım kutusu ve ilerleme çubuğu var (2.8s)
+  ok  67 [masaustu] › tests\gorev.spec.mjs:167:3 › Başarımlar › başarım bandı ekranda belirir ve kaybolur (8.9s)
+  ok  68 [masaustu] › tests\gorev.spec.mjs:197:3 › Başarımlar › istatistik sayfasında TÜM başarımlar listelenir (2.7s)
+  ok  69 [masaustu] › tests\gorev.spec.mjs:211:3 › Başarımlar › konsol hatası ve 404 yok (5.5s)
+  ok  70 [masaustu] › tests\klavye.spec.mjs:11:3 › Klavye kısayolları › her şıkta numara rozeti görünür (1.3s)
+  ok  71 [masaustu] › tests\klavye.spec.mjs:21:3 › Klavye kısayolları › 1-4 tuşlarıyla şık seçilir (1.8s)
+  ok  72 [masaustu] › tests\klavye.spec.mjs:33:3 › Klavye kısayolları › Enter ile devam edilir (2.3s)
+  ok  73 [masaustu] › tests\klavye.spec.mjs:53:3 › Klavye kısayolları › Enter, buton odaklıyken iki kez tetiklenmez (2.3s)
+  -   74 [masaustu] › tests\klavye.spec.mjs:74:3 › Dokunmatik cihaz davranışı › mobilde klavye ipucun görünmez ama numaralar kalır
+  ok  75 [masaustu] › tests\kombo.spec.mjs:9:3 › Kombo sistemi › üst üste doğruda çarpan kademeli artar, tavanda durur (2.6s)
+  ok  76 [masaustu] › tests\kombo.spec.mjs:31:3 › Kombo sistemi › yanlış cevap komboyu sıfırlar (2.6s)
+  ok  77 [masaustu] › tests\kombo.spec.mjs:50:3 › Kombo sistemi › kombo bonusu birikir ve temizle() sıfırlar (2.6s)
+Bonus: 15 (XP önce: 0)
+  ok  78 [masaustu] › tests\kombo.spec.mjs:68:3 › Kombo sistemi › ders bitişinde kombo rozeti ve bonus XP görünür (2.5s)
+  ok  79 [masaustu] › tests\kombo.spec.mjs:82:3 › Kombo sistemi › kombo göstergesi ekranda belirir (2+ doğru) (2.5s)
+  ok  80 [masaustu] › tests\kombo.spec.mjs:96:3 › Günlük hediye › günde bir kez açılabilir, ikinci kez açılamaz (2.6s)
+  ok  81 [masaustu] › tests\kombo.spec.mjs:116:3 › Günlük hediye › seri büyüdükçe ödül artar (2.6s)
+  ok  82 [masaustu] › tests\kombo.spec.mjs:139:3 › Günlük hediye › hediye XP si gerçekten Ilerleme.xp() değerini artırır (2.6s)
+  ok  83 [masaustu] › tests\kombo.spec.mjs:156:3 › Günlük hediye › dojo panelinde sandık butonu görünür ve tıklanabilir (3.2s)
+  ok  84 [masaustu] › tests\kombo.spec.mjs:174:3 › Sensei öğüdü › bağlama göre doğru cümle seçer (tekrar varsa tekrarı söyler) (2.6s)
+  ok  85 [masaustu] › tests\kombo.spec.mjs:195:3 › Sensei öğüdü › günlük hedefe yaklaşınca kalan XP söyler (2.6s)
+  ok  86 [masaustu] › tests\kombo.spec.mjs:212:3 › Sensei öğüdü › uzun aradan sonra karşılama cümlesi gelir (2.6s)
+  ok  87 [masaustu] › tests\kombo.spec.mjs:229:3 › Sensei öğüdü › hiç özel durum yoksa genel teşvik verir (boş dönmez) (2.6s)
+  ok  88 [masaustu] › tests\kombo.spec.mjs:246:3 › Sensei öğüdü › dojo sayfasında öğüt balonu görünür (3.1s)
+  ok  89 [masaustu] › tests\kombo.spec.mjs:258:3 › Sensei öğüdü › ziyaret tarihi kaydedilir (bir sonraki giriş için) (3.1s)
+  ok  90 [masaustu] › tests\kombo.spec.mjs:269:3 › Sensei öğüdü › konsol hatası ve 404 yok (5.5s)
+  ok  91 [masaustu] › tests\modul.spec.mjs:6:3 › Yeni modüller (analitik + bulut) › giriş sayfasında analitik/reklam/bulut yüklenir (1.8s)
+  ok  92 [masaustu] › tests\modul.spec.mjs:19:3 › Yeni modüller (analitik + bulut) › modüller durumlarını doğru bildir (acik() tutarlı) (1.5s)
+  ok  93 [masaustu] › tests\modul.spec.mjs:39:3 › Yeni modüller (analitik + bulut) › reklam localhost ta KAPALI (AdSense sahte tıklama saymasın) (1.5s)
+  ok  94 [masaustu] › tests\modul.spec.mjs:48:3 › Yeni modüller (analitik + bulut) › kapalıyken analitik/reklam dış istek yapmaz (gizlilik) (2.3s)
+  ok  95 [masaustu] › tests\modul.spec.mjs:68:3 › Yeni modüller (analitik + bulut) › reklam alanı yerelde görünmez (site bozulmasın) (1.8s)
+  ok  96 [masaustu] › tests\modul.spec.mjs:79:3 › Yeni modüller (analitik + bulut) › oyun sayfasında da yüklenir (2.1s)
+  ok  97 [masaustu] › tests\plan.spec.mjs:28:3 › Çalışma planı › plan en fazla 3 adım verir ve her adımın eylemi vardır (3.0s)
+  ok  98 [masaustu] › tests\plan.spec.mjs:46:3 › Çalışma planı › adımlar önem sırasına göre dizilir (en acil önce) (3.0s)
+  ok  99 [masaustu] › tests\plan.spec.mjs:60:3 › Çalışma planı › karıştırılan harf varsa planda karıştırma adımı çıkar (3.0s)
+  ok 100 [masaustu] › tests\plan.spec.mjs:69:3 › Çalışma planı › aynı URL iki kez gösterilmez (tekrar olmasın) (3.0s)
+  ok 101 [masaustu] › tests\plan.spec.mjs:78:3 › Çalışma planı › toplam süre doğru hesaplanır (3.0s)
+  ok 102 [masaustu] › tests\plan.spec.mjs:91:3 › Çalışma planı › hiçbir şey kalmadıysa tebrik adımı çıkar (boş plan olmaz) (3.0s)
+  ok 103 [masaustu] › tests\plan.spec.mjs:108:3 › Çalışma planı › dojo panelinde plan kutusu çizilir (3.2s)
+  ok 104 [masaustu] › tests\plan.spec.mjs:123:3 › Çalışma planı › plan adımına tıklanınca doğru ders açılır (5.4s)
+  ok 105 [masaustu] › tests\plan.spec.mjs:138:3 › Sözlük › içerik toplanır: harf, kelime ve kanji bulunur (2.9s)
+  ok 106 [masaustu] › tests\plan.spec.mjs:151:3 › Sözlük › romaji ile harf bulunur (2.8s)
+  ok 107 [masaustu] › tests\plan.spec.mjs:162:3 › Sözlük › JAPONCA karakterle arama çalışır (2.9s)
+  ok 108 [masaustu] › tests\plan.spec.mjs:172:3 › Sözlük › aynı sesin iki alfabesi de bulunur (あ ve ア) (2.9s)
+  ok 109 [masaustu] › tests\plan.spec.mjs:182:3 › Sözlük › Türkçe karakterli arama toleranslı çalışır (ç/ş/ğ/ı) (2.9s)
+  ok 110 [masaustu] › tests\plan.spec.mjs:203:3 › Sözlük › tür filtresi yalnızca o türü getirir (2.9s)
+  ok 111 [masaustu] › tests\plan.spec.mjs:218:3 › Sözlük › tam eşleşme listenin EN ÜSTÜNDE olur (2.9s)
+  ok 112 [masaustu] › tests\plan.spec.mjs:231:3 › Sözlük › olmayan arama boş döner (hata vermez) (2.8s)
+  ok 113 [masaustu] › tests\plan.spec.mjs:246:3 › Sözlük › arayüz: yazınca sonuç listesi çizilir ve tür etiketleri görünür (4.2s)
+  ok 114 [masaustu] › tests\plan.spec.mjs:269:3 › Sözlük › tür filtresi düğmeleri çalışır (4.1s)
+  ok 115 [masaustu] › tests\plan.spec.mjs:286:3 › Sözlük › konsol hatası ve 404 yok (3.8s)
+  ok 116 [masaustu] › tests\serit.spec.mjs:27:5 › Durum şeridi — her sayfada oyun durumu › /istatistik.html sayfasında şerit görünür ve dolu (2.7s)
+  ok 117 [masaustu] › tests\serit.spec.mjs:27:5 › Durum şeridi — her sayfada oyun durumu › /ayarlar.html sayfasında şerit görünür ve dolu (2.7s)
+  ok 118 [masaustu] › tests\serit.spec.mjs:27:5 › Durum şeridi — her sayfada oyun durumu › /kelime.html sayfasında şerit görünür ve dolu (2.7s)
+  ok 119 [masaustu] › tests\serit.spec.mjs:45:3 › Durum şeridi — her sayfada oyun durumu › seri bugün yapılmadıysa şeritte uyarı vurgusu çıkar (2.7s)
+  ok 120 [masaustu] › tests\serit.spec.mjs:69:3 › Durum şeridi — her sayfada oyun durumu › görev sayacına tıklayınca dojo açılır (4.3s)
+  ok 121 [masaustu] › tests\serit.spec.mjs:81:3 › Durum şeridi — her sayfada oyun durumu › YENİ kullanıcıda (kayıt yokken) şerit çıkmaz (3.0s)
+  ok 122 [masaustu] › tests\serit.spec.mjs:94:3 › Giriş ekranı — günlük hediye › girişte büyük hediye butonu çıkar ve sandığı açar (5.1s)
+  ok 123 [masaustu] › tests\serit.spec.mjs:112:3 › Giriş ekranı — günlük hediye › hediye alındıktan sonra buton bir daha çıkmaz (aynı gün) (8.0s)
+  ok 124 [masaustu] › tests\serit.spec.mjs:131:3 › Giriş ekranı — günlük hediye › giriş ekranında görev özeti görünür (4.2s)
+  ok 125 [masaustu] › tests\serit.spec.mjs:144:3 › Giriş ekranı — günlük hediye › girişte şeritteki hediye rozeti TEKRARLANMAZ (4.2s)
+  ok 126 [masaustu] › tests\serit.spec.mjs:161:3 › Kelime defteri — görev paneli › görev paneli görünür ve satırlar çizilir (2.7s)
+  ok 127 [masaustu] › tests\serit.spec.mjs:171:3 › Kelime defteri — görev paneli › görevler defterdekiyle aynı (tutarlı) (2.7s)
+  ok 128 [masaustu] › tests\serit.spec.mjs:187:5 › Yerleşim sağlığı › /index.html: konsol hatası ve 404 yok (3.2s)
+  ok 129 [masaustu] › tests\serit.spec.mjs:187:5 › Yerleşim sağlığı › /istatistik.html: konsol hatası ve 404 yok (3.3s)
+  ok 130 [masaustu] › tests\serit.spec.mjs:187:5 › Yerleşim sağlığı › /ayarlar.html: konsol hatası ve 404 yok (3.2s)
+  ok 131 [masaustu] › tests\serit.spec.mjs:187:5 › Yerleşim sağlığı › /kelime.html: konsol hatası ve 404 yok (3.3s)
+  ok 132 [masaustu] › tests\sinav.spec.mjs:47:3 › Yanlış defteri (karıştırılan harfler) › karıştırma kaydedilir ve tekrar okunur (2.6s)
+  ok 133 [masaustu] › tests\sinav.spec.mjs:65:3 › Yanlış defteri (karıştırılan harfler) › SIRALI kayıt: (a,b) ile (b,a) AYNI çift sayılır (2.6s)
+  ok 134 [masaustu] › tests\sinav.spec.mjs:83:3 › Yanlış defteri (karıştırılan harfler) › en çok karıştırılanlar doğru sıralanır (2.6s)
+  ok 135 [masaustu] › tests\sinav.spec.mjs:95:3 › Yanlış defteri (karıştırılan harfler) › zorSiklar: çok karıştırılan partneri döndür (2.6s)
+  ok 136 [masaustu] › tests\sinav.spec.mjs:111:3 › Yanlış defteri (karıştırılan harfler) › aynı harf kendisiyle çift oluşturmaz (2.6s)
+  ok 137 [masaustu] › tests\sinav.spec.mjs:125:3 › Yanlış defteri (karıştırılan harfler) › istatistik sayfasında karıştırılan harfler bölümü çizilir (3.0s)
+  ok 138 [masaustu] › tests\sinav.spec.mjs:136:3 › Yanlış defteri (karıştırılan harfler) › karıştırma yoksa bölüm hiç çıkmaz (3.0s)
+  ok 139 [masaustu] › tests\sinav.spec.mjs:146:3 › Sınav modu › ?ders=sinav gerçekten sınav açar (ders 1 DEĞİL) (3.1s)
+  ok 140 [masaustu] › tests\sinav.spec.mjs:162:3 › Sınav modu › sınavda 3 can olur (normal derste 4) (3.1s)
+  ok 141 [masaustu] › tests\sinav.spec.mjs:173:3 › Sınav modu › uret(): her soruda doğru cevap şıklarda VAR (3.1s)
+  ok 142 [masaustu] › tests\sinav.spec.mjs:200:3 › Sınav modu › uret() şema doğru: motorun beklediği alanlar (3.1s)
+  ok 143 [masaustu] › tests\sinav.spec.mjs:226:3 › Sınav modu › karıştırılan harfler sınavda AĞIRLIKLI sorulur (3.1s)
+  ok 144 [masaustu] › tests\sinav.spec.mjs:270:3 › Sınav modu › dojo panelinde sınav kısayolu var ve çalışıyor (5.7s)
+  ok 145 [masaustu] › tests\sinav.spec.mjs:283:3 › Sınav modu › sınavda yıldız KAYDEDİLMEZ (müfredat dairesi değil) (3.1s)
+  ok 146 [masaustu] › tests\sinav.spec.mjs:295:3 › Sınav modu › konsol hatası ve 404 yok (3.5s)
+  ok 147 [masaustu] › tests\yayin.spec.mjs:17:5 › Yayın sağlığı › Giriş: konsol hatası ve 404 yok (3.4s)
+  ok 148 [masaustu] › tests\yayin.spec.mjs:17:5 › Yayın sağlığı › Dojo: konsol hatası ve 404 yok (3.6s)
+  ok 149 [masaustu] › tests\yayin.spec.mjs:17:5 › Yayın sağlığı › Ders (harf): konsol hatası ve 404 yok (3.5s)
+  ok 150 [masaustu] › tests\yayin.spec.mjs:17:5 › Yayın sağlığı › Ders (test): konsol hatası ve 404 yok (3.5s)
+  ok 151 [masaustu] › tests\yayin.spec.mjs:41:3 › Yayın sağlığı › tanıtım turu kapalıyken dojo temiz açılır (3.1s)
+  ok 152 [masaustu] › tests\yayin.spec.mjs:58:3 › Yayın sağlığı › service worker kaydı hata vermez (2.3s)
+  ok 153 [mobil] › tests\klavye.spec.mjs:11:3 › Klavye kısayolları › her şıkta numara rozeti görünür (1.5s)
+  ok 154 [mobil] › tests\klavye.spec.mjs:21:3 › Klavye kısayolları › 1-4 tuşlarıyla şık seçilir (1.8s)
+  ok 155 [mobil] › tests\klavye.spec.mjs:33:3 › Klavye kısayolları › Enter ile devam edilir (2.3s)
+  ok 156 [mobil] › tests\klavye.spec.mjs:53:3 › Klavye kısayolları › Enter, buton odaklıyken iki kez tetiklenmez (2.3s)
+  ok 157 [mobil] › tests\klavye.spec.mjs:74:3 › Dokunmatik cihaz davranışı › mobilde klavye ipucun görünmez ama numaralar kalır (2.0s)
+
+
+  1) [masaustu] › tests\_gecici-qa.spec.mjs:4:1 › hangi HTML sayfalari NAVIGASYONDA dogru geliyor ──
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: "ayarlar"
+    Received: "YOK"
+        at D:\Desktop\SakarPaisen (2)\SakarPaisen\tests\_gecici-qa.spec.mjs:21:15)
+        at D:\Desktop\SakarPaisen (2)\SakarPaisen\node_modules\playwright\lib\worker\workerProcessEntry.js:1655:9)
+        at D:\Desktop\SakarPaisen (2)\SakarPaisen\node_modules\playwright\lib\worker\workerProcessEntry.js:1135:11)
+        at D:\Desktop\SakarPaisen (2)\SakarPaisen\node_modules\playwright\lib\worker\workerProcessEntry.js:1653:7)
+
+    Error Context: test-results\_gecici-qa-hangi-HTML-sayfalari-NAVIGASYONDA-dogru-geliyor-masaustu\error-context.md
+
+  2) [masaustu] › tests\ayarlar.spec.mjs:18:3 › Ayarlar sayfası › tema seçilince html[data-tema] yazılır ve kaydedilir 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: "rgb(20, 19, 26)"
+    Received: "rgba(0, 0, 0, 0)"
+        at D:\Desktop\SakarPaisen (2)\SakarPaisen\tests\ayarlar.spec.mjs:38:19)
+        at D:\Desktop\SakarPaisen (2)\SakarPaisen\node_modules\playwright\lib\worker\workerProcessEntry.js:1655:9)
+        at D:\Desktop\SakarPaisen (2)\SakarPaisen\node_modules\playwright\lib\worker\workerProcessEntry.js:1135:11)
+        at D:\Desktop\SakarPaisen (2)\SakarPaisen\node_modules\playwright\lib\worker\workerProcessEntry.js:1653:7)
+
+    Error Context: test-results\ayarlar-Ayarlar-sayfası-te-d24a0--tema-yazılır-ve-kaydedilir-masaustu\error-context.md
+
+  2 failed
+    [masaustu] › tests\_gecici-qa.spec.mjs:4:1 › hangi HTML sayfalari NAVIGASYONDA dogru geliyor ───
+    [masaustu] › tests\ayarlar.spec.mjs:18:3 › Ayarlar sayfası › tema seçilince html[data-tema] yazılır ve kaydedilir 
+  3 skipped
+  152 passed (7.7m)

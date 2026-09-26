@@ -129,8 +129,18 @@
   const kullanici = kullaniciKimligiOlustur();
   let sonYedek = 0;
 
+  // ÖNEMLİ — SADECE KAYITLI KULLANICI YEDEKLENİR.
+  // Eskiden kontrol yoktu: henüz adını yazmamış (yani ilerlemesi olmayan) her
+  // ziyaretçi için buluta YENİ bir satır açılıyordu. Ölçüm: Supabase'de 4 günde
+  // 2340 satırın 2325'i hiç oyun oynamamış boş kayıtlardı; bu hem ücretsiz
+  // planın kotasını yiyor hem de gerçek kullanıcı sayısını görünmez kılıyordu.
+  function kayitVarMi() {
+    try { return !!(localStorage.getItem('sakar_isim') || '').trim(); } catch (e) { return false; }
+  }
+
   // Yedekleme: en fazla 20 saniyede bir (gereksiz trafik olmasın)
   function yedekle(zorla) {
+    if (!kayitVarMi()) return Promise.resolve();   // kayıt yoksa yedeklenecek bir şey de yok
     const simdi = Date.now();
     if (!zorla && simdi - sonYedek < 20000) return Promise.resolve();
     sonYedek = simdi;
@@ -161,7 +171,7 @@
   // ÇAKIŞMA KURALI: yerel boşsa bulut gelir; ikisi de doluysa YEREL kazanır
   // (kullanıcı çevrimdışı oynamış olabilir; onu ezmek veri kaybı olur).
   function acilistaBirlestir() {
-    const yerelBos = !localStorage.getItem('sakar_isim');
+    const yerelBos = !kayitVarMi();
     if (!yerelBos) return Promise.resolve('yerel-dolu');
     return getir().then(kayit => {
       if (!kayit || !kayit.veri) return 'bulut-bos';

@@ -13,7 +13,7 @@
 //
 //   1) CLOUDFLARE WEB ANALYTICS  (önerilen: ücretsiz, çerezsiz, sınırsız)
 //      - https://dash.cloudflare.com → Analytics → Web Analytics → Add a site
-//      - Site adresi: https://sakarpaisen.netlify.app
+//      - Site adresi: https://sakarpaisen.com
 //      - Sana bir TOKEN verir → aşağıdaki CLOUDFLARE_TOKEN satırına yaz.
 //      - Çerez kullanmaz → KVKK/GDPR için ayrıca izin penceresi GEREKMEZ.
 //
@@ -33,7 +33,7 @@
 
   // ---------------- AYARLAR ----------------
   // Aşağıdaki iki satırı doldurana kadar analytics TAMEN KAPALI.
-  const CLOUDFLARE_TOKEN = '055829bd4d3a460da238676644490663';  // Cloudflare Web Analytics (sakarpaisen.netlify.app)
+  const CLOUDFLARE_TOKEN = '055829bd4d3a460da238676644490663';  // Cloudflare Web Analytics (sakarpaisen.com)
   const UMAMI_ADRES = '';        // ör. 'https://analytics.senin-siten.com'
   const UMAMI_SITE_ID = '';      // ör. 'abc123-def456'
 

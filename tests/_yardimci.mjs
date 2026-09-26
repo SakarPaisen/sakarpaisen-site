@@ -98,7 +98,16 @@ export function hataToplayici(page) {
   //    ağ kısıtı / offline olması sayfa hatası değildir. bulut.js zaten
   //    .catch() ile sessizce yutar ve oyun çalışmaya devam eder.
   //  - Reklam ağı: AdSense yerelde kasıtlı kapalı (bkz. reklam.js).
-  const zararsiz = [/Cross-Origin-Opener-Policy/i, /accounts\.google\.com/i];
+  //  - Google Identity (gsi/client): giriş ekranı bu kütüphaneyi yalnızca
+  //    kullanıcı "Google ile devam et"e basınca indirir. Yerel testte
+  //    accounts.google.com'a çıkış kapalı olabildiği için tarayıcı
+  //    "bad HTTP response code (404)" der. Bu, SAYFANIN değil dış servisin
+  //    hatasıdır ve giriş akışı zaten adımIsim()'e düşer (bkz. giris.js).
+  const zararsiz = [
+    /Cross-Origin-Opener-Policy/i,
+    /accounts\.google\.com/i,
+    /bad HTTP response code/i
+  ];
   const zararsizIstek = [
     /accounts\.google\.com/,
     /supabase\.co/,

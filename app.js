@@ -95,10 +95,11 @@
   // "İlk harfimiz!" öğretim kartı çıkıyordu). Artık dersID 'sinav' kalıyor.
   const dersID = (tekrarModu || kelimeTekrarModu) ? 0
     : (sinavModu ? 'sinav' : (parseInt(dersParam) || 1));
-  // SERBEST_MOD (dojo.html'deki ile aynı): true iken tüm dersler açılır.
-  // Kilit geri gelsin istersen burayı false yap (ve dojo.html'deki SERBEST_MOD'u da).
-  const SERBEST_MOD = true;
-  if (!SERBEST_MOD && !tekrarModu && !kelimeTekrarModu && dersID > Ilerleme.seviye()) { window.location.replace('dojo.html'); return; }   // kilitli daire
+  // SERBEST_MOD (dojo.html'deki ile aynı): KAPALI.
+  // Dojo haritasında dersler sırayla kilitli; kilitli bir derse doğrudan
+  // adresle girilirse (ör. oyun.html?ders=40) bu kontrol dojo'ya geri atar.
+  const SERBEST_MOD = false;
+  if (!SERBEST_MOD && !tekrarModu && !kelimeTekrarModu && !sinavModu && dersID > Ilerleme.seviye()) { window.location.replace('dojo.html'); return; }   // kilitli daire
 
   const sahne = document.getElementById('sahne');
   const btn = document.getElementById('devamBtn');

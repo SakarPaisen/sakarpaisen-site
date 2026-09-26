@@ -1,9 +1,17 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sakar Paisen | Kelime Defterim</title>
+    <meta name="description" content="Öğrendiğin Japonca kelimeleri kelime defterinde biriktir, anlamlarını incele ve tekrar et.">
+    <meta property="og:title" content="Sakar Paisen | Kelime Defterim">
+    <meta property="og:description" content="Öğrendiğin Japonca kelimeleri kaydet ve tekrar et.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sakarpaisen.com/kelime.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Sakar Paisen | Kelime Defterim">
+    <meta name="twitter:description" content="Japonca kelimelerini kaydet ve tekrar et.">
     <meta name="theme-color" content="#e63946">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -91,7 +99,7 @@
                    width: 34px; height: 34px; font-size: 15px; cursor: pointer; flex: none; }
         .ses-btn:active { transform: scale(.94); }
 
-        /* ---------- ÇALI�?MA MODU (kart destesi) ---------- */
+        /* ---------- ÇALIŞMA MODU (kart destesi) ---------- */
         .calis-katman {
             position: fixed; inset: 0; z-index: 100; background: rgba(51, 48, 43, .6);
             backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center;
@@ -173,7 +181,7 @@
         }
         .ts-btn:active { transform: translateY(4px); box-shadow: none; }
 
-        /* ---------- ÖZET �?ERİDİ: kanji'ye hazır bilgisi ---------- */
+        /* ---------- ÖZET ŞERİDİ: kanji'ye hazır bilgisi ---------- */
         .kanji-serit {
             display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
             background: linear-gradient(135deg, #fffdf5 0%, #fff8e8 100%);
@@ -305,10 +313,10 @@
 
     <nav class="ust">
         <button class="geri" id="geriBtn" title="Haritaya dön" aria-label="Haritaya dön">←</button>
-        <div class="baslik">g��� Kelime <span>Defterim</span></div>
+        <div class="baslik">📓 Kelime <span>Defterim</span></div>
         <!-- İstatistikler: zayıf harfleri ve genel gelişimi gör -->
         <a class="sayac" href="istatistik.html" title="İstatistiklerim"
-           style="text-decoration:none">g���</a>
+           style="text-decoration:none">←</a>
         <!-- Ayarlar: tema/ses/zorluk -->
         <a class="sayac" href="ayarlar.html" title="Ayarlar"
            style="text-decoration:none">⚙️</a>
@@ -336,8 +344,8 @@
                     <div class="ck-cumle" id="ckCumle" hidden></div>
                 </div>
                 <div class="ck-alt">
-                    <button class="ck-btn zayif" id="ckZor" title="Bilemedim">g��? Bilemedim</button>
-                    <button class="ck-btn iyi" id="ckKolay" title="Biliyorum">g��� Biliyorum</button>
+                    <button class="ck-btn zayif" id="ckZor"[^>]*>😵 Bilemedim</button>
+                    <button class="ck-btn iyi" id="ckKolay"[^>]*>😄 Biliyorum</button>
                 </div>
             </div>
         </div>
@@ -369,22 +377,22 @@
                 <div class="ts-baslik" id="tsBaslik">Tekrar zamanı</div>
                 <div class="ts-yazi" id="tsYazi"></div>
             </div>
-            <button class="ts-btn" id="tsBtn">TEKRAR ÇALI�?</button>
+            <button class="ts-btn" id="tsBtn">TEKRAR ÇALIŞ</button>
         </div>
 
         <!-- Kart destesiyle çalışma: aktif hatırlama -->
         <div class="tekrar-serit" id="calisSerit" hidden
              style="background: linear-gradient(135deg, #f6f3ff 0%, #efe9ff 100%); border-color: var(--mor); box-shadow: 0 4px 0 #c9b8f5;">
             <div class="ts-sol">
-                <div class="ts-baslik" style="color: var(--mor);">g���️ Kartlarla çalış</div>
+                <div class="ts-baslik">🃏 Kartlarla çalış</div>
                 <div class="ts-yazi" style="color: #5b44c0;" id="calisYazi"></div>
             </div>
-            <button class="ts-btn" id="calisBtn" style="background: var(--mor); color: #fff; box-shadow: 0 4px 0 var(--mor-golge);">ÇALI�?</button>
+            <button class="ts-btn" id="calisBtn" style="background: var(--mor); color: #fff; box-shadow: 0 4px 0 var(--mor-golge);">ÇALIŞ</button>
         </div>
 
         <div class="liste" id="liste"></div>
         <div class="bos" id="bos" hidden>
-            <div class="simge">g���</div>
+<div class="simge">🔎</div>
             <h3>Defterin henüz boş</h3>
             <p>Derslerde öğrettiğin kelimeler burada birikir. Haritaya dönüp bir ders yap, sonra buraya bak.</p>
             <a class="sp-btn" href="dojo.html">← Haritaya dön</a>
@@ -393,7 +401,7 @@
         <!-- GÖNLÜK GÖREVLER: defterdeki kelimelerle ilgili görevler burada da görünsün.
              İçerik JS ile doldurulur; görev yoksa gizli kalır. -->
         <div class="kart-kutu" id="kelimeGorev" style="margin-top:22px" hidden>
-            <h4>g��� Bugünün görevleri</h4>
+<h4>🎯 Bugünün görevleri</h4>
             <div id="kelimeGorevListe"></div>
         </div>
 
@@ -420,7 +428,7 @@
     <!-- GÖNLÜK GÖREVLER: kelime defterine eklenen YENİ kelimeler görevi besler. -->
     <script src="gorevler.js?v=2"></script>
     <script src="basarimlar.js?v=2"></script>
-    <!-- DURUM �?ERİDİ + HEDİYE: diğer sayfalarla aynı üst bilgi -->
+    <!-- DURUM ŞERİDİ + HEDİYE: diğer sayfalarla aynı üst bilgi -->
     <script src="hediye.js?v=2"></script>
     <script src="serit.js?v=1"></script>
     <!-- REKLAM: ayar boşken tamamen kapalı. Bkz. reklam.js -->
@@ -428,7 +436,7 @@
     <script>
         HataRapor.kur();
 
-        // ---------- DURUM �?ERİDİ ----------
+        // ---------- DURUM ŞERİDİ ----------
         // Çoğu menünün ALTINA yerleşir (menüyü itmesin).
         if (window.Serit) Serit.kur('.ust', { yuzen: false });
 
@@ -540,14 +548,14 @@
             'もり': { k: '\u68EE', ro: 'mori' },
             'つき': { k: '\u6708', ro: 'tsuki' },
             'ほし':     { k: 'æ✨Ÿ',     ro: 'hoshi' },
-            'か�?く':   { k: '家族',   ro: 'kazoku' },
+            'かŞく':   { k: '家族',   ro: 'kazoku' },
             'おかあさん': { k: '\u304A\u6BCD\u3055\u3093', ro: 'okaasan' },
             'おとうさん': { k: '\u304A\u7236\u3055\u3093', ro: 'otousan' },
             'こども': { k: '\u5B50\u4F9B', ro: 'kodomo' },
             'たべる': { k: '\u98DF\u3079\u308B', ro: 'taberu' },
             'のむ': { k: '\u98F2\u3080', ro: 'nomu' },
             'みる': { k: '\u898B\u308B', ro: 'miru' },
-            'きく':     { k: '�?く',   ro: 'kiku' },
+            'きく':     { k: 'Şく',   ro: 'kiku' },
             'いく': { k: '\u884C\u304F', ro: 'iku' },
             'くる': { k: '\u6765\u308B', ro: 'kuru' },
             'おきぐ': { k: 'å¤§きぐ', ro: 'ookii' },
@@ -616,7 +624,7 @@
             return l;
         }
 
-        // KANJİ'YE HAZIR �?ERİDİ
+        // KANJİ'YE HAZIR ŞERİDİ
         // Kanji karşılığı bilinen ve en az 2 kez doğru bilinen kelimeler varsa
         // kullanıcıya "artık kanji öğrenebilirsin" mesajı gösterilir.
         // Bu, defterin ikinci amacını somutlaştırır.
@@ -666,7 +674,7 @@
 
             if (!l.length) {
                 const b = el('div', 'bos');
-                b.append(el('div', 'simge', 'g��?'), el('h3', '', 'Eşleşen kelime yok'),
+                b.append(el('div', 'simge', '🔎'), el('h3', '', 'Eşleşen kelime yok'),
                     el('p', '', 'Aramanı değiştir ya da süzgeci "Hepsi" yap.'));
                 kap.append(b);
                 return;
@@ -686,7 +694,7 @@
                 else if (x.toplam >= 2 && x.oran === 1) sag.append(el('span', 'etiket iyi', 'biliyorsun'));
                 sag.append(el('div', 'k-tarih', tarihYaz(x.son)));
 
-                const ses = el('button', 'ses-btn', 'g���');
+                const ses = el('button', 'ses-btn', '🔊');
                 ses.title = 'Dinle';
                 ses.onclick = (ev) => { ev.stopPropagation(); Ses.oku(k.ja, true); };
 
@@ -717,7 +725,7 @@
         //   ← harflerine ayrılış (kanji öğrenmeye hazırlık)
         //   ← öğrenme istiği ve ilerleme çubuğu
         //   ← kanji alanı (kanji bölümü gelince dolacak)
-        const AYLAR = ['Oca', '�?ub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
+        const AYLAR = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
 
         function tarihYaz(t) {
             if (!t) return '—';
@@ -750,7 +758,7 @@
             const buyuk = el('div', 'kd-ja', k.ja);
             const sag = el('div', 'kd-sag');
             sag.append(el('div', 'kd-ro', k.ro || '—'), el('div', 'kd-tr', k.tr || '—'));
-            const sesBuyuk = el('button', 'kd-ses', 'g��� Dinle');
+            const sesBuyuk = el('button', 'kd-ses', '🔊 Dinle');
             sesBuyuk.onclick = (ev) => { ev.stopPropagation(); Ses.oku(k.ja, true); };
             sag.append(sesBuyuk);
             bas.append(buyuk, sag);
@@ -760,10 +768,10 @@
             const cumle = ornekCumle(k);
             if (cumle) {
                 const cb = el('div', 'kd-bolum');
-                cb.append(el('div', 'kd-bolum-baslik', 'g��? Cümle içinde'));
+cb.append(el('div', 'kd-bolum-baslik', '🗣️ Cümle içinde'));
                 const satir = el('div', 'kd-cumle');
                 satir.append(el('span', 'kd-cumle-ja', cumle.ja));
-                const sesCumle = el('button', 'kd-ses-kucuk', 'g���');
+                const sesCumle = el('button', 'kd-ses-kucuk', '🔊');
                 sesCumle.title = 'Cümleyi dinle';
                 sesCumle.onclick = (ev) => { ev.stopPropagation(); Ses.oku(cumle.ja, true); };
                 satir.append(sesCumle);
@@ -774,7 +782,7 @@
             // 3) Harflerine ayırma — kanji öğrenmeye hazırlık
             const harfler = harflereAyir(k.ja);
             const hb = el('div', 'kd-bolum');
-            hb.append(el('div', 'kd-bolum-baslik', 'g��� Harfleri'));
+hb.append(el('div', 'kd-bolum-baslik', '🔤 Harfleri'));
             const hkap = el('div', 'kd-harfler');
             harfler.forEach(h => {
                 const ci = el('div', 'kd-harf');
@@ -790,7 +798,7 @@
 
             // 4) Öğrenme istiği + ilerleme çubuğu
             const sb = el('div', 'kd-bolum');
-            sb.append(el('div', 'kd-bolum-baslik', 'g��� Öğrenme durumu'));
+sb.append(el('div', 'kd-bolum-baslik', '📈 Öğrenme durumu'));
             const oran = Math.round(x.oran * 100);
             const barKap = el('div', 'kd-bar-kap');
             const bar = el('div', 'kd-bar');
@@ -822,7 +830,7 @@
             if (kj) {
                 const satir = el('div', 'kd-kanji-satir');
                 satir.append(el('div', 'kd-kanji-yazi', kj.k));
-                const ses = el('button', 'kd-ses-kucuk', 'g���');
+                const ses = el('button', 'kd-ses-kucuk', '🔊');
                 ses.title = 'Kanji okunuşunu dinle';
                 ses.onclick = (ev) => { ev.stopPropagation(); Ses.oku(kj.ro, true); };
                 satir.append(ses);
@@ -858,7 +866,7 @@
             });
             const secilecek = sirali.slice(0, 8);
 
-            // KARTLARLA ÇALI�? şeridi: en az 8 kelime varsa aktif hatırlama önerilir.
+            // KARTLARLA ÇALIŞ şeridi: en az 8 kelime varsa aktif hatırlama önerilir.
             // (Liste gezmek öğrenme değil; kart destesi aktif hatırlama sağlar.)
             const calisSerit = document.getElementById('calisSerit');
             if (toplam >= 8) {
@@ -873,7 +881,7 @@
 
             serit.hidden = false;
             document.getElementById('tsBaslik').textContent =
-                zor.length >= 4 ? 'g��? Tekrar zamanı' : 'g���️ Kelimeleri pekiştir';
+                zor.length >= 4 ? '⏰ Tekrar zamanı' : '💪 Kelimeleri pekiştir';
             document.getElementById('tsYazi').textContent =
                 secilecek.length + ' kelime ile kısa bir tekrar' +
                 (zor.length ? ' · ' + zor.length + ' kelimede zorlanmışsın' : '');
@@ -957,7 +965,7 @@
             return a;
         }
 
-        // ---------- ÇALI�?MA MODU (kart destesi) ----------
+        // ---------- ÇALIŞMA MODU (kart destesi) ----------
         // Defterdeki kelimelerle kart tekrar: önce Japonca görünür,
         // dokunca anlam + romaji + kanji + örnek cümle açılır.
         // Sonra "Bilemedim / Biliyorum" ile ilerlenir.
@@ -1048,7 +1056,7 @@
             kutu.replaceChildren();
             const son = el('div', 'ck-son');
             son.append(
-                el('div', 'ck-son-simge', oran >= 80 ? '✅' : 'g���'),
+                el('div', 'ck-son-simge', oran >= 80 ? '✅' : '❌'),
                 el('div', 'ck-son-baslik', mesaj),
                 el('div', 'ck-son-oran', ckDogru + ' / ' + ckDeste.length + ' doğru (%' + oran + ')'),
             );
@@ -1097,6 +1105,5 @@
          Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
          KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli (aynı negatif
          z-index'te sonra gelen katman üstte görünür). -->
-    <script src="video-arkaplan.js?v=4"></script>
 </body>
 </html>

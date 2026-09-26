@@ -1,9 +1,17 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sakar Paisen | Video Dersler</title>
+    <meta name="description" content="Hiragana ve katakana anlatımlarını izleyerek Japonca yazı sistemlerini adım adım öğren.">
+    <meta property="og:title" content="Sakar Paisen | Video Dersler">
+    <meta property="og:description" content="Hiragana ve katakana anlatımlarını izleyerek öğren.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sakarpaisen.com/video.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Sakar Paisen | Video Dersler">
+    <meta name="twitter:description" content="Hiragana ve katakana video derslerini izle.">
     <meta name="theme-color" content="#7b5cf0">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -135,7 +143,7 @@
 <body class="sp">
     <nav class="sp-ust">
         <button class="sp-pill tikla" id="geriBtn" title="Haritaya dön" aria-label="Haritaya dön">←</button>
-        <div class="sp-logo">g�?� <span>Video Dersler</span></div>
+<div class="sp-logo">🎬 <span>Video Dersler</span></div>
         <div class="sp-istatistik">
             <a class="sp-pill tikla mor" href="dojo.html">Dojo'ya git</a>
         </div>
@@ -156,7 +164,7 @@
         <!-- BÖLÜMLERE GÖRE VİDEO LİSTESİ -->
         <div id="liste"></div>
 
-        <!-- VİDEO BA�?LANTISI YOKSA / HER DURUMDA: kanal çağrısı -->
+        <!-- VİDEO BAŞLANTISI YOKSA / HER DURUMDA: kanal çağrısı -->
         <div class="vd-cagri" id="cagri" hidden>
             <p>Bu videolar Sakar Paisen'in kendi kanalından. Yeni dersler eklendikçe burada görünecek.</p>
             <div class="vd-cagri-icerik" id="kanalAlan"></div>
@@ -164,7 +172,7 @@
 
         <!-- YAKINDA: hazırlanan video fikirleri -->
         <div class="vd-yakinda" id="yakinda" hidden>
-            <h3>g�?� Yapılacak videolar</h3>
+<h3>🗓️ Yapılacak videolar</h3>
             <p>Bu konular kanalda planlanıyor. Fikrini Sensei'ye yazarsan sırayı birlikte belirleriz.</p>
             <div class="vd-yakinda-liste" id="yakindaListe"></div>
         </div>
@@ -188,6 +196,5 @@
          Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
          KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli (aynı negatif
          z-index'te sonra gelen katman üstte görünür). -->
-    <script src="video-arkaplan.js?v=4"></script>
 </body>
 </html>

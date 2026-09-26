@@ -1,9 +1,17 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sakar Paisen | Sözlük</title>
+    <meta name="description" content="Hiragana, katakana, kelime ve kanji aramak için Sakar Paisen Japonca sözlüğünü kullan.">
+    <meta property="og:title" content="Sakar Paisen | Sözlük">
+    <meta property="og:description" content="Harf, kelime ve kanji ara; Japonca öğrenme notlarını hızlıca bul.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sakarpaisen.com/sozluk.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Sakar Paisen | Sözlük">
+    <meta name="twitter:description" content="Japonca harf, kelime ve kanji ara.">
     <meta name="theme-color" content="#7b5cf0">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -85,7 +93,7 @@
 <body class="sp">
     <nav class="sp-ust">
         <button class="sp-pill tikla" id="geriBtn" title="Haritaya dön" aria-label="Haritaya dön">←</button>
-        <div class="sp-logo">g��? <span>Sözlük</span></div>
+        <div class="sp-logo">🔎 <span>Sözlük</span></div>
         <div class="sp-istatistik"><span class="sp-pill" id="sayiRozet">—</span></div>
     </nav>
 
@@ -147,7 +155,7 @@
             if (!sonuc.length) {
                 const b = el('div', 'bos');
                 b.append(
-                    el('div', 'simge', 'g��?'),
+                    el('div', 'simge', '🔎')/g,
                     el('h3', '', '\"' + q + '\" bulunamadı'),
                     el('p', '', 'Farklı bir yazım dene: romaji (ka), Japonca (あ) veya Türkçe anlam.')
                 );
@@ -195,7 +203,7 @@
             kok.replaceChildren();
             const b = el('div', 'bos');
             b.append(
-                el('div', 'simge', 'g��?'),
+                el('div', 'simge', '🔎')/g,
                 el('h3', '', 'Ne aramak istersin?'),
                 el('p', '', s.harf + ' harf · ' + s.kelime + ' kelime · ' + s.kanji +
                     ' kanji · ' + s.defter + ' defter kaydı aranabilir.')
@@ -235,6 +243,5 @@
          Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
          KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli (aynı negatif
          z-index'te sonra gelen katman üstte görünür). -->
-    <script src="video-arkaplan.js?v=4"></script>
 </body>
 </html>

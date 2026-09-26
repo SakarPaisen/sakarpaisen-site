@@ -12,7 +12,8 @@
 //   1. https://console.cloud.google.com/apis/credentials adresine git.
 //   2. "Kimlik bilgileri oluştur" -> "OAuth istemci kimliği" -> Web uygulaması.
 //   3. "Yetkili JavaScript kaynakları"na şu adresleri ekle:
-//        https://sakarpaisen.netlify.app
+//        https://sakarpaisen.com
+//        https://www.sakarpaisen.com
 //        http://localhost:8000          (yerelde denemek için)
 //   4. Sana verilen istemci kimliğini (xxxx.apps.googleusercontent.com)
 //      aşağıdaki GOOGLE_CLIENT_ID satırına yapıştır. Bitti.
@@ -28,6 +29,9 @@
     // giriş ekranı "Google ile devam et" moduna geçer.
     // Örnek: '1234567890-abcdefg.apps.googleusercontent.com'
     const GOOGLE_CLIENT_ID = '919231297764-b42ipapn40a8v16201gtqt1eoljm6s4l.apps.googleusercontent.com';
+    // Google Cloud Console'da bu origini birebir yetkilendir:
+    // https://sakarpaisen.com ve https://www.sakarpaisen.com
+    // Yerel test: kullandığın port hangisiyse (örn. http://localhost:5500) onu da ekle.
     const TEST_MODU = false;              // test için true: giriş istenmez, dojo açılır
     const GOOGLE_ILE_GIRIS = !!GOOGLE_CLIENT_ID && !TEST_MODU;
     const DOJO_ADRESI = 'dojo.html';
@@ -62,13 +66,24 @@
 
     // ---------- Daktilo efektiyle konuşma ----------
     function konus(metin, bitince) {
-        clearInterval(yaziZamanlayici);
+        // Akış balonu ile hero konuşması AYRI ögelerdir (#balon / #heroKonusma);
+        // hero metni ekranda kalır, akış balonu ayrıca yazılır. Yine de hero'nun
+        // daktilo efekti hâlâ dönüyorsa durdurulur (aşağıdaki konusAnimasyonDurdur).
+        konusAnimasyonDurdur();
         balon.textContent = '';
+        balon.classList.remove('konusuyor');
         let i = 0;
         yaziZamanlayici = setInterval(() => {
             balon.textContent = metin.slice(0, ++i);
             if (i >= metin.length) { clearInterval(yaziZamanlayici); if (bitince) bitince(); }
         }, 28);
+    }
+    // Hero konuşması ile akış balonu AYRI ögeler (#heroKonusma / #balon), ama
+    // hero kapanırken daktilo efekti hâlâ dönüyor olabilir; boşa çalışmasın diye
+    // durdurulur. heroKonus kaydettiği durdurucuyu bırakır, burada çağrılır.
+    let heroYaziDurdur = null;
+    function konusAnimasyonDurdur() {
+        if (heroYaziDurdur) { heroYaziDurdur(); heroYaziDurdur = null; }
     }
     function panelGoster(...elemanlar) {
         panel.hidden = false;
@@ -80,12 +95,27 @@
     // ---------- Ortak: kaydı yaz ve dojo'ya geç ----------
     // Ilerleme.baslat varsa onu kullanır (ilerleme.js), yoksa eski anahtarlara yazar.
     function kayitYaz(isim) {
-        const baslat = (window.Ilerleme && Ilerleme.baslat) ? Ilerleme.baslat : null;
-        if (baslat) return baslat(isim, 'yok', 1);
-        localStorage.setItem('sakar_isim', isim);
-        localStorage.setItem('sakar_bilgi', 'yok');
-        localStorage.setItem('sakar_seviye', 1);
-        localStorage.setItem('sakar_xp', 0);
+        // Google'a yeniden girişte mevcut ilerlemeyi asla sıfırlama.
+        // Gizli sekme/depolama engeli giriş akışını kırmamalı; Ilerleme yazıcısı
+        // da ayrıca try/catch kullandığı için burada yerel yedek güvenli tutulur.
+        try {
+            const mevcutIsim = localStorage.getItem('sakar_isim');
+            if (mevcutIsim) {
+                localStorage.setItem('sakar_isim', mevcutIsim);
+                return;
+            }
+            const baslat = (window.Ilerleme && Ilerleme.baslat) ? Ilerleme.baslat : null;
+            if (baslat) return baslat(isim, 'yok', 1);
+            localStorage.setItem('sakar_isim', isim);
+            localStorage.setItem('sakar_bilgi', 'yok');
+            localStorage.setItem('sakar_seviye', 1);
+            localStorage.setItem('sakar_xp', 0);
+        } catch (e) {
+            // Depolama kullanılamasa da kullanıcıyı sessizce kilitleme.
+            // İsim yalnızca bu sessiyon için tutulur; bulut girişinden sonra
+            // kalıcı yedek yeniden denenebilir.
+            try { window._sakarGeciciIsim = String(isim || '').trim().slice(0, 22); } catch (y) { }
+        }
     }
 
     function oturumAc(isim, kucukResim) {
@@ -164,7 +194,7 @@
                             },
                             error_callback: (hata) => {
                                 console.error('[giriş] Google penceresi açılamadı:', hata);
-                                konus('Google penceresi kapanmış görünüyor. Tekrar dener misin?');
+                                konus(adresHatasi(hata));
                                 butonKur(yeni);
                             }
                         });
@@ -336,8 +366,9 @@
             console.info('[giriş] Google girişi açık. İstemci kimliği: ' + GOOGLE_CLIENT_ID);
         }
         console.info('[giriş] Yetkili JavaScript kaynağı olarak şu adresleri eklemiş olmalısın:' +
-            '\n         https://sakarpaisen.netlify.app' +
-            (yerel ? '\n         ' + origin + '   (yerelde denemek için)' : '\n         ' + origin));
+            '\n         https://sakarpaisen.com' +
+            '\n         https://www.sakarpaisen.com' +
+            (yerel ? '\n         ' + origin + '   (yerelde denemek için)' : ''));
     }
 
     // Test kolaylığı: kimlik kontrolünü dışarıdan çağırabilmek için
@@ -354,19 +385,29 @@
             console.info('[giriş] Google girişi açık. İstemci kimliği: ' + kimlik);
         }
         console.info('[giriş] Yetkili JavaScript kaynağı olarak şu adresleri eklemiş olmalısın:' +
-            '\n         https://sakarpaisen.netlify.app\n         ' + location.origin +
-            (adresYerelMi(location.origin) ? '   (yerelde denemek için)' : ''));
+            '\n         https://sakarpaisen.com' +
+            '\n         https://www.sakarpaisen.com' +
+            (adresYerelMi(location.origin) ? '\n         ' + location.origin + '   (yerelde denemek için)' : ''));
         return gercek;
     };
 
     function adresHatasi(yanit) {
-        // Google'ın döndürdüğü yaygın iki hata: origin yetkili değil / kimlik bulunamadı
-        const kod = (yanit && (yanit.error || yanit.error_type)) || '';
-        if (kod === 'invalid_client' || kod === 'idpiframe_initialization_failed') {
-            return 'Bu adres Google\'da yetkili değil (' + location.origin + '). Cloud Console → ' +
-                'OAuth istemci kimliği → "Yetkili JavaScript kaynakları" listesine bu adresi ekle.';
+        const kod = String((yanit && (yanit.error || yanit.error_type || yanit.code || yanit.message)) || '').toLowerCase();
+        if (kod.indexOf('access_denied') > -1) {
+            return 'Google giriş izni verilmedi. Açılan pencerede hesabını seçip "İzin ver"e bas.';
         }
-        return 'Giriş tamamlanmadı. Başka bir hesapla tekrar dener misin?';
+        if (kod.indexOf('origin_mismatch') > -1 || kod.indexOf('origin mismatch') > -1) {
+            return 'Google bu adresi izinli kaynak olarak tanımıyor: ' + location.origin + '. Google Cloud Console → OAuth istemci kimliği → Yetkili JavaScript kaynakları kısmına bu origini eksiksiz ekle.';
+        }
+        if (kod.indexOf('popup_closed_by_user') > -1 || kod.indexOf('user_cancelled') > -1) {
+            return 'Google penceresi kapatıldı. Hazır olduğunda tekrar dene.';
+        }
+        if (kod.indexOf('invalid_client') > -1 || kod.indexOf('idpiframe_initialization_failed') > -1 || kod.indexOf('origin_mismatch') > -1) {
+            return 'Google giriş yetkisi eksik. Bu site adresi: ' + location.origin +
+                ' → Google Cloud Console → OAuth istemci kimliği → Yetkili JavaScript kaynakları' +
+                ' listesine eklenmeli.';
+        }
+        return 'Giriş tamamlanmadı. Google ayarlarında bu adresin izinli olduğundan emin ol: ' + location.origin;
     }
 
     // ---------- Adım: geri dönen kullanıcı ----------
@@ -549,6 +590,9 @@
     function heroKapat() {
         if (document.body.classList.contains('secim-asamasi')) return;
         document.body.classList.add('hero-gecis');
+        // Hero'nun daktilo efekti hâlâ dönüyorsa hemen durdur; akış balonu
+        // birazdan aynı ögeye yazacak (bkz. heroYaziDurdur).
+        konusAnimasyonDurdur();
         // Kısa sahne çıkışı; seçim ekranı hemen açılır, arka plan kapak görünmeye devam eder.
         window.setTimeout(function () {
             document.body.classList.remove('hero-asamasi', 'hero-gecis');
@@ -560,6 +604,45 @@
             try { document.dispatchEvent(new Event('basla-sonrasi')); } catch (e) { }
             try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { }
         }, 220);
+    }
+
+    // Açılış ekranının karşılaması: sensei hero metninin altında konuşur
+    // (#heroKonusma). Yazı efekti bitince çağrıya geçer. Düğme metnine DOKUNMAZ:
+    // düğme her zaman "BAŞLA" der (bkz. index.html).
+    function heroKonus() {
+        var heroBalon = document.getElementById('heroKonusma');
+        if (!heroBalon) return;
+        var metin = 'Konnichiwa! Ben Sakar Paisen. Hiragana, katakana ve kanjiyi ' +
+            'oyun oynayarak öğreteceğim.';
+        var yazZamanlayici = null;
+        function temizle() {
+            if (yazZamanlayici) { clearInterval(yazZamanlayici); yazZamanlayici = null; }
+        }
+        function yaz(hedef, sonra) {
+            temizle();
+            heroBalon.classList.remove('konusuyor');
+            heroBalon.textContent = '';
+            var i = 0;
+            yazZamanlayici = setInterval(function () {
+                heroBalon.textContent = hedef.slice(0, ++i);
+                if (i >= hedef.length) { temizle(); if (sonra) window.setTimeout(sonra, 1600); }
+            }, 42);
+        }
+        // Gecikme: sayfa açılışındaki diğer işler (video, SW kaydı) önce bitsin.
+        // Kullanıcı konuşma sırasında akışı açarsa (secim-asamasi) sözü kesilir;
+        // konus() zaten zamanlayıcıyı durdurur (bkz. heroYaziDurdur aşağıda).
+        heroYaziDurdur = temizle;
+        window.setTimeout(function () {
+            if (!heroBalon.isConnected) return;
+            if (document.body.classList.contains('secim-asamasi')) return;
+            yaz(metin, function () {
+                if (!heroBalon.isConnected) return;
+                if (document.body.classList.contains('secim-asamasi')) return;
+                heroBalon.classList.add('konusuyor');
+                heroBalon.textContent = 'Hazırsan BAŞLA\'ya bas! ↓';
+                window.setTimeout(function () { heroBalon.classList.remove('konusuyor'); }, 2600);
+            });
+        }, 500);
     }
 
     // Akışı kur (hero'dan sonra çağrılır; eski "Başlat" bölümünün karşılığı)
@@ -588,6 +671,11 @@
     }
 
     heroNotYaz();
+    // Açılış ekranındaki karşılama: kullanıcı "BAŞLAT"a basmadan önce ne olacağını
+    // bilsin. Otomatik başlar; düğmeye basınca akış açılır (girilen ad vb.).
+    // NOT: Bu metinler arama motorlarını ilgilendirmez; index.html'deki doğrulama
+    // meta etiketi ham HTML'de durur (bkz. index.html <head>).
+    heroKonus();
     // Kayıt varsa "kaldığın yerden devam" ikinci yolu görünür olur.
     // (CSS: body:not(.kayit-var) .hero-ikincil { display:none })
     const kayitli = kayitliAd();

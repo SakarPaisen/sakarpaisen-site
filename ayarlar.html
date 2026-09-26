@@ -1,10 +1,18 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sakar Paisen | Ayarlar</title>
+    <meta name="description" content="Sakar Paisen tema, ses, zorluk ve ilerleme yedekleme ayarlarını kişiselleştir.">
+    <meta property="og:title" content="Sakar Paisen | Ayarlar">
+    <meta property="og:description" content="Tema, ses, zorluk ve veri ayarlarını kişiselleştir.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sakarpaisen.com/ayarlar.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Sakar Paisen | Ayarlar">
+    <meta name="twitter:description" content="Sakar Paisen ayarlarını yönet.">
     <meta name="theme-color" content="#7b5cf0">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -77,7 +85,7 @@
 
         /* Bilgi notu: "hareketi azalt açık" gibi durumları açıklar.
            data-animasyon="0" olsa da görünür kalır — çünkü bu metin
-           animasyon DE�?İL, erişilebilirlik bilgisidir. */
+           animasyon DEŞİL, erişilebilirlik bilgisidir. */
         .not-kucuk {
             margin: 10px 0 0;
             padding: 10px 13px;
@@ -252,7 +260,7 @@
 
         <!-- ---------- GÖRÜNÜM ---------- -->
         <section class="grup">
-            <h2>g���️ Görünüm</h2>
+<h2>🎨 Görünüm</h2>
             <p>Sitenin rengini ve yazı büyüklüğünü kendine göre ayarla.</p>
 
             <div class="satir">
@@ -301,7 +309,7 @@
 
         <!-- ---------- OYUN ---------- -->
         <section class="grup">
-            <h2>g���️ Oyun</h2>
+<h2>🎮 Oyun</h2>
             <p>Zorluk, can sayısını ve ders uzunluğunu değiştir.</p>
 
             <div class="satir">
@@ -324,7 +332,7 @@
 
         <!-- ---------- KAYIT ---------- -->
         <section class="grup">
-            <h2>g��� Kayıt ve veriler</h2>
+<h2>☁️ Kayıt ve veriler</h2>
             <p>İlerlemen tarayıcında saklanır ve mümkünse buluta yedeklenir.</p>
 
             <div class="ozet-kutular" id="ozetKutular"></div>
@@ -337,7 +345,7 @@
             </div>
             <div class="satir">
                 <div class="satir-ana">
-                    <b>�?imdi yedekle</b>
+                    <b>Şimdi yedekle</b>
                     <small>Başka cihazda devam etmek istersen ilerlemeni buluta gönder.</small>
                 </div>
                 <button class="sp-btn kucuk cizgili" id="yedekleBtn">YEDEKLE</button>
@@ -363,7 +371,7 @@
                     <b>Her şeyi sil</b>
                     <small>Kayıt, XP, seri, kanji ve kelime defteri tamamen silinir.</small>
                 </div>
-                <button class="sil-btn" id="tumSifirla">HER �?EYİ SİL</button>
+                <button class="sil-btn" id="tumSifirla">HER ŞEYİ SİL</button>
             </div>
         </section>
 
@@ -377,7 +385,7 @@
     <script>window.addEventListener('load', function () { if (window.Analitik) window.Analitik.sayfa('ayarlar'); });</script>
     <!-- AYARLAR: tema/ses/zorluk/veri. Bu sayfanın asıl motoru. -->
     <script src="ayarlar.js?v=1"></script>
-    <!-- DURUM �?ERİDİ: her sayfada oyun durumu görünsün (serit.js) -->
+    <!-- DURUM ŞERİDİ: her sayfada oyun durumu görünsün (serit.js) -->
     <script src="gorevler.js?v=2"></script>
     <script src="hediye.js?v=2"></script>
     <script src="serit.js?v=1"></script>
@@ -454,7 +462,7 @@
 
         function zorlukYaz() {
             document.getElementById('zorlukAciklama').textContent = Ayarlar.zorluk().aciklama;
-            document.getElementById('zorlukRozet').textContent = 'g���️ ' + Ayarlar.zorlukAdi();
+            document.getElementById('zorlukRozet').textContent = '⚙️ ' + Ayarlar.zorlukAdi();
         }
         zorlukYaz();
 
@@ -592,7 +600,6 @@
          Dosya yoksa sessizce vazgeçer, alttaki 3D sahne görünür kalır.
          KOD SIRASI ÖNEMLİ: sahne3d.js'ten SONRA yüklenmeli (aynı negatif
          z-index'te sonra gelen katman üstte görünür). -->
-    <script src="video-arkaplan.js?v=4"></script>
 </body>
 
 </html>

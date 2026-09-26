@@ -1,7 +1,27 @@
 // PWA: service worker kaydı + otomatik güncelleme + "uygulamayı yükle" düğmesi.
 // Not: service worker sadece https:// veya http://localhost üzerinde çalışır (file:// üzerinde çalışmaz).
 (function () {
-  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+  // ÖNEMLİ — SW KAYDI 8000 PORTUNDA KAPALI.
+  //
+  // NEDEN: service worker kaydı PORT'A BAĞLI DEĞİL, alan adına (host) bağlıdır:
+  // 'localhost' üzerinde kaydedilen bir SW, localhost'un HANGİ portunda olursa
+  // olsun devreye girer. (BKZ. ServiceWorkerRegistration.scope: kapsam,
+  // register() çağrısındaki scope seçeneğine göre belirlenir;
+  // https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration )
+  //
+  // Yaşanan gerçek sorun: 8000 portunda bir kez kurulan SW; sunucu 8000'de
+  // kapatılıp site BAŞKA bir portta (ör. 8321) açıldığında da aktif kalıyordu.
+  // sw.js'i o portta sunan sunucu, eski SW'nin önbelleğindeki cevapları
+  // döndürdüğü için /oyun.html isteği sessizce GİRİŞ SAYFASI olarak
+  // yanıtlanıyordu: app.js çalışıyor, ama aradığı #sahne bulunmadığı için
+  // duruyordu ve "ders açılmıyor" belirtisiyle görünüyordu.
+  //
+  // Sadece TEST/yerel geliştirme bu tuzağa düşsün diye 8000 kapatıldı;
+  // 8000 dışındaki portlar (canlıda gerçek alan adı) eskisi gibi çalışır.
+  const SW_KAPALI_PORTLAR = ['8000'];   // test/yerel sunucu portu
+  const swKapali = SW_KAPALI_PORTLAR.indexOf(location.port) > -1;
+
+  if (!swKapali && 'serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
     // SERVICE WORKER KAYDI — SAYFA YÜKLEMESİNİ BLOKE ETMEZ.
     // Eskiden `window.addEventListener('load', ...)` içinde kaydediliyordu ve
     // eski bir SW kayıtlıysa yükleme 26 saniyeye çıkıyordu.
@@ -43,6 +63,7 @@
       window.addEventListener('load', function () { setTimeout(swKaydet, 200); });
     }
   }
+  window.PWA_KAPALI = swKapali;   // testler ve hata ayıklama için görünür olsun
   let bekleyen = null;
   window.addEventListener('beforeinstallprompt', function (e) {
     e.preventDefault(); bekleyen = e;

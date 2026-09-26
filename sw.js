@@ -3,7 +3,7 @@
 //  - Resim / ikon: önce önbellek                    -> hızlı ve offline
 // Kod değiştirince CACHE_NAME'i arttırman şart değil (kod ağdan alınır), ama yeni dosya
 // eklersen ya da eskileri temizlemek istersen arttır.
-const CACHE_NAME = 'sakar-paisen-v55';
+const CACHE_NAME = 'sakar-paisen-v56';
 
 // HARF RESİMLERİ
 // ÖNEMLİ: Eskiden `importScripts('kana.js')` ile harf listesi alınıyordu.
@@ -94,6 +94,13 @@ self.addEventListener('activate', event => {
     // (pwa.js bunu görünce "yeni sürüm hazır" diyebilir veya yeniler.)
     const istemciler = await self.clients.matchAll({ type: 'window' });
     istemciler.forEach(c => c.postMessage({ tip: 'sw-guncellendi', surum: CACHE_NAME }));
+
+    // Yeni sürümde önbelleğe alınan HTML güncellensin diye açık sayfaları yenile.
+    // Başka bir sekmede kalınan site, yeni sürümden sonra ağdan güncel HTML'i
+    // almadığı için eski <meta name="google-site-verification"> etiketiyle
+    // kalabiliyordu. Sekme yenilenince HTML ağdan gelir ve etiket güncellenir.
+    // Yalnızca zaten açık olan sekmeler yenilenir (yeni ziyaretçi etkilenmez).
+    istemciler.forEach(c => { try { c.navigate(c.url); } catch (e) {} });
   })());
 });
 

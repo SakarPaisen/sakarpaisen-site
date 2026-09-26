@@ -29,9 +29,10 @@
   'use strict';
 
   // ---------------- AYARLAR ----------------
-  const ADSENSE_ID = '';      // ör. 'ca-pub-1234567890123456'
-  const ADSENSE_SLOT = '';    // ör. '1234567890'
+  const ADSENSE_ID = 'ca-pub-2039369863449847';
+  const ADSENSE_SLOT = '';    // AdSense onayından sonra reklam birimi numarası
 
+  // Reklam yalnızca hesap ve onaylı reklam birimi birlikte tanımlıysa açılır.
   const ACIK = !!(ADSENSE_ID && ADSENSE_SLOT);
 
   // Yerelde reklam YOK (AdSense kuralı: kendi tıklaman = hesap askıya alınır).

@@ -1,0 +1,23 @@
+# ============================================================
+# robots.txt — Sakar Paisen
+#
+# NE İŞE YARAR: Arama motorlarına "neyi tarayabilirsin" der.
+# Google bu dosyayı her taramada okur; sitemap.xml satırı sayesinde
+# sayfaları tek tek keşfetmek zorunda kalmaz.
+#
+# DOĞRU YAZIM KURALI: Yorumlar (#) satırın BAŞINDA ya da sonunda olur,
+# SELECTOR'ün ORTASINA yazılamaz. `User-agent: * # yorum` yazarsan
+# Google "* # yorum" diye bir bot adı arar ve kuralı yok sayar.
+# (Bu dosyada yorumlar ayrı satırda: en güvenli biçim.)
+# ============================================================
+
+User-agent: *
+Allow: /
+
+# Yönetim/deneme dosyaları dizine girmesin.
+Disallow: /test-sonuc
+Disallow: /test-liste
+Disallow: /*.txt$
+
+# Site haritası (mutlak adres olmalı).
+Sitemap: https://sakarpaisen.com/sitemap.xml
