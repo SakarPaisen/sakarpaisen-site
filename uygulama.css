@@ -523,22 +523,12 @@ body:has(#videoArkaplan) .harita-alani { background-color: color-mix(in srgb, va
 :root[data-tema] .sandik-odul span.koruma { background: #1b2740; border-color: #2f4670; color: #8ab4ff; }
 
 /* ============================================================
-   SENSEİ ÖĞÜDÜ BALONU (ogut.js) — dojo sağ panel
+   SENSEİ ÖĞÜDÜ (ogut.js) — dojo sağ panel
+   NOT: Öğüt artık AYRI bir balonda değil, ana konuşma balonunda (#balon)
+   gösterilir. Bu yüzden balona özel kutu/kuyruk stilleri kaldırıldı;
+   yalnızca balon içindeki simgenin aralığı kalıyor.
    ============================================================ */
-.ogut-balon {
-  position: relative; margin-top: 10px; padding: 12px 14px;
-  background: var(--kart); border: 2px solid var(--cizgi); border-radius: 16px;
-  font-size: 13.5px; font-weight: 700; line-height: 1.5; color: var(--yazi);
-  box-shadow: 0 3px 0 var(--cizgi);
-  animation: spGir .35s ease-out both;
-}
-/* Balonun kuyruğu (maskota doğru) */
-.ogut-balon::before {
-  content: ''; position: absolute; top: -11px; left: 26px;
-  border-width: 0 10px 11px; border-style: solid;
-  border-color: transparent transparent var(--cizgi) transparent;
-}
-.ogut-balon .ob-simge { font-size: 16px; margin-right: 6px; }
+.balon .ob-simge { font-size: 16px; margin-right: 6px; }
 
 /* ============================================================
    DERS BİTİŞİ — KOMBO ÖZETİ ROZETİ

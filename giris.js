@@ -683,11 +683,14 @@
 
     // Seçim ekranının başlığını kullanıcıya göre kişiselleştir: yeni gelen
     // "nereden başlamak istersin", kalan kullanıcı "kaldığın yerden devam".
+    // ÖNEMLİ: Burada "Tekrar hoş geldin" YAZILMAZ. Aynı selamlama zaten üstteki
+    // sohbet balonunda (konus) söyleniyor; başlıkta da tekrarlanınca mesaj
+    // ekranda iki kez görünüyordu. Başlık yalnızca bölümün sorusunu sorar.
     if (kayitli) {
         try {
             const baslik = document.getElementById('obBaslik');
             const alt = document.getElementById('obAlt');
-            if (baslik) baslik.textContent = 'Tekrar hoş geldin, ' + kayitli + '!';
+            if (baslik) baslik.textContent = 'Nereden devam etmek istersin?';
             if (alt) alt.textContent = 'Kaldığın yerden devam edebilir veya başka bir çalışma biçimi seçebilirsin.';
         } catch (e) { }
     }

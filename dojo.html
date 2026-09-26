@@ -22,7 +22,23 @@
         /* Sayfaya ozel ince ayarlar. Tema renkleri uygulama.css'ten gelir. */
 
         /* Dojo ekranında görsel arka plan bulunmaz; video ve 3D sahne yalnızca giriş sayfasında kalır. */
-        .ust-menu, .ana-kapsayici { position: relative; z-index: 1; }
+        /* ÖNEMLİ: Üst çubuk SABİT kalmalı (dojo.css: position: sticky). Eskiden
+           burada "position: relative" yazıyordu ve dojo.css'teki sticky kuralını
+           eziyordu; bu yüzden istatistik çubuğu kaydırmada yukarı kaçıyor,
+           arka plandaki büyük görselin üzerine binip okunmaz hâle geliyordu.
+           Sadece z-index'i yükseltiyoruz; konumlandırmayı dojo.css belirlesin. */
+        .ust-menu { z-index: 200; }
+        .ana-kapsayici { position: relative; z-index: 1; }
+        /* İstatistik çubuğu her görselin üzerinde NET okunsun: opak zemin +
+           hafif bulanıklık. Yarı saydam zemin yerine temanın kart rengi
+           kullanılır; böylece arkadaki görsel ne olursa olsun yazı okunur. */
+        .ust-menu {
+            background: var(--kart);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+        }
+        .ust-menu .stat-kutu { background: var(--zemin-2); }
         .sag-panel { background-color: var(--kart); backdrop-filter: none; }
         @media (min-width: 761px) {
             .ana-kapsayici { gap: 40px; }
@@ -40,9 +56,9 @@
         .reklam-alani .reklam-etiket { font-size: 11px; font-weight: 800; color: var(--yazi-soluk);
                                        text-transform: uppercase; letter-spacing: 1px; }
 
-        /* ---------- SEVİYE BELİRLEME EKRANI (ilk giriş) ----------
-           Kullanıcı hiragana/katakana biliyorsa ilgili bölümleri atlar.
-           Perde: arkadaki haritayı karartır, kutu ortada durur. */
+        /* ---------- SEVİYE BELİRLEME SINAVI (ilk giriş) ----------
+           Kullanıcıya kademeli sorular sorulur; doğru sayısına göre başlangıç
+           dairesi belirlenir. Perde: arkadaki haritayı karartır. */
         .seviye-perde { position: fixed; inset: 0; z-index: 300; display: flex;
                         align-items: center; justify-content: center; padding: 20px;
                         background: rgba(10, 14, 28, .55); backdrop-filter: blur(3px);
@@ -53,9 +69,24 @@
                        border-radius: 20px; padding: 22px 20px;
                        box-shadow: 0 14px 0 rgba(0, 0, 0, .12), 0 24px 60px rgba(0, 0, 0, .35); }
         .seviye-baslik { margin: 0 0 6px; font-size: 21px; }
-        .seviye-alt { margin: 0 0 16px; font-size: 13.5px; font-weight: 700;
+        .seviye-alt { margin: 0 0 14px; font-size: 13.5px; font-weight: 700;
                       color: var(--yazi-soluk); line-height: 1.5; }
-        .seviye-liste { display: flex; flex-direction: column; gap: 10px; }
+
+        /* Sınav ilerleme çubuğu: kaçıncı sorudayım */
+        .seviye-ilerleme { height: 10px; border-radius: 999px; background: var(--zemin-2);
+                           border: 2px solid var(--cizgi); overflow: hidden; margin-bottom: 18px; }
+        .seviye-ilerleme > div { height: 100%; width: 0%; background: var(--mor);
+                                 border-radius: 999px; transition: width .3s; }
+
+        .seviye-govde { display: flex; flex-direction: column; gap: 12px; }
+        .seviye-soru-no { font-size: 12px; font-weight: 800; color: var(--yazi-soluk);
+                          text-transform: uppercase; letter-spacing: .6px; }
+        /* Sorulan harf: büyük ve net */
+        .seviye-harf { font-size: 74px; line-height: 1; text-align: center;
+                       font-weight: 800; color: var(--yazi); margin: 6px 0 2px; }
+        .seviye-soru { margin: 0 0 4px; font-size: 14.5px; font-weight: 800; text-align: center; }
+        .seviye-secenekler { display: flex; flex-direction: column; gap: 10px; }
+
         .seviye-secim { display: flex; align-items: center; gap: 12px; width: 100%;
                         text-align: left; cursor: pointer; font-family: inherit;
                         background: var(--zemin-2); color: var(--yazi);
@@ -65,11 +96,33 @@
         .seviye-secim:hover { transform: translateY(-2px); border-color: var(--mor);
                               box-shadow: 0 5px 0 var(--cizgi); }
         .seviye-secim:active { transform: translateY(3px); box-shadow: none; }
-        .seviye-secim .ss-sol { flex: 1 1 auto; min-width: 0; }
+        .seviye-secim:disabled { cursor: default; }
+        .seviye-secim .ss-sol { flex: 1 1 auto; min-width: 0; font-size: 17px; font-weight: 800; }
         .seviye-secim b { display: block; font-size: 15.5px; }
         .seviye-secim small { display: block; margin-top: 3px; font-size: 12.5px;
                               font-weight: 700; color: var(--yazi-soluk); line-height: 1.4; }
         .seviye-secim .ss-ok { flex: none; font-size: 19px; font-weight: 800; color: var(--mor); }
+        /* Doğru / yanlış geri bildirimi */
+        .seviye-secim.dogru { border-color: var(--turkuaz); background: color-mix(in srgb, var(--turkuaz) 16%, var(--zemin-2)); }
+        .seviye-secim.yanlis { border-color: var(--kirmizi); background: color-mix(in srgb, var(--kirmizi) 14%, var(--zemin-2)); }
+        .seviye-secim.vurgulu { background: var(--mor); border-color: var(--mor); color: #fff; box-shadow: 0 4px 0 var(--mor-golge); }
+        .seviye-secim.vurgulu .ss-ok, .seviye-secim.vurgulu small { color: #fff; opacity: .92; }
+
+        /* "Emin değilim" ve "sıfırdan başla" gibi ikincil düğmeler */
+        .seviye-atla { background: none; border: none; color: var(--yazi-soluk);
+                       font-family: inherit; font-size: 13px; font-weight: 700;
+                       text-decoration: underline; cursor: pointer; padding: 6px; }
+        .seviye-atla:hover { color: var(--mor); }
+
+        /* Sonuç kutusu: "sen şuradan başlamalısın" */
+        .seviye-ozet { display: flex; align-items: center; gap: 12px;
+                       background: var(--zemin-2); border: 2px solid var(--cizgi);
+                       border-radius: 16px; padding: 14px; }
+        .seviye-ozet .so-simge { font-size: 30px; flex: none; }
+        .seviye-ozet b { display: block; font-size: 16px; }
+        .seviye-ozet small { display: block; margin-top: 3px; font-size: 12.5px;
+                             font-weight: 700; color: var(--yazi-soluk); line-height: 1.4; }
+        .seviye-puan { margin: 0; font-size: 13px; font-weight: 800; color: var(--yazi-soluk); text-align: center; }
     </style>
 </head>
 <body class="sp dojo">
@@ -91,7 +144,7 @@
             <!-- Ayarlar: tema, ses, zorluk, veri yönetimi -->
             <div class="stat-kutu" id="ayarBtn" title="Ayarlar" role="button" tabindex="0" aria-label="Ayarları aç">⚙️</div>
             <div class="stat-kutu yardim" id="yardim" title="Nasıl oynanır?" role="button" tabindex="0" aria-label="Nasıl oynanır yardımını aç">❓</div>
-            <div class="stat-kutu profil" id="profil" title="Tıkla: ilerlemeyi sıfırla"></div>
+            <div class="stat-kutu profil" id="profil" title="Tıkla: ilerlemeyi sıfırla" role="button" tabindex="0" aria-label="İlerlemeyi sıfırla"></div>
         </div>
     </nav>
 
@@ -110,9 +163,10 @@
             <div class="bar"><div id="gorevBar"></div></div>
             <div class="kucuk" id="ilerlemeYazi"></div>
             <div class="chibi-kap" id="chibiAlan"></div>
+            <!-- TEK KONUŞMA BALONU: Sensei'nin durum cümlesi ve öğüdü AYNI
+                 balonda gösterilir. Eskiden burada ikinci bir "ogut-balon"
+                 vardı; ekranda üst üste iki balon çıkıyordu. Bkz. ogut.js -->
             <div class="balon" id="balon"></div>
-            <!-- SENSEİ ÖĞÜDÜ: duruma göre akıllı ipucu (ogut.js) -->
-            <div class="ogut-balon" id="ogutBalon" hidden></div>
 
             <!-- GÜNLÜK HEDİYE SANDIŞI: günde bir kez açılır (hediye.js) -->
             <button class="sandik-btn" id="sandikBtn" hidden>
@@ -365,6 +419,103 @@
             return noktalar;
         }
 
+        // ============================================================
+        // SEVİYE BELİRLEME SINAVI
+        //
+        // NEDEN SINAV: Eskiden ekran, "şuradan başla / buradan başla" diyen
+        // uzun bir liste sunuyordu. Kullanıcıya HİÇ SORULMUYORDU; hangi
+        // seviyede olduğunu kendisi tahmin etmek zorundaydı ve çoğu kişi
+        // yanlış yeri seçip ya çok kolay ya çok zor bir yerden başlıyordu.
+        //
+        // YENİ AKIŞ: Kullanıcıya kademeli olarak zorlaşan birkaç örnek soru
+        // sorulur (harfi gör -> romajisini seç). Doğru/yanlış sayısına göre
+        // sistem "sen şuradan başlamalısın" der ve doğrudan oraya yönlendirir.
+        //
+        // GÜVENLİK: Sonuç yalnızca BAŞLANGIÇ noktasını ileri taşır; geriye
+        // almaz. Yani kötü bir sınav ilerlemeyi bozamaz.
+        // ============================================================
+
+        // Sınav soruları: kolaydan zora. Her adım bir "basamak"tır.
+        //   asama 1-2 : Hiragana temel (bilinmiyorsa sıfırdan başlar)
+        //   asama 3   : Hiragana türev (dakuten/youon)
+        //   asama 4   : Katakana temel
+        //   asama 5   : Katakana türev
+        // Romaji -> doğru cevap; çeldiriciler KANA'dan üretilir.
+        const SEVIYE_SORULARI = [
+            { harf: 'h:a',   cevap: 'a',   asama: 1 },
+            { harf: 'h:ka',  cevap: 'ka',  asama: 1 },
+            { harf: 'h:shi', cevap: 'shi', asama: 2 },
+            { harf: 'h:tsu', cevap: 'tsu', asama: 2 },
+            { harf: 'h:ga',  cevap: 'ga',  asama: 3 },
+            { harf: 'h:kya', cevap: 'kya', asama: 3 },
+            { harf: 'k:a',   cevap: 'a',   asama: 4 },
+            { harf: 'k:ka',  cevap: 'ka',  asama: 4 },
+            { harf: 'k:shi', cevap: 'shi', asama: 4 },
+            { harf: 'k:ga',  cevap: 'ga',  asama: 5 },
+            { harf: 'k:kya', cevap: 'kya', asama: 5 }
+        ];
+
+        // Bir soru için 4 şık üret: doğru cevap + 3 farklı çeldirici.
+        // Çeldiriciler aynı alfabeden seçilir ki soru "hangi yazı" testine
+        // dönüşmesin; kullanıcı gerçekten SESİ bilsin.
+        function siklar(harfId, cevap) {
+            const hedef = KANA[harfId];
+            if (!hedef) return [cevap];
+            const havuz = (hedef.a === 'k' ? KATAKANA : HIRAGANA)
+                .map(x => x.r)
+                .filter(r => r !== cevap);
+            // Rastgele 3 benzersiz çeldirici
+            const secilen = [];
+            while (secilen.length < 3 && havuz.length) {
+                const i = Math.floor(Math.random() * havuz.length);
+                const r = havuz.splice(i, 1)[0];
+                if (secilen.indexOf(r) === -1) secilen.push(r);
+            }
+            const hepsi = secilen.concat([cevap]);
+            // Şıkları karıştır
+            for (let i = hepsi.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                const t = hepsi[i]; hepsi[i] = hepsi[j]; hepsi[j] = t;
+            }
+            return hepsi;
+        }
+
+        // Sınav sonucuna göre başlangıç dairesini bul.
+        // Mantık: en yüksek DOĞRU cevaplanan basamağa kadar "biliyor" sayılır
+        // ve o bölümün başındaki daire başlangıç olur. Hiç doğru yoksa 1. daire.
+        //
+        // ÖNEMLİ (ÜST SINIR): Sınav YALNIZCA harf tanımayı ölçer. Bu yüzden
+        // sonuç asla okuma/kanji bölümlerine atlamaz; en fazla "İki Alfabe"
+        // bölümünün başına (id 54) kadar ileri gider. Aksi hâlde 11 soruyu
+        // doğru yapan biri kendini okuma derslerinde buluyordu.
+        function sinavSonucSeviye(dogruAsamalar) {
+            if (!dogruAsamalar.length) {
+                return { seviye: 1, ad: 'Sıfırdan başla', aciklama: 'İlk harften başlayıp sırayla ilerleyeceksin.' };
+            }
+            const enIyi = Math.max.apply(null, dogruAsamalar);
+
+            // Hiragana temel bitti -> Hiragana türevlerinden devam
+            if (enIyi <= 1) {
+                return { seviye: 1, ad: 'Sıfırdan başla', aciklama: 'Temelleri baştan sağlam kuralım.' };
+            }
+            if (enIyi === 2) {
+                const ilk = MUFREDAT.find(m => m.grup === 'g:ga');   // Hiragana türevleri
+                if (ilk) return { seviye: ilk.id, ad: 'Hiragana · ' + ilk.baslik, aciklama: 'Hiragana temelini biliyorsun; türev seslerden devam edelim.' };
+            }
+            if (enIyi === 3) {
+                const katakanaBas = MUFREDAT.find(m => m.alfabe === 'k' && m.tip === 'ders');   // Katakana temel
+                if (katakanaBas) return { seviye: katakanaBas.id, ad: 'Katakana · ' + katakanaBas.baslik, aciklama: 'Hiragana’yı biliyorsun; Katakana’ya geçelim.' };
+            }
+            if (enIyi === 4) {
+                const k = MUFREDAT.find(m => m.alfabe === 'k' && m.grup === 'g:ga');   // Katakana türevleri
+                if (k) return { seviye: k.id, ad: 'Katakana · ' + k.baslik, aciklama: 'Katakana temelini de biliyorsun; türev seslerden devam.' };
+            }
+            // En iyi: iki alfabeyi de biliyor -> "İki Alfabe" bölümünün başı
+            const ikiAlfabe = MUFREDAT.find(m => m.bolum === 'İki Alfabe');
+            if (ikiAlfabe) return { seviye: ikiAlfabe.id, ad: 'İki Alfabe · ' + ikiAlfabe.baslik, aciklama: 'İki alfabeyi de biliyorsun; karşılıklı eşleştirmeyle pekiştirelim.' };
+            return { seviye: 1, ad: 'Sıfırdan başla', aciklama: 'İlk harften başlayıp sırayla ilerleyeceksin.' };
+        }
+
         function seviyeBelirlemeAc() {
             const noktalar = atlamaNoktalari();
             if (!noktalar.length) { seviyeBelirlemeIsaretle(); return; }
@@ -373,55 +524,133 @@
             const kutu = yaziEl('div', 'seviye-kutu');
             kutu.setAttribute('role', 'dialog');
             kutu.setAttribute('aria-modal', 'true');
-            kutu.setAttribute('aria-label', 'Seviye belirleme');
+            kutu.setAttribute('aria-label', 'Seviye belirleme sınavı');
 
-            kutu.append(
-                yaziEl('h2', 'seviye-baslik', 'Nereden başlamak istersin?'),
-                yaziEl('p', 'seviye-alt',
-                    'Hiragana ya da Katakana’yı zaten biliyorsan, o bölümleri atlayabilirsin. ' +
-                    'Sonradan istediğin derse yine girebilirsin.')
-            );
+            // Sınav durumu
+            const durum = { i: 0, dogruAsamalar: [], yanlis: 0 };
 
-            const liste = yaziEl('div', 'seviye-liste');
+            const baslik = yaziEl('h2', 'seviye-baslik', 'Seviyeni belirleyelim');
+            const alt = yaziEl('p', 'seviye-alt',
+                'Birkaç kısa soru soracağım; doğru bildiğin yerden başlarsın. ' +
+                'Bilmiyorsan “Emin değilim” de, seni sıfırdan başlatayım.');
 
-            // 1) Her zaman: sıfırdan başla
-            const sifir = seviyeSecenegi('🌱 Sıfırdan başla', 'İlk harften başlayıp sırayla ilerle.', 1, kutu, perde);
-            liste.append(sifir);
+            const govde = yaziEl('div', 'seviye-govde');
+            const ilerleme = yaziEl('div', 'seviye-ilerleme');
+            const ilerlemeIc = yaziEl('div');
+            ilerleme.append(ilerlemeIc);
 
-            // 2) Her atlama noktası için bir seçenek
-            noktalar.forEach(function (n) {
-                const etiket = (n.alfabe ? n.alfabe + ' · ' : '') + n.sonrakiBaslik;
-                liste.append(seviyeSecenegi(
-                    '⏭ ' + etiket + ' ile başla',
-                    '"' + n.baslik + '" sınavını geçmiş sayılır; buradan devam edersin.',
-                    n.sonrakiId, kutu, perde
-                ));
-            });
-
-            kutu.append(liste);
+            kutu.append(baslik, alt, ilerleme, govde);
             perde.append(kutu);
             document.body.append(perde);
+
+            // Soru ekranını çiz
+            function soruCiz() {
+                ilerlemeIc.style.width = Math.round(durum.i / SEVIYE_SORULARI.length * 100) + '%';
+                govde.replaceChildren();
+
+                if (durum.i >= SEVIYE_SORULARI.length) { sonucCiz(); return; }
+
+                const s = SEVIYE_SORULARI[durum.i];
+                const e = KANA[s.harf];
+                if (!e) { durum.i++; soruCiz(); return; }
+
+                const soruNo = yaziEl('div', 'seviye-soru-no',
+                    'Soru ' + (durum.i + 1) + ' / ' + SEVIYE_SORULARI.length);
+                const harf = yaziEl('div', 'seviye-harf', e.j);
+                harf.setAttribute('lang', 'ja');
+                const soru = yaziEl('p', 'seviye-soru', 'Bu harfin okunuşu hangisi?');
+
+                const secenekler = yaziEl('div', 'seviye-secenekler');
+                siklar(s.harf, s.cevap).forEach(function (r) {
+                    const b = yaziEl('button', 'seviye-secim');
+                    b.type = 'button';
+                    b.append(yaziEl('span', 'ss-sol', r), yaziEl('span', 'ss-ok', '→'));
+                    b.onclick = function () {
+                        // Çift tıklamayı engelle: butonlar kapanır, sonra ilerler
+                        secenekler.querySelectorAll('button').forEach(x => x.disabled = true);
+                        const dogruMu = (r === s.cevap);
+                        b.classList.add(dogruMu ? 'dogru' : 'yanlis');
+                        if (dogruMu) { durum.dogruAsamalar.push(s.asama); try { Ses.dogru(); } catch (err) { } }
+                        else { durum.yanlis++; try { Ses.yanlis(); } catch (err) { } }
+                        // Doğru cevabı göster (yanlışsa)
+                        if (!dogruMu) {
+                            secenekler.querySelectorAll('button').forEach(x => {
+                                if (x.textContent.indexOf(s.cevap) === 0) x.classList.add('dogru');
+                            });
+                        }
+                        durum.i++;
+                        setTimeout(soruCiz, 420);
+                    };
+                    secenekler.append(b);
+                });
+
+                // "Emin değilim": sınavı bitirir, sıfırdan başlatır (kullanıcı
+                // zorlanıyorsa boşa uğraşmasın).
+                const bilmiyorum = yaziEl('button', 'seviye-atla', 'Emin değilim, sıfırdan başlayayım');
+                bilmiyorum.type = 'button';
+                bilmiyorum.onclick = function () {
+                    durum.i = SEVIYE_SORULARI.length;
+                    sonucCiz();
+                };
+
+                govde.append(soruNo, harf, soru, secenekler, bilmiyorum);
+            }
+
+            // Sonuç ekranı: "sen şuradan başlamalısın" + doğrudan git
+            function sonucCiz() {
+                ilerlemeIc.style.width = '100%';
+                govde.replaceChildren();
+                baslik.textContent = 'Sonuç hazır!';
+                alt.textContent = 'Cevaplarına göre en uygun başlangıcı seçtim.';
+
+                const sonuc = sinavSonucSeviye(durum.dogruAsamalar);
+                const toplamDogru = durum.dogruAsamalar.length;
+
+                const ozet = yaziEl('div', 'seviye-ozet');
+                ozet.append(
+                    yaziEl('span', 'so-simge', sonuc.seviye > 1 ? '🎯' : '🌱'),
+                    (function () {
+                        const o = yaziEl('div', 'so-orta');
+                        o.append(
+                            yaziEl('b', '', 'Sen ' + sonuc.ad + ' ile başlamalısın'),
+                            yaziEl('small', '', sonuc.aciklama)
+                        );
+                        return o;
+                    })()
+                );
+
+                const puan = yaziEl('p', 'seviye-puan',
+                    SEVIYE_SORULARI.length + ' sorudan ' + toplamDogru + ' tanesini doğru bildin.');
+
+                const git = yaziEl('button', 'seviye-secim vurgulu');
+                git.type = 'button';
+                const sol = yaziEl('span', 'ss-sol');
+                sol.append(yaziEl('b', '', 'Buradan başla'), yaziEl('small', '', 'Dojo haritası açılır, seviyen buraya ayarlanır.'));
+                git.append(sol, yaziEl('span', 'ss-ok', '→'));
+                git.onclick = function () { baslangicSec(sonuc.seviye, perde); };
+
+                // Kullanıcı isterse en baştan da başlayabilir
+                const sifir = yaziEl('button', 'seviye-atla', 'Hayır, sıfırdan başlamak istiyorum');
+                sifir.type = 'button';
+                sifir.onclick = function () { baslangicSec(1, perde); };
+
+                govde.append(ozet, puan, git, sifir);
+            }
+
+            soruCiz();
         }
 
-        // Tek bir seçenek satırı. Tıklanınca başlangıç seviyesi yazılır ve harita yenilenir.
-        function seviyeSecenegi(ad, aciklama, yeniSeviye, kutu, perde) {
-            const b = yaziEl('button', 'seviye-secim');
-            b.type = 'button';
-            const sol = yaziEl('span', 'ss-sol');
-            sol.append(yaziEl('b', '', ad), yaziEl('small', '', aciklama));
-            b.append(sol, yaziEl('span', 'ss-ok', '→'));
-            b.onclick = function () {
-                // ÖNEMLİ: seviye yalnızca İLERİ taşınır; mevcut ilerleme geri alınmaz.
-                if (yeniSeviye > Ilerleme.seviye()) Ilerleme.seviyeYaz(yeniSeviye);
-                seviyeBelirlemeIsaretle();
-                perde.remove();
-                haritaCiz(Ilerleme.seviye());
-                baslat();
-                // Seviye ekranı kapandı: ilk kez gelen kullanıcıya tanıtım turu
-                // şimdi gösterilebilir (ikisi aynı anda açılmıyor).
-                if (window.Tur && Tur.gerekli()) setTimeout(() => Tur.baslat(), 400);
-            };
-            return b;
+        // Seçilen başlangıç dairesini uygula ve haritayı yenile.
+        // ÖNEMLİ: seviye yalnızca İLERİ taşınır; mevcut ilerleme geri alınmaz.
+        function baslangicSec(yeniSeviye, perde) {
+            if (yeniSeviye > Ilerleme.seviye()) Ilerleme.seviyeYaz(yeniSeviye);
+            seviyeBelirlemeIsaretle();
+            if (perde) perde.remove();
+            haritaCiz(Ilerleme.seviye());
+            baslat();
+            // Seviye ekranı kapandı: ilk kez gelen kullanıcıya tanıtım turu
+            // şimdi gösterilebilir (ikisi aynı anda açılmıyor).
+            if (window.Tur && Tur.gerekli()) setTimeout(() => Tur.baslat(), 400);
         }
 
         const isim = Ilerleme.isim();
@@ -589,7 +818,11 @@
             document.getElementById('rutbeKutu').title = rutbe.sonraki ? 'Sonraki rütbe: ' + rutbe.sonraki.ad + ' (' + rutbe.sonraki.min + ' XP)' : 'En yüksek rütbe!';
             document.getElementById('profil').textContent = '🙂 ' + isim;
             document.getElementById('profil').onclick = ilerlemeyiSifirla;
-            document.getElementById('sagMenu').prepend(Ses.buton());
+            // Ses düğmesi TEK KEZ eklenir. baslat() ikinci kez çalıştığında
+            // (seviye sınavı sonrası) yeniden eklenirse üst menüde İKİ ses
+            // düğmesi görünüyordu. Zaten varsa tekrar ekleme.
+            const sagMenu = document.getElementById('sagMenu');
+            if (!sagMenu.querySelector('.ses-anahtar')) sagMenu.prepend(Ses.buton());
 
             // ---------- ÇALIŞMA PLANI ----------
             // "Bugün ne çalışayım" sorusunu yanıtlar. En önemli 3 adım.
@@ -614,12 +847,16 @@
             // Maskot kullanıcının GERÇEK durumuna göre konuşur (ogut.js).
             // ÖNEMLİ: Görüntülemeden ÖNCE çağrılıp sonra ziyaret kaydedilir;
             // böylece "kaç gündür gelmedi" hesabı doğru çıkar.
+            //
+            // ÖNEMLİ (TEK BALON): Öğüt AYRI bir balona yazılmaz. Eskiden ana
+            // balonun altına ikinci bir "ogut-balon" ekleniyordu; ekranda üst
+            // üste iki konuşma balonu görünüyor ve aynı karşılama iki kez
+            // okunuyordu. Artık öğüt, ANA balonun metni olur: tek balon kalır.
             if (window.Ogut) {
                 try {
                     const o = Ogut.soyle();
-                    const balon = document.getElementById('ogutBalon');
+                    const balon = document.getElementById('balon');
                     if (balon && o && o.metin) {
-                        balon.hidden = false;
                         balon.replaceChildren(
                             yaziEl('span', 'ob-simge', o.simge || '🗺️'),
                             document.createTextNode(o.metin)
@@ -646,9 +883,9 @@
             }
 
             // Tanıtım: ❓ butonu istendiğinde açar; ilk kez gelen kullanıcıya kendiliğinden gösterilir.
-            // ÖNEMLİ: Seviye belirleme ekranı AÇIKSA tur hemen başlatılmaz; ikisi üst üste
-            // binerse kullanıcı seviye seçeneğine tıklayamıyordu. Tur, seviye ekranı
-            // kapandıktan sonra başlar (seviyeSecenegi içinde tetiklenir).
+            // ÖNEMLİ: Seviye belirleme sınavı AÇIKSA tur hemen başlatılmaz; ikisi üst üste
+            // binerse kullanıcı sınav şıkkına tıklayamıyordu. Tur, sınav ekranı
+            // kapandıktan sonra başlar (baslangicSec içinde tetiklenir).
             document.getElementById('yardim').onclick = () => Tur.ac();
             if (Tur.gerekli() && !document.querySelector('.seviye-perde')) {
                 setTimeout(() => Tur.baslat(), 700);
@@ -666,6 +903,26 @@
             [statBtn, ayarBtn, alanBtn].forEach(b => b.addEventListener('keydown', e => {
                 if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); b.click(); }
             }));
+
+            // ---------- SESSİZ BUTON KORUMASI ----------
+            // Üst menüde role="button" olup HİÇBİR işleyicisi olmayan ikon
+            // kalırsa (yeni bir ikon eklenip bağlanması unutulursa), o ikon
+            // sessizce ölü kalmasın: tıklanınca "yakında" uyarısı versin.
+            // Kullanıcı bildirimi: "tıklanamayan görünmez buton olarak kalmasın".
+            Array.prototype.forEach.call(
+                document.getElementById('sagMenu').querySelectorAll('[role="button"]'),
+                function (b) {
+                    // onclick özelliği de addEventListener da olabilir; ikisini de kontrol et
+                    if (b.onclick || b.dataset.bagli === '1') return;
+                    b.dataset.bagli = '1';
+                    b.addEventListener('click', function () {
+                        alert('Bu özellik çok yakında! 🚧 Şimdilik dojo haritasından devam edebilirsin.');
+                    });
+                    b.addEventListener('keydown', function (e) {
+                        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); b.click(); }
+                    });
+                }
+            );
 
             const biten = Math.min(seviye - 1, oynanabilir);
             document.getElementById('gorevBar').style.width = (biten / oynanabilir * 100) + '%';
@@ -689,10 +946,17 @@
             else if (tekrarSayisi >= 3) konusma = tekrarSayisi + ' harf tekrar bekliyor. Kısa bir tekrar iyi gelir!';
             document.getElementById('balon').textContent = konusma;
 
+            // ---------- CHIBI (SAĞ PANEL MASKOTU) ----------
+            // ÖNEMLİ: baslat() sayfa açılışında VE seviye sınavı bittikten sonra
+            // çağrılır. Eskiden burada sadece "append" vardı; alan temizlenmediği
+            // için ikinci çağrıda ÜST ÜSTE İKİ chibi görünüyordu (kullanıcı
+            // bildirimi: "aynı chibi karakteri iki kez görünüyor").
+            // Çözüm: önce alanı boşalt, sonra tek görseli ekle.
             const alan = document.getElementById('chibiAlan');
+            alan.replaceChildren();
             const img = document.createElement('img');
             img.className = 'chibi'; img.src = chibi; img.alt = 'Sensei';
-img.onerror = () => { alan.innerHTML = '<div class="chibi-emoji">🙂</div>'; };
+            img.onerror = () => { alan.innerHTML = '<div class="chibi-emoji">🙂</div>'; };
             alan.append(img);
 
             tekrarKutusu(tekrarSayisi);
@@ -758,6 +1022,9 @@ uyari.textContent = '🔁 ' + zor.length + ' kelime tekrar bekliyor';
 
         function tekrarKutusu(sayi) {
             const kutu = document.getElementById('tekrarKutu');
+            // baslat() birden fazla kez çalışabilir (açılış + seviye sınavı sonrası).
+            // Temizlemezsek başlık ve düğme her seferinde bir kez daha eklenir.
+            kutu.replaceChildren();
 kutu.append(yaziEl('h4', '', '🔁 Tekrar'));
             const btn = yaziEl('button', 'tekrar-btn');
             if (sayi > 0) {
@@ -1197,7 +1464,10 @@ if (ders.reading === 'dikte') return '🔊 Dinle ve romaji yaz';
             k.title = 'Çıkış yap (ilerlemen silinmez)';
             k.setAttribute('role', 'button');
             k.setAttribute('tabindex', '0');
-k.textContent = '🗺️';
+            k.setAttribute('aria-label', 'Çıkış yap');
+            // İkon: kapı/çıkış. Eskiden 🗺️ (harita) kullanılıyordu; haritayla
+            // hiç ilgisi olmayan bu simge kullanıcıyı şaşırtıyordu.
+            k.textContent = '🚪';
             k.onclick = function () {
                 if (confirm('Çıkış yapılsın mı? İlerlemen silinmez; tekrar girince kaldığın yerden devam edersin.')) {
                     cikisYap();

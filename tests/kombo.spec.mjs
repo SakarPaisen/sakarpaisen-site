@@ -243,16 +243,21 @@ test.describe('Sensei öğüdü', () => {
     expect(d.metin.length, 'Boş cümle olmamalı').toBeGreaterThan(10);
   });
 
-  test('dojo sayfasında öğüt balonu görünür', async ({ page }) => {
+  test('dojo sayfasında Sensei öğüdü ana balonda görünür', async ({ page }) => {
     await kayitYaz(page, { isim: 'Ali', seviye: 99 });
     await page.evaluate(() => { localStorage.setItem('sakar_tur', '1'); });
     await page.goto('/dojo.html');
     await page.waitForTimeout(2500);
 
-    const balon = page.locator('#ogutBalon');
+    // Öğüt artık AYRI bir balona değil, ana konuşma balonuna yazılır.
+    // (Eskiden iki balon üst üste çıkıyordu; tek balona indirildi.)
+    const balon = page.locator('#balon');
     await expect(balon).toBeVisible();
     const metin = await balon.textContent();
     expect(metin.length, 'Balon boş olmamalı').toBeGreaterThan(5);
+
+    // İkinci bir öğüt balonu KALMAMALI: tekrar eden konuşma balonu yok.
+    expect(await page.locator('#ogutBalon').count(), 'İkinci balon kaldırılmalıydı').toBe(0);
   });
 
   test('ziyaret tarihi kaydedilir (bir sonraki giriş için)', async ({ page }) => {

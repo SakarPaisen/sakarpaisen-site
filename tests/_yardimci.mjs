@@ -8,7 +8,12 @@
 //   - localStorage'ı oku (kalıcı veriler orada)
 //   - Gerekiyorsa evaluateEval() ile dosya kapsamındaki isme eriş
 
-/** Kayıt yaz (dojo/oyun sayfaları kayıt olmadan index.html'e atar). */
+/** Kayıt yaz (dojo/oyun sayfaları kayıt olmadan index.html'e atar).
+ *
+ * ÖNEMLİ: Seviye belirleme sınavı yalnızca HİÇ ilerlememiş, yeni kullanıcıya
+ * çıkar. Testler "var olan bir kullanıcı"yı taklit ettiği için bayrağı da
+ * yazıyoruz; aksi hâlde sınav ekranı açılıp diğer öğelerin (ör. tanıtım turu)
+ * tıklanmasını engelliyordu. */
 export async function kayitYaz(page, { isim = 'Test Kullanıcı', seviye = 1, xp = 0, bilgi = 'yok' } = {}) {
   await page.goto('/index.html');
   await page.evaluate(([i, s, x, b]) => {
@@ -16,6 +21,7 @@ export async function kayitYaz(page, { isim = 'Test Kullanıcı', seviye = 1, xp
     localStorage.setItem('sakar_seviye', String(s));
     localStorage.setItem('sakar_xp', String(x));
     localStorage.setItem('sakar_bilgi', b);
+    localStorage.setItem('sakar_seviye_soruldu', '1');
   }, [isim, seviye, xp, bilgi]);
 }
 

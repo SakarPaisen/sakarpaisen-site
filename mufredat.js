@@ -58,7 +58,7 @@ const MUFREDAT = [
   { id: 24,baslik: "Bileşik: H ve M", tip: "ders", grup: 'y:hya', harfler: ['hya','hyu','hyo','mya','myu','myo'] },
   { id: 25,baslik: "Bileşik: R sesleri", tip: "ders", grup: 'y:rya', harfler: ['rya','ryu','ryo'] },
   { id: 26,baslik: "Test: Bileşik sesler", tip: "test", kapsam: 'hepsi', soru: 16, can: 4, xp: 80 },
-  { id: 27,baslik: "👺 Türev Sınavı", tip: "boss", kapsam: 'hepsi', soru: 24, can: 5, xp: 160 },
+  { id: 27,baslik: "👺 Hiragana Ustası", tip: "boss", kapsam: 'hepsi', soru: 24, can: 5, xp: 160 },
 
   // ============================================================
   // BÖLÜM 3: KATAKANA TEMEL

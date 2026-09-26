@@ -48,6 +48,25 @@ body { overflow-x: hidden; }
 .profil:active { transform: translateY(3px); box-shadow: none; }
 .ses-anahtar { color: var(--yazi) !important; }
 
+/* ============================================================
+   TIKLANABİLİR ÜST MENÜ İKONLARI
+
+   NEDEN: Üst sağdaki ikonlar (🧰 📊 ⚙️ 🗺️) gerçekten çalışıyordu
+   ama imleç "auto" olduğu ve hover geri bildirimi bulunmadığı için
+   DÜZ YAZI gibi duruyorlardı. Kullanıcı "bu ikonlar tıklanmıyor"
+   diye bildirdi. Bu kural, tıklanabilir olan her kutuya el imleci ve
+   basılabilir görünüm verir.
+   ============================================================ */
+.stat-kutu[role="button"] {
+  cursor: pointer;
+  transition: transform .12s, border-color .15s, box-shadow .12s, color .15s;
+  box-shadow: 0 3px 0 var(--cizgi);
+}
+.stat-kutu[role="button"]:hover { transform: translateY(-2px); border-color: var(--mor); color: var(--mor); }
+.stat-kutu[role="button"]:active { transform: translateY(3px); box-shadow: none; }
+/* Klavye ile gezinirken hangi ikonda olduğun belli olsun (erişilebilirlik) */
+.stat-kutu[role="button"]:focus-visible { outline: 3px solid var(--mor); outline-offset: 2px; }
+
 /* Dojo'da destek e-posta adresi (footer) */
 .git-not { text-align: center; padding: 18px 14px 26px; font-size: 12.5px; color: var(--yazi-soluk); font-weight: 600; }
 .git-not a { color: var(--mor); font-weight: 800; text-decoration: none; }

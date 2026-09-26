@@ -155,7 +155,7 @@
             if (!sonuc.length) {
                 const b = el('div', 'bos');
                 b.append(
-                    el('div', 'simge', '🔎')/g,
+                    el('div', 'simge', '🔎'),
                     el('h3', '', '\"' + q + '\" bulunamadı'),
                     el('p', '', 'Farklı bir yazım dene: romaji (ka), Japonca (あ) veya Türkçe anlam.')
                 );
@@ -183,7 +183,7 @@
                 );
                 // Harfler için dinleme düğmesi (öğrenmeye doğrudan katkı)
                 if (x.tur === 'harf') {
-                    const ses = el('button', 's-tur', 'gY"S');
+                    const ses = el('button', 's-tur', '🔊');
                     ses.title = 'Dinle';
                     ses.onclick = (ev) => {
                         ev.preventDefault();   // bağlantıyı açma
@@ -203,7 +203,7 @@
             kok.replaceChildren();
             const b = el('div', 'bos');
             b.append(
-                el('div', 'simge', '🔎')/g,
+                el('div', 'simge', '🔎'),
                 el('h3', '', 'Ne aramak istersin?'),
                 el('p', '', s.harf + ' harf · ' + s.kelime + ' kelime · ' + s.kanji +
                     ' kanji · ' + s.defter + ' defter kaydı aranabilir.')
