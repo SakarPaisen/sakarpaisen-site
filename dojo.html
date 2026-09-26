@@ -79,8 +79,14 @@
                                  border-radius: 999px; transition: width .3s; }
 
         .seviye-govde { display: flex; flex-direction: column; gap: 12px; }
-        .seviye-soru-no { font-size: 12px; font-weight: 800; color: var(--yazi-soluk);
+        /* Soru numarası satırı: solda "Soru N", sağda canlı seviye tahmini */
+        .seviye-soru-no { display: flex; align-items: center; justify-content: space-between;
+                          gap: 10px; font-size: 12px; font-weight: 800; color: var(--yazi-soluk);
                           text-transform: uppercase; letter-spacing: .6px; }
+        .seviye-tahmin { text-transform: none; letter-spacing: 0; font-size: 11.5px;
+                         padding: 4px 10px; border-radius: 999px; white-space: nowrap;
+                         background: color-mix(in srgb, var(--mor) 10%, var(--zemin-2));
+                         color: var(--mor); border: 1.5px solid color-mix(in srgb, var(--mor) 25%, var(--cizgi)); }
         /* Sorulan harf: büyük ve net */
         .seviye-harf { font-size: 74px; line-height: 1; text-align: center;
                        font-weight: 800; color: var(--yazi); margin: 6px 0 2px; }
@@ -435,25 +441,62 @@
         // almaz. Yani kötü bir sınav ilerlemeyi bozamaz.
         // ============================================================
 
-        // Sınav soruları: kolaydan zora. Her adım bir "basamak"tır.
-        //   asama 1-2 : Hiragana temel (bilinmiyorsa sıfırdan başlar)
-        //   asama 3   : Hiragana türev (dakuten/youon)
-        //   asama 4   : Katakana temel
-        //   asama 5   : Katakana türev
-        // Romaji -> doğru cevap; çeldiriciler KANA'dan üretilir.
-        const SEVIYE_SORULARI = [
-            { harf: 'h:a',   cevap: 'a',   asama: 1 },
-            { harf: 'h:ka',  cevap: 'ka',  asama: 1 },
-            { harf: 'h:shi', cevap: 'shi', asama: 2 },
-            { harf: 'h:tsu', cevap: 'tsu', asama: 2 },
-            { harf: 'h:ga',  cevap: 'ga',  asama: 3 },
-            { harf: 'h:kya', cevap: 'kya', asama: 3 },
-            { harf: 'k:a',   cevap: 'a',   asama: 4 },
-            { harf: 'k:ka',  cevap: 'ka',  asama: 4 },
-            { harf: 'k:shi', cevap: 'shi', asama: 4 },
-            { harf: 'k:ga',  cevap: 'ga',  asama: 5 },
-            { harf: 'k:kya', cevap: 'kya', asama: 5 }
-        ];
+        // ============================================================
+        // SEVİYE BELİRLEME SINAVI (ADAPTİF)
+        //
+        // NEDEN SINAV: Eskiden ekran "şuradan başla / buradan başla" diyen
+        // uzun bir liste sunuyordu. Kullanıcıya HİÇ SORULMUYORDU; hangi
+        // seviyede olduğunu tahmin etmek zorundaydı.
+        //
+        // NEDEN ADAPTİF: İlk sürüm SABİT 11 soru soruyordu. Bilen biri için
+        // 11 soru sıkıcı, bilmeyen için 11 soru moral bozucuydu. Adaptif
+        // sürümde soru sayısı kullanıcıya göre 3-7 arasında değişir ve
+        // doğru/yanlış zincirine göre erken biter.
+        //
+        // MANTIK:
+        //   • Zorluk 1'den başlar (en kolay harf).
+        //   • Doğru cevap → zorluk +1 (daha zor soru)
+        //   • Yanlış cevap → zorluk -1 (daha kolay soru)
+        //   • 2 ardışık yanlış VEYA 3 ardışık doğru → sınav biter (erken çıkış)
+        //   • En fazla 7 soru sorulur (güvenlik sınırı)
+        //
+        // GÜVENLİK: Sonuç yalnızca BAŞLANGIÇ noktasını ileri taşır; geriye
+        // almaz. Yani kötü bir sınav ilerlemeyi bozamaz.
+        // ============================================================
+
+        // ZORLUK BASAMAKLARI: kolaydan zora. Her basamak bir "seviye"yi
+        // temsil eder; sınav sonucu en yüksek ULAŞILAN basamağa göre verilir.
+        //   basamak 1 : Hiragana temel (あ か)
+        //   basamak 2 : Hiragana zor harfler (し つ ふ)
+        //   basamak 3 : Hiragana türev (が きゃ)
+        //   basamak 4 : Katakana temel (ア カ シ)
+        //   basamak 5 : Katakana türev (ガ キャ)
+        const ZORLUK_SORULARI = {
+            1: [
+                { harf: 'h:a', cevap: 'a' }, { harf: 'h:i', cevap: 'i' },
+                { harf: 'h:ka', cevap: 'ka' }, { harf: 'h:o', cevap: 'o' }
+            ],
+            2: [
+                { harf: 'h:shi', cevap: 'shi' }, { harf: 'h:tsu', cevap: 'tsu' },
+                { harf: 'h:fu', cevap: 'fu' }, { harf: 'h:chi', cevap: 'chi' }
+            ],
+            3: [
+                { harf: 'h:ga', cevap: 'ga' }, { harf: 'h:kya', cevap: 'kya' },
+                { harf: 'h:ja', cevap: 'ja' }, { harf: 'h:pa', cevap: 'pa' }
+            ],
+            4: [
+                { harf: 'k:a', cevap: 'a' }, { harf: 'k:ka', cevap: 'ka' },
+                { harf: 'k:shi', cevap: 'shi' }, { harf: 'k:tsu', cevap: 'tsu' }
+            ],
+            5: [
+                { harf: 'k:ga', cevap: 'ga' }, { harf: 'k:kya', cevap: 'kya' },
+                { harf: 'k:ja', cevap: 'ja' }, { harf: 'k:pa', cevap: 'pa' }
+            ]
+        };
+        const EN_ZOR_BASAMAK = 5;
+        const EN_FAZLA_SORU = 7;      // güvenlik sınırı (sonsuz döngü olmasın)
+        const ARDISIK_DOGRU_BITIS = 3;  // 3 doğru üst üste → yeterince biliyor
+        const ARDISIK_YANLIS_BITIS = 2; // 2 yanlış üst üste → daha fazla zorlamayalım
 
         // Bir soru için 4 şık üret: doğru cevap + 3 farklı çeldirici.
         // Çeldiriciler aynı alfabeden seçilir ki soru "hangi yazı" testine
@@ -481,39 +524,31 @@
         }
 
         // Sınav sonucuna göre başlangıç dairesini bul.
-        // Mantık: en yüksek DOĞRU cevaplanan basamağa kadar "biliyor" sayılır
-        // ve o bölümün başındaki daire başlangıç olur. Hiç doğru yoksa 1. daire.
+        // Ulaşılan EN YÜKSEK basamak belirleyicidir.
         //
         // ÖNEMLİ (ÜST SINIR): Sınav YALNIZCA harf tanımayı ölçer. Bu yüzden
         // sonuç asla okuma/kanji bölümlerine atlamaz; en fazla "İki Alfabe"
-        // bölümünün başına (id 54) kadar ileri gider. Aksi hâlde 11 soruyu
-        // doğru yapan biri kendini okuma derslerinde buluyordu.
-        function sinavSonucSeviye(dogruAsamalar) {
-            if (!dogruAsamalar.length) {
-                return { seviye: 1, ad: 'Sıfırdan başla', aciklama: 'İlk harften başlayıp sırayla ilerleyeceksin.' };
+        // bölümünün başına kadar ileri gider.
+        function sinavSonucSeviye(ulasilanBasamak) {
+            if (!ulasilanBasamak || ulasilanBasamak <= 1) {
+                return { seviye: 1, ad: 'Sıfırdan başla', aciklama: 'Temelleri baştan sağlam kuralım.', basamak: 1 };
             }
-            const enIyi = Math.max.apply(null, dogruAsamalar);
-
-            // Hiragana temel bitti -> Hiragana türevlerinden devam
-            if (enIyi <= 1) {
-                return { seviye: 1, ad: 'Sıfırdan başla', aciklama: 'Temelleri baştan sağlam kuralım.' };
-            }
-            if (enIyi === 2) {
+            if (ulasilanBasamak === 2) {
                 const ilk = MUFREDAT.find(m => m.grup === 'g:ga');   // Hiragana türevleri
-                if (ilk) return { seviye: ilk.id, ad: 'Hiragana · ' + ilk.baslik, aciklama: 'Hiragana temelini biliyorsun; türev seslerden devam edelim.' };
+                if (ilk) return { seviye: ilk.id, ad: 'Hiragana · ' + ilk.baslik, aciklama: 'Hiragana temelini biliyorsun; türev seslerden devam edelim.', basamak: 2 };
             }
-            if (enIyi === 3) {
-                const katakanaBas = MUFREDAT.find(m => m.alfabe === 'k' && m.tip === 'ders');   // Katakana temel
-                if (katakanaBas) return { seviye: katakanaBas.id, ad: 'Katakana · ' + katakanaBas.baslik, aciklama: 'Hiragana’yı biliyorsun; Katakana’ya geçelim.' };
+            if (ulasilanBasamak === 3) {
+                const katakanaBas = MUFREDAT.find(m => m.alfabe === 'k' && m.tip === 'ders');
+                if (katakanaBas) return { seviye: katakanaBas.id, ad: 'Katakana · ' + katakanaBas.baslik, aciklama: 'Hiragana’yı biliyorsun; Katakana’ya geçelim.', basamak: 3 };
             }
-            if (enIyi === 4) {
+            if (ulasilanBasamak === 4) {
                 const k = MUFREDAT.find(m => m.alfabe === 'k' && m.grup === 'g:ga');   // Katakana türevleri
-                if (k) return { seviye: k.id, ad: 'Katakana · ' + k.baslik, aciklama: 'Katakana temelini de biliyorsun; türev seslerden devam.' };
+                if (k) return { seviye: k.id, ad: 'Katakana · ' + k.baslik, aciklama: 'Katakana temelini de biliyorsun; türev seslerden devam.', basamak: 4 };
             }
             // En iyi: iki alfabeyi de biliyor -> "İki Alfabe" bölümünün başı
             const ikiAlfabe = MUFREDAT.find(m => m.bolum === 'İki Alfabe');
-            if (ikiAlfabe) return { seviye: ikiAlfabe.id, ad: 'İki Alfabe · ' + ikiAlfabe.baslik, aciklama: 'İki alfabeyi de biliyorsun; karşılıklı eşleştirmeyle pekiştirelim.' };
-            return { seviye: 1, ad: 'Sıfırdan başla', aciklama: 'İlk harften başlayıp sırayla ilerleyeceksin.' };
+            if (ikiAlfabe) return { seviye: ikiAlfabe.id, ad: 'İki Alfabe · ' + ikiAlfabe.baslik, aciklama: 'İki alfabeyi de biliyorsun; karşılıklı eşleştirmeyle pekiştirelim.', basamak: 5 };
+            return { seviye: 1, ad: 'Sıfırdan başla', aciklama: 'İlk harften başlayıp sırayla ilerleyeceksin.', basamak: 1 };
         }
 
         function seviyeBelirlemeAc() {
@@ -527,11 +562,23 @@
             kutu.setAttribute('aria-label', 'Seviye belirleme sınavı');
 
             // Sınav durumu
-            const durum = { i: 0, dogruAsamalar: [], yanlis: 0 };
+            const durum = {
+                i: 0,
+                dogru: 0,
+                basamak: 1,          // şu anki zorluk
+                ulasilan: 1,         // ulaşılan en yüksek basamak (sonucu belirler)
+                ardisikDogru: 0,
+                ardisikYanlis: 0,
+                bitti: false,
+                sorulan: {},         // aynı harfi iki kez sormayalım
+                // Sınav boyunca gösterilecek sabit soru listesi DEĞİL;
+                // her soru bir önceki cevaba göre anında seçilir.
+                gecmis: []
+            };
 
             const baslik = yaziEl('h2', 'seviye-baslik', 'Seviyeni belirleyelim');
             const alt = yaziEl('p', 'seviye-alt',
-                'Birkaç kısa soru soracağım; doğru bildiğin yerden başlarsın. ' +
+                'Birkaç kısa soru soracağım; bildiğin yerden başlarsın. ' +
                 'Bilmiyorsan “Emin değilim” de, seni sıfırdan başlatayım.');
 
             const govde = yaziEl('div', 'seviye-govde');
@@ -543,19 +590,43 @@
             perde.append(kutu);
             document.body.append(perde);
 
+            // Basamağa uygun, henüz sorulmamış bir soru seç
+            function soruSec(basamak) {
+                const havuz = ZORLUK_SORULARI[basamak] || ZORLUK_SORULARI[1];
+                const kalan = havuz.filter(s => !durum.sorulan[s.harf]);
+                const kaynak = kalan.length ? kalan : havuz;
+                const soru = kaynak[Math.floor(Math.random() * kaynak.length)];
+                durum.sorulan[soru.harf] = true;
+                return soru;
+            }
+
+            // Basamağın okunabilir adı (canlı tahmin etiketi için)
+            function tahminMetni(basamak) {
+                if (basamak <= 1) return '🌱 Sıfırdan başlıyoruz';
+                if (basamak === 2) return '🌿 Hiragana temeli biliyorsun';
+                if (basamak === 3) return '🌳 Hiragana türevleri biliyorsun';
+                if (basamak === 4) return '🎌 Katakana temeli biliyorsun';
+                return '🏆 İki alfabeyi de biliyorsun';
+            }
+
             // Soru ekranını çiz
             function soruCiz() {
-                ilerlemeIc.style.width = Math.round(durum.i / SEVIYE_SORULARI.length * 100) + '%';
+                // İlerleme: erken çıkış olabileceği için "soru N" gösterilir,
+                // çubuk ise ulaşılan zorluk seviyesini yansıtır.
+                ilerlemeIc.style.width = Math.round(durum.basamak / EN_ZOR_BASAMAK * 100) + '%';
                 govde.replaceChildren();
 
-                if (durum.i >= SEVIYE_SORULARI.length) { sonucCiz(); return; }
+                if (durum.bitti) { sonucCiz(); return; }
 
-                const s = SEVIYE_SORULARI[durum.i];
+                const s = soruSec(durum.basamak);
                 const e = KANA[s.harf];
-                if (!e) { durum.i++; soruCiz(); return; }
+                if (!e) { durum.bitti = true; sonucCiz(); return; }
 
-                const soruNo = yaziEl('div', 'seviye-soru-no',
-                    'Soru ' + (durum.i + 1) + ' / ' + SEVIYE_SORULARI.length);
+                const soruNo = yaziEl('div', 'seviye-soru-no', 'Soru ' + (durum.i + 1));
+                // CANLI SEVİYE TAHMİNİ: kullanıcı ilerlediğini görsün.
+                // Sınav "nerede olduğumu bilmiyorum" hissi vermesin.
+                const tahmin = yaziEl('span', 'seviye-tahmin', tahminMetni(durum.basamak));
+                soruNo.append(tahmin);
                 const harf = yaziEl('div', 'seviye-harf', e.j);
                 harf.setAttribute('lang', 'ja');
                 const soru = yaziEl('p', 'seviye-soru', 'Bu harfin okunuşu hangisi?');
@@ -570,26 +641,47 @@
                         secenekler.querySelectorAll('button').forEach(x => x.disabled = true);
                         const dogruMu = (r === s.cevap);
                         b.classList.add(dogruMu ? 'dogru' : 'yanlis');
-                        if (dogruMu) { durum.dogruAsamalar.push(s.asama); try { Ses.dogru(); } catch (err) { } }
-                        else { durum.yanlis++; try { Ses.yanlis(); } catch (err) { } }
-                        // Doğru cevabı göster (yanlışsa)
                         if (!dogruMu) {
+                            // Doğru cevabı da göster ki kullanıcı öğrensin
                             secenekler.querySelectorAll('button').forEach(x => {
                                 if (x.textContent.indexOf(s.cevap) === 0) x.classList.add('dogru');
                             });
                         }
+                        try { dogruMu ? Ses.dogru() : Ses.yanlis(); } catch (err) { }
+
+                        durum.gecmis.push({ basamak: durum.basamak, dogru: dogruMu });
                         durum.i++;
-                        setTimeout(soruCiz, 420);
+
+                        if (dogruMu) {
+                            durum.dogru++;
+                            durum.ardisikDogru++;
+                            durum.ardisikYanlis = 0;
+                            durum.basamak = Math.min(EN_ZOR_BASAMAK, durum.basamak + 1);
+                            durum.ulasilan = Math.max(durum.ulasilan, durum.basamak);
+                        } else {
+                            durum.ardisikYanlis++;
+                            durum.ardisikDogru = 0;
+                            durum.basamak = Math.max(1, durum.basamak - 1);
+                        }
+
+                        // ERKEN ÇIKIŞ: yeterince bilgi toplandı mı?
+                        if (durum.ardisikDogru >= ARDISIK_DOGRU_BITIS ||
+                            durum.ardisikYanlis >= ARDISIK_YANLIS_BITIS ||
+                            durum.i >= EN_FAZLA_SORU) {
+                            durum.bitti = true;
+                        }
+
+                        setTimeout(soruCiz, 480);
                     };
                     secenekler.append(b);
                 });
 
-                // "Emin değilim": sınavı bitirir, sıfırdan başlatır (kullanıcı
-                // zorlanıyorsa boşa uğraşmasın).
+                // "Emin değilim": sınavı bitirir, sıfırdan başlatır
                 const bilmiyorum = yaziEl('button', 'seviye-atla', 'Emin değilim, sıfırdan başlayayım');
                 bilmiyorum.type = 'button';
                 bilmiyorum.onclick = function () {
-                    durum.i = SEVIYE_SORULARI.length;
+                    durum.ulasilan = 1;
+                    durum.bitti = true;
                     sonucCiz();
                 };
 
@@ -603,8 +695,7 @@
                 baslik.textContent = 'Sonuç hazır!';
                 alt.textContent = 'Cevaplarına göre en uygun başlangıcı seçtim.';
 
-                const sonuc = sinavSonucSeviye(durum.dogruAsamalar);
-                const toplamDogru = durum.dogruAsamalar.length;
+                const sonuc = sinavSonucSeviye(durum.ulasilan);
 
                 const ozet = yaziEl('div', 'seviye-ozet');
                 ozet.append(
@@ -620,7 +711,7 @@
                 );
 
                 const puan = yaziEl('p', 'seviye-puan',
-                    SEVIYE_SORULARI.length + ' sorudan ' + toplamDogru + ' tanesini doğru bildin.');
+                    durum.i + ' sorudan ' + durum.dogru + ' tanesini doğru bildin.');
 
                 const git = yaziEl('button', 'seviye-secim vurgulu');
                 git.type = 'button';

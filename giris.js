@@ -70,12 +70,18 @@
         // hero metni ekranda kalır, akış balonu ayrıca yazılır. Yine de hero'nun
         // daktilo efekti hâlâ dönüyorsa durdurulur (aşağıdaki konusAnimasyonDurdur).
         konusAnimasyonDurdur();
+        // ÖNEMLİ: ÖNCEKİ balon yazımı da durdurulmalı. Eskiden burada sadece
+        // hero yazısı durduruluyordu; balonun kendi zamanlayıcısı hâlâ dönüyorsa
+        // iki setInterval AYNI #balon'a yazıyor ve ESKİ metin kazanıyordu.
+        // (Bu hata misafir girişinde yakalandı: balon "Google ile giriş yap"
+        //  yazısında takılı kalıyordu.)
+        if (yaziZamanlayici) { clearInterval(yaziZamanlayici); yaziZamanlayici = null; }
         balon.textContent = '';
         balon.classList.remove('konusuyor');
         let i = 0;
         yaziZamanlayici = setInterval(() => {
             balon.textContent = metin.slice(0, ++i);
-            if (i >= metin.length) { clearInterval(yaziZamanlayici); if (bitince) bitince(); }
+            if (i >= metin.length) { clearInterval(yaziZamanlayici); yaziZamanlayici = null; if (bitince) bitince(); }
         }, 28);
     }
     // Hero konuşması ile akış balonu AYRI ögeler (#heroKonusma / #balon), ama
@@ -214,6 +220,14 @@
                 });
         };
         panelGoster(bas, kullanimNotu());
+
+        // MİSAFİR SEÇENEĞİ: Google hesabı olmayan ya da hesabını bağlamak
+        // istemeyen kullanıcı buradan tek dokunuşla başlayabilir. Aksi hâlde
+        // Google tek yol olur ve o kullanıcı siteyi tamamen kaybederiz.
+        const misafir = el('button', 'metin-btn', 'Misafir olarak devam et →');
+        misafir.type = 'button';
+        misafir.onclick = () => adimMisafir();
+        panel.appendChild(misafir);
     }
 
     function kullanimNotu() {
@@ -750,7 +764,36 @@
         };
         btn.onclick = gonder;
         kutu.addEventListener('keydown', e => { if (e.key === 'Enter') gonder(); });
-        panelGoster(kutu, hata, btn);
+
+        // MİSAFİR GİRİŞİ: adını yazmak istemeyen kullanıcıyı zorlamayalım.
+        // En sık bırakma noktası bir form doldurmaktır; isim yazdırmak
+        // yerine tek dokunuşla başlatmak dönüşümü belirgin artırır.
+        // İlerleme yine bu cihazda saklanır; misafir de tam oynayabilir.
+        const misafir = el('button', 'metin-btn', 'Misafir olarak devam et →');
+        misafir.type = 'button';
+        misafir.onclick = () => adimMisafir();
+
+        panelGoster(kutu, hata, btn, misafir);
         setTimeout(() => kutu.focus(), 400);
+    }
+
+    // ---------- Misafir: isim sormadan başlat ----------
+    // NOT: Misafire rastgele bir takma ad verilir (ör. "Misafir 42"). Böylece
+    // ilerleme/seri sistemleri isim bekleyen yerlerde sorunsuz çalışır ve
+    // kullanıcı adını sonradan ayarlardan değiştirebilir.
+    function adimMisafir() {
+        const takmaAd = 'Misafir ' + (Math.floor(Math.random() * 900) + 100);
+        zipla();
+        Ses.hosgeldin();
+        kayitYaz(takmaAd);
+        // Misafir bayrağı: arayüz "misafir" olduğunu bilip ona göre
+        // davranabilsin (ör. bulut kaydı önermemek için).
+        try { localStorage.setItem('sakar_misafir', '1'); } catch (e) { }
+
+        konus('Hoş geldin! Misafir olarak başlıyorsun. İlerlemen bu cihazda saklanır 🥋');
+        const devam = el('button', 'buyuk-btn', 'DOJO\'YA GİR 🥋');
+        devam.onclick = () => window.location.href = DOJO_ADRESI;
+        panelGoster(devam);
+        panel.appendChild(kullanimNotu());
     }
 })();
